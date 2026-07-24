@@ -350,11 +350,13 @@
     document.getElementById('overlay').classList.add('show');
 
     try {
+      // URLSearchParams形式で送信（application/x-www-form-urlencodedはCORSの制約を受けない）
+      const params = new URLSearchParams();
+      Object.entries(payload).forEach(([k, v]) => params.append(k, String(v)));
       await fetch(GAS_URL, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' }, // no-corsではtext/plainが必須
-        body: JSON.stringify(payload)
+        body: params
       });
       // no-cors では成功判定不可のため，fetch が完了したら成功とみなす
       document.getElementById('overlay').classList.remove('show');
