@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>研究参加者募集 | 運動・血糖値・こころの関係を調べる研究</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:   #1A2340;
+    --green:  #2EAA6E;
+    --green-light: #EBF7F2;
+    --amber:  #E8973A;
+    --gray:   #8A94A6;
+    --gray-light: #F4F6FA;
+    --white:  #FFFFFF;
+    --text:   #1A2340;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--text);
+    background: var(--white);
+    line-height: 1.8;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(26,35,64,0.95);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5%;
+    height: 60px;
+  }
+  .nav-logo {
+    color: var(--white);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+  }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    color: rgba(255,255,255,0.75);
+    text-decoration: none;
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--green); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    background: var(--navy);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 80px 5% 60px;
+    position: relative; overflow: hidden;
+  }
+
+  /* SVG wave signature element */
+  .hero-wave {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 180px; opacity: 0.18;
+  }
+
+  .hero-eyebrow {
+    color: var(--green);
+    font-size: 0.78rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1.4rem;
+    font-weight: 500;
+  }
+
+  .hero-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    color: var(--white);
+    text-align: center;
+    line-height: 1.5;
+    max-width: 720px;
+    margin-bottom: 1.4rem;
+  }
+
+  .hero-title span { color: var(--green); }
+
+  .hero-sub {
+    color: rgba(255,255,255,0.65);
+    font-size: 0.95rem;
+    text-align: center;
+    max-width: 540px;
+    margin-bottom: 2.6rem;
+    line-height: 1.9;
+  }
+
+  .btn-primary {
+    background: var(--green);
+    color: var(--white);
+    border: none; cursor: pointer;
+    padding: 0.85rem 2.4rem;
+    border-radius: 2px;
+    font-size: 0.9rem;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    display: inline-block;
+    transition: background .2s, transform .15s;
+  }
+  .btn-primary:hover { background: #269960; transform: translateY(-1px); }
+
+  .hero-badges {
+    display: flex; gap: 1.2rem; flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 2.6rem;
+  }
+  .badge {
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 2px;
+    padding: 0.45rem 1rem;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── SECTIONS ── */
+  section { padding: 80px 5%; }
+
+  .section-eyebrow {
+    color: var(--green);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+  }
+  .section-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(1.35rem, 2.5vw, 1.9rem);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+  .section-lead {
+    color: #4A5568;
+    max-width: 620px;
+    font-size: 0.95rem;
+    line-height: 1.9;
+  }
+
+  /* ── ABOUT ── */
+  .about { background: var(--gray-light); }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 2.6rem;
+  }
+  .about-card {
+    background: var(--white);
+    border-left: 3px solid var(--green);
+    padding: 1.6rem 1.4rem;
+  }
+  .about-card-icon { font-size: 1.6rem; margin-bottom: 0.7rem; }
+  .about-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .about-card p { font-size: 0.85rem; color: #4A5568; line-height: 1.8; }
+
+  /* ── STUDIES ── */
+  .studies-tabs {
+    display: flex; gap: 0; margin-top: 2.2rem;
+    border-bottom: 2px solid #E2E8F0;
+  }
+  .tab-btn {
+    padding: 0.7rem 1.8rem;
+    background: none; border: none; cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.88rem; font-weight: 500;
+    color: var(--gray);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all .2s;
+  }
+  .tab-btn.active { color: var(--navy); border-bottom-color: var(--green); }
+
+  .tab-panel { display: none; padding-top: 2rem; }
+  .tab-panel.active { display: block; }
+
+  .study-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+  }
+  .study-box {
+    background: var(--gray-light);
+    padding: 1.6rem;
+    border-radius: 2px;
+  }
+  .study-box h4 {
+    font-size: 0.82rem; font-weight: 700;
+    color: var(--green); letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 0.7rem;
+  }
+  .study-box ul { padding-left: 1.2rem; }
+  .study-box li { font-size: 0.88rem; color: #4A5568; margin-bottom: 0.35rem; }
+
+  /* ── FLOW ── */
+  .flow { background: var(--navy); }
+  .flow .section-title { color: var(--white); }
+  .flow .section-eyebrow { color: var(--green); }
+  .flow-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 2.6rem;
+    position: relative;
+  }
+  .flow-steps::before {
+    content: '';
+    position: absolute;
+    top: 28px; left: 10%; right: 10%;
+    height: 1px;
+    background: rgba(255,255,255,0.15);
+  }
+  .flow-step { text-align: center; padding: 0 0.8rem; }
+  .flow-step-num {
+    width: 56px; height: 56px;
+    background: var(--green);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.1rem; font-weight: 700; color: var(--white);
+    margin: 0 auto 1rem;
+    position: relative; z-index: 1;
+  }
+  .flow-step h4 { color: var(--white); font-size: 0.88rem; margin-bottom: 0.4rem; }
+  .flow-step p { color: rgba(255,255,255,0.55); font-size: 0.78rem; line-height: 1.7; }
+
+  /* ── REWARD ── */
+  .reward { background: var(--green-light); }
+  .reward-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .reward-card {
+    background: var(--white);
+    padding: 2rem;
+    border-top: 3px solid var(--amber);
+  }
+  .reward-card .label {
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em;
+    color: var(--amber); text-transform: uppercase; margin-bottom: 0.5rem;
+  }
+  .reward-card .amount {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 2.4rem; font-weight: 700; color: var(--navy);
+    margin-bottom: 0.3rem;
+  }
+  .reward-card .amount span { font-size: 1rem; font-weight: 400; }
+  .reward-card p { font-size: 0.85rem; color: #4A5568; line-height: 1.8; }
+
+  /* ── CONDITION ── */
+  .condition-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+    margin-top: 2rem;
+  }
+  .condition-box { padding: 1.4rem 0; }
+  .condition-box h3 {
+    font-size: 0.88rem; font-weight: 700; margin-bottom: 0.9rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .condition-box h3::before {
+    content: '';
+    display: inline-block; width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .ok h3::before { background: var(--green); }
+  .ng h3::before { background: #E57373; }
+  .condition-box li {
+    font-size: 0.88rem; color: #4A5568;
+    list-style: none; padding-left: 1.2rem;
+    position: relative; margin-bottom: 0.45rem;
+    line-height: 1.7;
+  }
+  .ok li::before { content: '✓'; position: absolute; left: 0; color: var(--green); }
+  .ng li::before { content: '✕'; position: absolute; left: 0; color: #E57373; }
+
+  /* ── FAQ ── */
+  .faq { background: var(--gray-light); }
+  .faq-list { margin-top: 2rem; max-width: 720px; }
+  .faq-item {
+    border-bottom: 1px solid #E2E8F0;
+  }
+  .faq-q {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    padding: 1.2rem 0;
+    cursor: pointer;
+    font-size: 0.9rem; font-weight: 500;
+    gap: 1rem;
+    background: none; border: none; width: 100%;
+    text-align: left; font-family: 'Noto Sans JP', sans-serif;
+    color: var(--navy);
+  }
+  .faq-icon {
+    color: var(--green); font-size: 1.2rem;
+    flex-shrink: 0; transition: transform .2s;
+    line-height: 1;
+  }
+  .faq-item.open .faq-icon { transform: rotate(45deg); }
+  .faq-a {
+    display: none;
+    font-size: 0.87rem; color: #4A5568;
+    padding-bottom: 1.2rem; line-height: 1.9;
+  }
+  .faq-item.open .faq-a { display: block; }
+
+  /* ── CONTACT ── */
+  .contact { background: var(--navy); text-align: center; }
+  .contact .section-title { color: var(--white); }
+  .contact .section-lead { color: rgba(255,255,255,0.6); margin: 0 auto 2rem; }
+  .contact-box {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: left;
+  }
+  .contact-box p {
+    font-size: 0.85rem; color: rgba(255,255,255,0.65);
+    margin-bottom: 0.4rem;
+  }
+  .contact-box a { color: var(--green); text-decoration: none; }
+  .contact-box .divider {
+    height: 1px; background: rgba(255,255,255,0.1);
+    margin: 1rem 0;
+  }
+  .contact-note {
+    font-size: 0.75rem; color: rgba(255,255,255,0.35);
+    margin-top: 1rem; text-align: center;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #111827;
+    padding: 1.6rem 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 0.8rem;
+  }
+  footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .about-grid, .study-grid, .reward-grid,
+    .condition-grid, .flow-steps { grid-template-columns: 1fr; }
+    .flow-steps::before { display: none; }
+    .studies-tabs { overflow-x: auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo">運動・血糖・こころの研究</span>
+  <ul class="nav-links">
+    <li><a href="#about">研究について</a></li>
+    <li><a href="#studies">研究の種類</a></li>
+    <li><a href="#flow">参加の流れ</a></li>
+    <li><a href="#condition">参加条件</a></li>
+    <li><a href="#contact">お問い合わせ</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <!-- CGM波形グラフ（シグネチャ要素） -->
+  <svg class="hero-wave" viewBox="0 0 1440 180" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <polyline
+      points="0,120 60,115 120,100 180,90 240,85 300,95 360,120 420,140 480,148 540,140 600,110 660,78 720,60 780,55 840,68 900,90 960,108 1020,118 1080,115 1140,108 1200,98 1260,88 1320,80 1380,75 1440,72"
+      fill="none" stroke="#2EAA6E" stroke-width="2.5"
+    />
+    <polyline
+      points="0,140 60,138 120,130 180,125 240,128 300,136 360,148 420,155 480,158 540,150 600,132 660,108 720,88 780,80 840,88 900,106 960,122 1020,132 1080,130 1140,124 1200,116 1260,106 1320,95 1380,86 1440,80"
+      fill="none" stroke="#2EAA6E" stroke-width="1" stroke-dasharray="4 3"
+    />
+  </svg>
+
+  <p class="hero-eyebrow">参加者募集中 ― 令和8年度 科学研究費補助金 基盤研究（C）</p>
+  <h1 class="hero-title">
+    運動・血糖値・こころの関係を<br>
+    <span>一緒に調べてみませんか？</span>
+  </h1>
+  <p class="hero-sub">
+    日常生活の中で血糖値を記録し，気分や認知機能との関係を明らかにする研究です。<br>
+    特別な運動経験や医学知識は必要ありません。18歳以上の健康な成人の方を募集しています。
+  </p>
+  <a href="#contact" class="btn-primary">参加を申し込む</a>
+  <div class="hero-badges">
+    <span class="badge">倫理審査承認済み</span>
+    <span class="badge">謝礼あり</span>
+    <span class="badge">スマートフォンで参加可能</span>
+    <span class="badge">来室は最大4回</span>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <p class="section-eyebrow">研究について</p>
+  <h2 class="section-title">なぜ，運動はうつを改善するのか？</h2>
+  <p class="section-lead">
+    運動がうつ状態の改善に効果的であることは多くの研究で示されていますが，その仕組みはまだ十分にわかっていません。本研究では「血糖値の変動」を鍵として，運動・認知機能・気分状態の連鎖的なつながりを科学的に解明します。
+  </p>
+  <div class="about-grid">
+    <div class="about-card">
+      <div class="about-card-icon">📈</div>
+      <h3>血糖値の変動を記録する</h3>
+      <p>小型の持続血糖モニター（CGM）を上腕部に装着し，日常生活の中での血糖値の変動を14日間記録します。痛みはほとんどありません。</p>
+    </div>
+    <div class="about-card">
+      <div class="about-card-icon">🧠</div>
+      <h3>認知機能を測定する</h3>
+      <p>スマートフォンまたはPCで毎日約20分，注意機能とワーキングメモリの課題に取り組んでいただきます。</p>
+    </div>
+    <div class="about-card">
+      <div class="about-card-icon">😌</div>
+      <h3>気分状態を記録する</h3>
+      <p>抑うつ傾向を測るアンケート（CES-D）に，期間中3回（初日・7日目・最終日）お答えいただきます。</p>
+    </div>
+  </div>
+</section>
+
+<!-- STUDIES -->
+<section id="studies">
+  <p class="section-eyebrow">研究の種類</p>
+  <h2 class="section-title">2種類の研究を実施します</h2>
+  <p class="section-lead">研究1（観察研究）と研究2（運動介入研究）の2種類があります。どちらに参加いただくかは，募集時期によって異なります。</p>
+
+  <div class="studies-tabs">
+    <button class="tab-btn active" onclick="switchTab('s1', this)">研究1 ― 観察研究</button>
+    <button class="tab-btn" onclick="switchTab('s2', this)">研究2 ― 運動介入研究</button>
+  </div>
+
+  <div id="s1" class="tab-panel active">
+    <div class="study-grid">
+      <div class="study-box">
+        <h4>概要</h4>
+        <ul>
+          <li>期間：2週間（14日間）</li>
+          <li>来室：2回（初回・返却時）</li>
+          <li>通常の生活を送りながら記録するだけ</li>
+          <li>運動の実施は不要</li>
+        </ul>
+      </div>
+      <div class="study-box">
+        <h4>測定内容</h4>
+        <ul>
+          <li>持続血糖モニター（CGM）装着</li>
+          <li>スマートウォッチで活動量・睡眠を記録</li>
+          <li>毎日：認知課題（CPT・Nバック，約20分）</li>
+          <li>3回：抑うつ傾向アンケート（CES-D，約5分）</li>
+        </ul>
+      </div>
+      <div class="study-box">
+        <h4>募集人数・時期</h4>
+        <ul>
+          <li>60名（毎月15名ずつ募集）</li>
+          <li>2026年5月〜2027年2月</li>
+        </ul>
+      </div>
+      <div class="study-box">
+        <h4>謝礼</h4>
+        <ul>
+          <li>全期間完了で 2,000円相当</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="s2" class="tab-panel">
+    <div class="study-grid">
+      <div class="study-box">
+        <h4>概要</h4>
+        <ul>
+          <li>期間：6週間（ベースライン2週＋介入2週＋フォロー2週）</li>
+          <li>来室：4回</li>
+          <li>介入群・対照群にランダムに割り当て</li>
+          <li>介入群は日常的な軽い運動を4週間実施</li>
+        </ul>
+      </div>
+      <div class="study-box">
+        <h4>介入の内容（介入群のみ）</h4>
+        <ul>
+          <li>食後10〜15分の速歩（毎食後）</li>
+          <li>1〜2時間ごとに2〜3分の軽い体の動かし</li>
+          <li>食後の座位を中断する軽い活動</li>
+        </ul>
+      </div>
+      <div class="study-box">
+        <h4>募集人数・時期</h4>
+        <ul>
+          <li>120名（2ヶ月ごと15名ずつ募集）</li>
+          <li>2027年4月〜2028年12月</li>
+        </ul>
+      </div>
+      <div class="study-box">
+        <h4>謝礼</h4>
+        <ul>
+          <li>全期間完了で 6,000円相当</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section class="flow" id="flow">
+  <p class="section-eyebrow">参加の流れ</p>
+  <h2 class="section-title" style="color:#fff;">研究1の参加ステップ</h2>
+  <div class="flow-steps">
+    <div class="flow-step">
+      <div class="flow-step-num">1</div>
+      <h4>申し込み</h4>
+      <p>フォームまたはメールでお申し込みください。担当者からご連絡します。</p>
+    </div>
+    <div class="flow-step">
+      <div class="flow-step-num">2</div>
+      <h4>初回来室（約30分）</h4>
+      <p>CGMセンサーとスマートウォッチを装着。説明文書をお渡しし同意書にご署名いただきます。</p>
+    </div>
+    <div class="flow-step">
+      <div class="flow-step-num">3</div>
+      <h4>2週間の記録</h4>
+      <p>日常生活を送りながら，毎日約20分の認知課題に取り組んでいただきます。</p>
+    </div>
+    <div class="flow-step">
+      <div class="flow-step-num">4</div>
+      <h4>機器返却・謝礼（約15分）</h4>
+      <p>機器を返却していただき，謝礼をお受け取りください。</p>
+    </div>
+  </div>
+</section>
+
+<!-- REWARD -->
+<section class="reward">
+  <p class="section-eyebrow">謝礼</p>
+  <h2 class="section-title">ご参加への感謝をお伝えします</h2>
+  <div class="reward-grid">
+    <div class="reward-card">
+      <p class="label">研究1（観察研究）</p>
+      <p class="amount">2,000<span> 円相当</span></p>
+      <p>全期間（2週間）を完了された方にお渡しします。途中で参加を中断された場合も，不利益は一切生じません。</p>
+    </div>
+    <div class="reward-card">
+      <p class="label">研究2（運動介入研究）</p>
+      <p class="amount">6,000<span> 円相当</span></p>
+      <p>全期間（6週間）を完了された方にお渡しします。途中で参加を中断された場合も，不利益は一切生じません。</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONDITION -->
+<section id="condition">
+  <p class="section-eyebrow">参加条件</p>
+  <h2 class="section-title">こんな方を募集しています</h2>
+  <div class="condition-grid">
+    <div class="condition-box ok">
+      <h3>参加できる方</h3>
+      <ul>
+        <li>18歳以上の成人の方</li>
+        <li>精神科・心療内科での治療を受けていない方</li>
+        <li>糖尿病・糖尿病予備群の診断を受けていない方</li>
+        <li>スマートフォンまたはPCをお持ちの方</li>
+        <li>（研究2のみ）食後に10〜15分程度の速歩ができる方</li>
+      </ul>
+    </div>
+    <div class="condition-box ng">
+      <h3>参加をご遠慮いただく方</h3>
+      <ul>
+        <li>テープ・絆創膏類にアレルギーのある方</li>
+        <li>皮膚疾患のある方（センサー装着部位）</li>
+        <li>現在妊娠中または授乳中の方</li>
+        <li>（研究2のみ）心疾患・整形外科疾患等のある方</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:1.6rem; font-size:0.85rem; color:#4A5568;">
+    ※ 参加を希望される方には，研究担当者から詳しい説明文書をお送りします。参加は完全に任意であり，いつでも理由を問わず取りやめることができます。
+  </p>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <p class="section-eyebrow">よくある質問</p>
+  <h2 class="section-title">FAQ</h2>
+  <div class="faq-list">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        センサーの装着は痛いですか？
+        <span class="faq-icon">+</span>
+      </button>
+      <p class="faq-a">CGMセンサー（FreeStyle リブレ2）の装着時に，非常に細いフィラメント（約5mm）が皮膚に挿入されます。ほとんどの方はほぼ痛みを感じませんが，個人差があります。装着は経験のある研究担当者が行いますので，ご安心ください。</p>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        毎日どのくらいの時間がかかりますか？
+        <span class="faq-icon">+</span>
+      </button>
+      <p class="faq-a">認知課題（CPTおよびNバック課題）を毎日約20分以内で実施していただきます。スマートフォンまたはPCで，ご自宅など任意の場所で実施できます。血糖値・活動量の記録はセンサーが自動で行いますので，追加の作業は不要です。</p>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        お風呂や運動の時はどうすればいいですか？
+        <span class="faq-icon">+</span>
+      </button>
+      <p class="faq-a">CGMセンサー（FreeStyle リブレ2）はIP27規格の防水仕様です。シャワー・入浴・軽い水泳は可能ですが，長時間の水中使用は避けてください。スマートウォッチは激しいスポーツの際に一時的に外していただいてかまいません。</p>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        参加を途中でやめることはできますか？
+        <span class="faq-icon">+</span>
+      </button>
+      <p class="faq-a">いつでも，理由を問わず参加を取りやめることができます。途中で中断されても，いかなる不利益も生じません。謝礼については，参加いただいた期間・回数に応じてご相談させていただきます。</p>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        個人情報はどのように扱われますか？
+        <span class="faq-icon">+</span>
+      </button>
+      <p class="faq-a">取得した個人情報（氏名・連絡先）は参加管理のみに使用し，研究データと分離して管理します。データはすべて匿名化（IDコード化）のうえ解析され，個人が特定される形で公表されることはありません。データは研究終了後10年間，パスワードおよびアクセス制御により保護されたPCと施錠可能なキャビネットで保管されます。</p>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        アンケートの内容が心配です
+        <span class="faq-icon">+</span>
+      </button>
+      <p class="faq-a">気分状態に関するアンケート（CES-D）では，過去1週間の感情状態についてお答えいただきます。回答中に不快な気持ちになった場合は，いつでも中断できます。得点が高値域に達した場合，研究担当者からご連絡し，必要に応じて相談窓口をご案内します。</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <p class="section-eyebrow">お問い合わせ・参加申込み</p>
+  <h2 class="section-title">参加を希望される方はこちらへ</h2>
+  <p class="section-lead">まずはお気軽にご連絡ください。担当者より詳細をご説明します。参加を強制するものではありません。</p>
+  <div class="contact-box">
+    <p><strong style="color:#fff;">研究責任者</strong></p>
+    <p>【※氏名】｜【※所属】心理部門</p>
+    <div class="divider"></div>
+    <p>📧 メール：<a href="mailto:">【※メールアドレス】</a></p>
+    <p>📞 電話：【※電話番号】（平日 9:00〜17:00）</p>
+    <div class="divider"></div>
+    <p style="font-size:0.8rem;">倫理審査承認番号：【※承認番号】<br>
+    尚絅学院大学 人間対象研究・調査倫理審査委員会 承認済み</p>
+  </div>
+  <p class="contact-note">お問い合わせいただいた情報は，研究参加の管理のみに使用します。</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 【※研究者氏名】研究室 ― 尚絅学院大学 心理部門</p>
+  <p>本研究は日本学術振興会 科学研究費補助金（基盤研究C）の助成を受けています</p>
+</footer>
+
+<script>
+  function switchTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+  function toggleFaq(btn) {
+    const item = btn.parentElement;
+    item.classList.toggle('open');
+  }
+</script>
+</body>
+</html>
