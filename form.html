@@ -195,6 +195,23 @@
     <!-- 4. その他 -->
     <div class="form-card">
       <h2>ご質問・ご要望</h2>
+
+      <div class="field">
+        <label>長期休暇期間中の参加について<span class="required">※必須</span></label>
+        <p class="field-note" style="margin-bottom: 0.6rem;">夏休み・冬休み・春休みなどの長期休暇期間中も，研究に参加することができますか？</p>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="vacation" value="参加可能">
+            <span><strong>参加できる</strong>：長期休暇中も来室・課題実施が可能</span>
+          </label>
+          <label>
+            <input type="radio" name="vacation" value="参加不可">
+            <span><strong>参加できない</strong>：長期休暇中は来室・課題実施が難しい</span>
+          </label>
+        </div>
+        <p class="field-error" id="err_vacation">長期休暇中の参加可否を選択してください</p>
+      </div>
+
       <div class="field">
         <label>ご質問・ご不明な点など<span class="optional">（任意）</span></label>
         <textarea id="message" placeholder="研究内容・参加方法・スケジュール等，何でもご記入ください。"></textarea>
@@ -316,6 +333,10 @@
     markInvalid(email, emailErr); showError('err_email', emailErr);
     if (emailErr) valid = false;
 
+    const vacationChecked = document.querySelector('input[name="vacation"]:checked');
+    showError('err_vacation', !vacationChecked);
+    if (!vacationChecked) valid = false;
+
     const condErr = !['cond1','cond2','cond3','cond4','cond5'].every(id => document.getElementById(id).checked);
     showError('err_cond', condErr);
     if (condErr) valid = false;
@@ -331,17 +352,18 @@
 
     // 送信データを組み立て
     const payload = {
-      送信日時:      new Date().toLocaleString('ja-JP'),
-      氏名_漢字:    nameK.value,
-      氏名_かな:    nameN.value,
-      年齢:         age.value,
-      性別:         document.getElementById('gender').value,
-      メール:       email.value,
-      電話:         document.getElementById('tel').value,
-      質問等:       document.getElementById('message').value,
-      きっかけ:     document.getElementById('source').value,
-      参加条件確認: '全項目確認済み',
-      個人情報同意: '同意済み',
+      送信日時:          new Date().toLocaleString('ja-JP'),
+      氏名_漢字:         nameK.value,
+      氏名_かな:         nameN.value,
+      年齢:              age.value,
+      性別:              document.getElementById('gender').value,
+      メール:            email.value,
+      電話:              document.getElementById('tel').value,
+      長期休暇中の参加:  vacationChecked.value,
+      質問等:            document.getElementById('message').value,
+      きっかけ:          document.getElementById('source').value,
+      参加条件確認:      '全項目確認済み',
+      個人情報同意:      '同意済み',
     };
 
     // 送信
