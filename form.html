@@ -377,8 +377,7 @@
     document.body.appendChild(gasForm);
 
     await new Promise((resolve) => {
-      iframe.onload = () => resolve();
-      setTimeout(resolve, 5000); // タイムアウト保険
+      setTimeout(resolve, 2000); // 2秒待って完了とみなす
       gasForm.submit();
     });
 
