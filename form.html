@@ -350,14 +350,39 @@
     document.getElementById('overlay').classList.add('show');
 
     try {
-      // URLSearchParams形式で送信（application/x-www-form-urlencodedはCORSの制約を受けない）
-      const params = new URLSearchParams();
-      Object.entries(payload).forEach(([k, v]) => params.append(k, String(v)));
-      await fetch(GAS_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: params
-      });
+    // 隠しiframeを作成（ページ遷移を防ぐ）
+    let iframe = document.getElementById('gasIframe');
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.id   = 'gasIframe';
+      iframe.name = 'gasIframe';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+    }
+
+    // 隠しformを作成してGASへ直接POST（CORSの制約を受けない）
+    const gasForm = document.createElement('form');
+    gasForm.action  = GAS_URL;
+    gasForm.method  = 'POST';
+    gasForm.target  = 'gasIframe';
+    gasForm.style.display = 'none';
+
+    Object.entries(payload).forEach(([key, value]) => {
+      const input = document.createElement('input');
+      input.type  = 'hidden';
+      input.name  = key;
+      input.value = value;
+      gasForm.appendChild(input);
+    });
+    document.body.appendChild(gasForm);
+
+    await new Promise((resolve) => {
+      iframe.onload = () => resolve();
+      setTimeout(resolve, 5000); // タイムアウト保険
+      gasForm.submit();
+    });
+
+    document.body.removeChild(gasForm);
       // no-cors では成功判定不可のため，fetch が完了したら成功とみなす
       document.getElementById('overlay').classList.remove('show');
       document.getElementById('applyForm').style.display = 'none';
