@@ -1,1 +1,674 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>研究1 参加者ページ | 運動・血糖値・こころの研究</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  :root {
+    --navy:        #1A2340;
+    --navy-mid:    #243055;
+    --green:       #2EAA6E;
+    --green-light: #EBF7F2;
+    --green-dim:   #1E7A4E;
+    --amber:       #E8973A;
+    --gray:        #8A94A6;
+    --gray-light:  #F4F6FA;
+    --border:      #E2E8F0;
+    --white:       #FFFFFF;
+    --text:        #1A2340;
+    --mono:        'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--text);
+    background: var(--gray-light);
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--navy);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5%; height: 56px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo {
+    color: var(--white);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+  }
+  .nav-tag {
+    background: rgba(46,170,110,0.2);
+    color: var(--green);
+    font-size: 0.72rem;
+    font-family: var(--mono);
+    letter-spacing: 0.08em;
+    padding: 0.25rem 0.7rem;
+    border: 1px solid rgba(46,170,110,0.35);
+    border-radius: 2px;
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    background: var(--navy);
+    padding: 48px 5% 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::after {
+    content: 'STUDY 1';
+    position: absolute;
+    right: 4%;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--mono);
+    font-size: clamp(4rem, 10vw, 8rem);
+    font-weight: 500;
+    color: rgba(255,255,255,0.04);
+    letter-spacing: -0.02em;
+    pointer-events: none;
+    user-select: none;
+  }
+  .header-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--green);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 0.7rem;
+  }
+  .header-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    color: var(--white);
+    line-height: 1.5;
+    margin-bottom: 0.8rem;
+  }
+  .header-sub {
+    color: rgba(255,255,255,0.55);
+    font-size: 0.85rem;
+    max-width: 560px;
+    line-height: 1.9;
+  }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 36px 5% 80px;
+  }
+
+  /* ── ID CARD ── */
+  .id-card {
+    background: var(--white);
+    border: 2px solid var(--green);
+    border-radius: 3px;
+    padding: 1.8rem 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+  .id-card-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 0.8rem;
+  }
+  .id-input-row {
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .id-input {
+    font-family: var(--mono);
+    font-size: 1.4rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    color: var(--navy);
+    border: 2px solid var(--border);
+    border-radius: 2px;
+    padding: 0.55rem 0.9rem;
+    width: 200px;
+    text-transform: uppercase;
+    transition: border-color .2s;
+    background: var(--gray-light);
+  }
+  .id-input:focus {
+    outline: none;
+    border-color: var(--green);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(46,170,110,0.12);
+  }
+  .id-input::placeholder {
+    color: var(--gray);
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+  }
+  .btn-id-save {
+    background: var(--green);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    padding: 0.6rem 1.4rem;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    border-radius: 2px;
+    transition: background .2s;
+    height: 52px;
+  }
+  .btn-id-save:hover { background: var(--green-dim); }
+
+  .id-status {
+    margin-top: 0.7rem;
+    font-size: 0.82rem;
+    min-height: 1.4rem;
+  }
+  .id-status.saved {
+    color: var(--green);
+    font-weight: 700;
+    font-family: var(--mono);
+  }
+  .id-status.empty { color: #E53E3E; }
+
+  .id-note {
+    margin-top: 0.9rem;
+    font-size: 0.78rem;
+    color: var(--gray);
+    line-height: 1.7;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 0.9rem;
+  }
+
+  /* ── MENU CARDS ── */
+  .menu-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .menu-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    display: flex;
+    align-items: stretch;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color .2s, box-shadow .2s, transform .15s;
+    overflow: hidden;
+    position: relative;
+  }
+  .menu-card:hover {
+    border-color: var(--green);
+    box-shadow: 0 3px 12px rgba(46,170,110,0.12);
+    transform: translateY(-1px);
+  }
+  .menu-card.disabled {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  /* 左カラーバー */
+  .menu-card-bar {
+    width: 5px;
+    flex-shrink: 0;
+    background: var(--border);
+    transition: background .2s;
+  }
+  .menu-card:hover .menu-card-bar { background: var(--green); }
+  .menu-card.accent-amber .menu-card-bar { background: var(--amber); }
+  .menu-card.accent-amber:hover .menu-card-bar { background: var(--amber); }
+
+  .menu-card-body {
+    flex: 1;
+    padding: 1.1rem 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+  }
+
+  .menu-card-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    width: 40px;
+    text-align: center;
+  }
+
+  .menu-card-text { flex: 1; }
+
+  .menu-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .menu-card-desc {
+    font-size: 0.8rem;
+    color: var(--gray);
+    line-height: 1.6;
+  }
+
+  /* バッジ */
+  .badge {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .badge-init {
+    background: rgba(232,151,58,0.15);
+    color: var(--amber);
+    border: 1px solid rgba(232,151,58,0.3);
+  }
+  .badge-daily {
+    background: rgba(46,170,110,0.12);
+    color: var(--green-dim);
+    border: 1px solid rgba(46,170,110,0.25);
+  }
+  .badge-select {
+    background: rgba(138,148,166,0.12);
+    color: var(--gray);
+    border: 1px solid rgba(138,148,166,0.3);
+  }
+  .badge-guide {
+    background: rgba(26,35,64,0.08);
+    color: var(--navy-mid);
+    border: 1px solid rgba(26,35,64,0.15);
+  }
+
+  .menu-card-arrow {
+    color: var(--gray);
+    font-size: 1rem;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    transition: color .2s, transform .2s;
+  }
+  .menu-card:hover .menu-card-arrow {
+    color: var(--green);
+    transform: translateX(2px);
+  }
+
+  /* ── スケジュール表 ── */
+  .schedule-block {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    padding: 1.4rem 1.6rem;
+    margin-top: 2rem;
+  }
+  .schedule-block h3 {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 1rem;
+  }
+  .schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+  }
+  .schedule-table th {
+    text-align: left;
+    padding: 0.45rem 0.7rem;
+    background: var(--gray-light);
+    color: var(--navy);
+    font-weight: 700;
+    font-size: 0.78rem;
+    border-bottom: 2px solid var(--border);
+  }
+  .schedule-table td {
+    padding: 0.55rem 0.7rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    color: #4A5568;
+    line-height: 1.5;
+  }
+  .schedule-table tr:last-child td { border-bottom: none; }
+  .dot-green { color: var(--green); font-size: 1.1rem; line-height: 1; }
+  .dot-amber { color: var(--amber); font-size: 1.1rem; line-height: 1; }
+  .dot-gray  { color: var(--border); font-size: 1.1rem; line-height: 1; }
+  .day-col { font-family: var(--mono); font-size: 0.8rem; color: var(--navy); font-weight: 500; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #111827;
+    padding: 1.2rem 5%;
+    text-align: center;
+  }
+  footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
+
+  @media (max-width: 600px) {
+    .id-input-row { flex-direction: column; }
+    .id-input { width: 100%; }
+    .btn-id-save { width: 100%; height: auto; padding: 0.7rem; }
+    .menu-card-body { gap: 0.7rem; }
+    .schedule-table { font-size: 0.76rem; }
+  }
+  /* ── ID未設定時のロック状態 ── */
+  .menu-card.locked {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+  .lock-banner {
+    display: none;
+    background: #FFF3CD;
+    border: 1.5px solid var(--amber);
+    border-radius: 3px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.83rem;
+    color: #7A5000;
+    line-height: 1.7;
+  }
+  .lock-banner.show { display: block; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" class="nav-logo">運動・血糖・こころの研究</a>
+  <span class="nav-tag">STUDY 1 — PARTICIPANT</span>
+</nav>
+
+<div class="page-header">
+  <p class="header-eyebrow">Research 1 / 参加者ページ</p>
+  <h1 class="header-title">研究1 参加者ページへようこそ</h1>
+  <p class="header-sub">このページは，研究1の参加期間中に毎日使用するページです。下記から参加者IDを入力し，各メニューへ進んでください。</p>
+</div>
+
+<main>
+
+  <!-- ID入力カード -->
+  <div class="id-card">
+    <p class="id-card-label">▌ Step 1 — 参加者IDを入力してください</p>
+    <div class="id-input-row">
+      <input
+        type="text"
+        id="participantId"
+        class="id-input"
+        placeholder="例：P001"
+        maxlength="10"
+        autocomplete="off"
+        spellcheck="false"
+      >
+      <button class="btn-id-save" onclick="saveId()">保存する</button>
+    </div>
+    <p class="id-status" id="idStatus"></p>
+    <p class="id-note">
+      参加者IDは，実験担当者からお渡しした名刺サイズのカードに記載されています。<br>
+      入力したIDはこのブラウザに保存され，各課題のデータに自動で紐づけられます。<br>
+      ブラウザを変更した場合や，端末を変更した場合は，再度IDを入力してください。
+    </p>
+  </div>
+
+  <!-- メニュー -->
+  <p class="section-label">▌ Step 2 — メニューを選んでください</p>
+
+  <!-- ID未入力時のロックバナー -->
+  <div class="lock-banner" id="lockBanner">
+    🔒 <strong>参加者IDが未入力です。</strong>上のStep 1でIDを入力・保存してから，各メニューへ進んでください。<br>
+    設定ガイド（リブレ2・Garmin）はIDなしでも参照できます。
+  </div>
+
+  <div class="menu-grid">
+
+    <!-- 1. 同意確認 -->
+    <a href="consent.html" class="menu-card accent-amber" id="link-consent">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-icon">📋</div>
+        <div class="menu-card-text">
+          <div class="menu-card-title">
+            同意確認
+            <span class="badge badge-init">初日のみ</span>
+          </div>
+          <p class="menu-card-desc">研究への参加に同意していただくためのページです。参加初日に1回だけ実施してください。</p>
+        </div>
+      </div>
+      <span class="menu-card-arrow">›</span>
+    </a>
+
+    <!-- 2. リブレ2 -->
+    <a href="libre2.html" class="menu-card" id="link-libre2">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-icon">📡</div>
+        <div class="menu-card-text">
+          <div class="menu-card-title">
+            FreeStyle リブレ2 の使い方
+            <span class="badge badge-guide">ガイド</span>
+          </div>
+          <p class="menu-card-desc">持続血糖モニター（CGM）の設定方法・日常での使い方を確認できます。</p>
+        </div>
+      </div>
+      <span class="menu-card-arrow">›</span>
+    </a>
+
+    <!-- 3. Garmin -->
+    <a href="garmin.html" class="menu-card" id="link-garmin">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-icon">⌚</div>
+        <div class="menu-card-text">
+          <div class="menu-card-title">
+            Garmin vivosmart 5 の使い方
+            <span class="badge badge-guide">ガイド</span>
+          </div>
+          <p class="menu-card-desc">スマートウォッチの設定方法・日常での使い方を確認できます。</p>
+        </div>
+      </div>
+      <span class="menu-card-arrow">›</span>
+    </a>
+
+    <!-- 4. 認知課題 -->
+    <a href="cognitive.html" class="menu-card" id="link-cognitive">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-icon">🧠</div>
+        <div class="menu-card-text">
+          <div class="menu-card-title">
+            今日の認知課題
+            <span class="badge badge-daily">毎日実施</span>
+          </div>
+          <p class="menu-card-desc">注意機能（CPT）とワーキングメモリ（Nバック）の2つの課題です。毎日同じ時間帯に実施してください。所要時間：約20分。</p>
+        </div>
+      </div>
+      <span class="menu-card-arrow">›</span>
+    </a>
+
+    <!-- 5. CES-D -->
+    <a href="cesd.html" class="menu-card" id="link-cesd">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-icon">😌</div>
+        <div class="menu-card-text">
+          <div class="menu-card-title">
+            うつ傾向の測定（CES-D）
+            <span class="badge badge-select">特定の日のみ</span>
+          </div>
+          <p class="menu-card-desc">抑うつ傾向に関するアンケートです。<strong>初日・7日目・最終日（14日目）</strong>の3回だけ実施してください。所要時間：約5分。</p>
+        </div>
+      </div>
+      <span class="menu-card-arrow">›</span>
+    </a>
+
+  </div>
+
+  <!-- 実施スケジュール表 -->
+  <div class="schedule-block">
+    <h3>▌ 実施スケジュール（14日間）</h3>
+    <table class="schedule-table">
+      <thead>
+        <tr>
+          <th>日</th>
+          <th>認知課題<br>（毎日）</th>
+          <th>CES-D<br>（特定日）</th>
+          <th>備考</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="day-col">1日目（初日）</td>
+          <td><span class="dot-green">●</span></td>
+          <td><span class="dot-amber">●</span></td>
+          <td>同意確認・機器装着も実施</td>
+        </tr>
+        <tr>
+          <td class="day-col">2〜6日目</td>
+          <td><span class="dot-green">●</span></td>
+          <td><span class="dot-gray">−</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="day-col">7日目</td>
+          <td><span class="dot-green">●</span></td>
+          <td><span class="dot-amber">●</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="day-col">8〜13日目</td>
+          <td><span class="dot-green">●</span></td>
+          <td><span class="dot-gray">−</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="day-col">14日目（最終日）</td>
+          <td><span class="dot-green">●</span></td>
+          <td><span class="dot-amber">●</span></td>
+          <td>機器返却・謝礼受け取り</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<footer>
+  <p>© 2026 池田研究室 ― 尚絅学院大学 心理部門　|　倫理審査承認番号：2026-002</p>
+</footer>
+
+<script>
+  const ID_KEY = 'study1_participant_id';
+
+  // データ収集があるページ（IDが必須）
+  const LOCKED_LINKS = ['link-consent', 'link-cognitive', 'link-cesd'];
+
+  // ── ページ読み込み時 ──
+  window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem(ID_KEY);
+    if (saved) {
+      document.getElementById('participantId').value = saved;
+      showSaved(saved);
+      unlockMenus();
+    } else {
+      showLocked();
+    }
+  });
+
+  // ── ID保存 ──
+  function saveId() {
+    const val = document.getElementById('participantId').value.trim().toUpperCase();
+    if (!val) {
+      document.getElementById('idStatus').textContent = 'IDを入力してください。';
+      document.getElementById('idStatus').className = 'id-status empty';
+      lockMenus();
+      return;
+    }
+    localStorage.setItem(ID_KEY, val);
+    document.getElementById('participantId').value = val;
+    showSaved(val);
+    unlockMenus();
+  }
+
+  // ── 保存済み表示 ──
+  function showSaved(id) {
+    document.getElementById('idStatus').textContent =
+      `✓ 参加者ID「${id}」を保存しました。各メニューへ進んでください。`;
+    document.getElementById('idStatus').className = 'id-status saved';
+  }
+
+  // ── 未入力表示 ──
+  function showLocked() {
+    document.getElementById('idStatus').textContent =
+      '※ IDを入力・保存してから各メニューへ進んでください。';
+    document.getElementById('idStatus').className = 'id-status empty';
+    lockMenus();
+  }
+
+  // ── メニューをロック（データ収集ページのみ） ──
+  function lockMenus() {
+    LOCKED_LINKS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('locked');
+    });
+    document.getElementById('lockBanner').classList.add('show');
+  }
+
+  // ── メニューのロック解除 ──
+  function unlockMenus() {
+    LOCKED_LINKS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('locked');
+    });
+    document.getElementById('lockBanner').classList.remove('show');
+  }
+
+  // ── Enterキーでも保存 ──
+  document.getElementById('participantId').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') saveId();
+  });
+
+  // ════════════════════════════════════════════════
+  //  各課題ページから呼び出す共通関数
+  //  cognitive.html・cesd.html・consent.html の
+  //  <script> 冒頭に以下を記述してください：
+  //
+  //  const ID_KEY = 'study1_participant_id';
+  //  const pid = localStorage.getItem(ID_KEY);
+  //  if (!pid) {
+  //    alert('参加者IDが登録されていません。\nトップページでIDを入力してから戻ってきてください。');
+  //    location.href = 'index.html';
+  //  }
+  // ════════════════════════════════════════════════
+</script>
+</body>
+</html>
