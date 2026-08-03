@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>うつ傾向の測定（CES-D）| 研究1</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:        #1A2340;
+    --navy-mid:    #243055;
+    --green:       #2EAA6E;
+    --green-light: #EBF7F2;
+    --green-dim:   #1E7A4E;
+    --amber:       #E8973A;
+    --amber-light: #FFF8EC;
+    --gray:        #8A94A6;
+    --gray-light:  #F4F6FA;
+    --border:      #E2E8F0;
+    --white:       #FFFFFF;
+    --text:        #1A2340;
+    --mono:        'DM Mono', monospace;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Noto Sans JP', sans-serif; color: var(--text); background: var(--gray-light); line-height: 1.8; }
+
+  /* NAV */
+  nav { background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 56px; position: sticky; top: 0; z-index: 100; }
+  .nav-logo { color: var(--white); font-family: 'Noto Serif JP', serif; font-size: 0.85rem; text-decoration: none; letter-spacing: 0.05em; }
+  .nav-back { color: rgba(255,255,255,0.7); font-size: 0.82rem; text-decoration: none; transition: color .2s; }
+  .nav-back:hover { color: var(--green); }
+
+  /* HEADER */
+  .page-header { background: var(--navy); padding: 36px 5% 32px; position: relative; overflow: hidden; }
+  .page-header::after { content: 'CES-D'; position: absolute; right: 3%; top: 50%; transform: translateY(-50%); font-family: var(--mono); font-size: clamp(3rem, 8vw, 6rem); color: rgba(255,255,255,0.04); pointer-events: none; }
+  .header-eyebrow { font-family: var(--mono); font-size: 0.7rem; color: var(--green); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.6rem; }
+  .header-title { font-family: 'Noto Serif JP', serif; font-size: clamp(1.2rem, 3vw, 1.6rem); color: var(--white); margin-bottom: 0.5rem; }
+  .header-sub { color: rgba(255,255,255,0.55); font-size: 0.83rem; max-width: 520px; line-height: 1.9; }
+
+  /* MAIN */
+  main { max-width: 720px; margin: 0 auto; padding: 28px 5% 80px; }
+
+  /* SESSION BADGE */
+  .session-badge {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    background: var(--white); border: 2px solid var(--green);
+    border-radius: 3px; padding: 0.7rem 1.2rem;
+    margin-bottom: 1.2rem; font-size: 0.88rem;
+  }
+  .session-badge .num { font-family: var(--mono); font-size: 1.2rem; font-weight: 700; color: var(--green); }
+  .session-badge .label { font-weight: 700; color: var(--navy); }
+  .session-badge .sub { font-size: 0.75rem; color: var(--gray); margin-left: 0.3rem; }
+
+  /* INSTRUCTION CARD */
+  .instruction-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 3px; padding: 1.4rem 1.6rem; margin-bottom: 1.4rem; }
+  .instruction-card p { font-size: 0.88rem; color: #4A5568; line-height: 1.9; }
+  .instruction-card .scale-row { display: flex; gap: 0; margin-top: 1rem; border: 1.5px solid var(--border); border-radius: 3px; overflow: hidden; }
+  .scale-item { flex: 1; text-align: center; padding: 0.6rem 0.3rem; border-right: 1px solid var(--border); }
+  .scale-item:last-child { border-right: none; }
+  .scale-item .key { font-family: var(--mono); font-size: 1.1rem; font-weight: 700; color: var(--navy); display: block; margin-bottom: 0.2rem; }
+  .scale-item .val { font-size: 0.7rem; color: var(--gray); line-height: 1.4; display: block; }
+
+  /* QUESTION CARD */
+  .q-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 3px; margin-bottom: 0.6rem; overflow: hidden; transition: border-color .2s; }
+  .q-card.answered { border-color: var(--green); }
+  .q-header { display: flex; align-items: flex-start; gap: 0.8rem; padding: 1rem 1.2rem 0.8rem; }
+  .q-num { font-family: var(--mono); font-size: 0.72rem; color: var(--gray); background: var(--gray-light); border-radius: 2px; padding: 0.15rem 0.45rem; flex-shrink: 0; margin-top: 0.15rem; letter-spacing: 0.05em; }
+  .q-text { font-size: 0.9rem; font-weight: 500; line-height: 1.6; }
+  .q-options { display: flex; gap: 0; border-top: 1px solid var(--border); }
+  .q-option { flex: 1; }
+  .q-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .q-option label {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 0.65rem 0.3rem; cursor: pointer; font-size: 0.82rem; font-weight: 700;
+    border-right: 1px solid var(--border); color: var(--gray);
+    transition: background .15s, color .15s;
+    min-height: 52px;
+  }
+  .q-option:last-child label { border-right: none; }
+  .q-option label .opt-key { font-family: var(--mono); font-size: 1rem; display: block; }
+  .q-option label .opt-freq { font-size: 0.62rem; color: var(--gray); display: block; margin-top: 0.1rem; line-height: 1.2; text-align: center; }
+  .q-option input:checked + label { background: var(--navy); color: var(--white); }
+  .q-option input:checked + label .opt-freq { color: rgba(255,255,255,0.6); }
+
+  /* PROGRESS */
+  .progress-bar-wrap { background: var(--border); border-radius: 99px; height: 6px; margin-bottom: 1.2rem; overflow: hidden; }
+  .progress-bar { height: 100%; background: var(--green); border-radius: 99px; transition: width .3s; }
+  .progress-label { font-size: 0.75rem; color: var(--gray); font-family: var(--mono); margin-bottom: 0.5rem; }
+
+  /* SUBMIT */
+  .submit-area { text-align: center; margin-top: 1.6rem; }
+  .btn-submit { background: var(--green); color: var(--white); border: none; cursor: pointer; padding: 0.9rem 3rem; font-size: 0.92rem; font-family: 'Noto Sans JP', sans-serif; font-weight: 700; letter-spacing: 0.08em; border-radius: 2px; transition: background .2s; }
+  .btn-submit:hover { background: var(--green-dim); }
+  .btn-submit:disabled { background: var(--gray); cursor: not-allowed; }
+  .submit-note { font-size: 0.78rem; color: var(--gray); margin-top: 0.7rem; line-height: 1.7; }
+  .error-msg { color: #E53E3E; font-size: 0.82rem; margin-top: 0.6rem; display: none; }
+
+  /* STATES */
+  .state-panel { display: none; text-align: center; padding: 3rem 2rem; background: var(--white); border: 1.5px solid var(--border); border-radius: 3px; }
+  .state-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .state-panel h2 { font-family: 'Noto Serif JP', serif; font-size: 1.3rem; margin-bottom: 0.8rem; }
+  .state-panel p { font-size: 0.88rem; color: #4A5568; line-height: 1.9; }
+  .state-panel.done h2 { color: var(--green); }
+  .state-panel.all-done h2 { color: var(--navy); }
+  .state-panel.already h2 { color: var(--amber); }
+
+  /* OVERLAY */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(26,35,64,0.5); z-index: 200; align-items: center; justify-content: center; }
+  .overlay.show { display: flex; }
+  .overlay-box { background: var(--white); padding: 2rem 2.5rem; text-align: center; border-radius: 3px; }
+  .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 1rem; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .back-link { display: inline-block; margin-top: 1.4rem; color: var(--green); font-size: 0.85rem; text-decoration: none; font-weight: 700; }
+  .next-info { background: var(--green-light); border-left: 3px solid var(--green); padding: 0.9rem 1.1rem; font-size: 0.83rem; color: #1A5C3A; margin-top: 1rem; text-align: left; border-radius: 2px; line-height: 1.8; }
+
+  footer { background: #111827; padding: 1.2rem 5%; text-align: center; }
+  footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
+
+  @media (max-width: 600px) {
+    .q-option label { padding: 0.5rem 0.2rem; font-size: 0.75rem; }
+    .q-option label .opt-freq { display: none; }
+    .scale-item .val { font-size: 0.62rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<!-- 送信中オーバーレイ -->
+<div class="overlay" id="overlay">
+  <div class="overlay-box">
+    <div class="spinner"></div>
+    <p style="font-size:0.9rem; color:#4A5568;">送信中です…</p>
+  </div>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">研究1 参加者ページ</a>
+  <a href="index.html" class="nav-back">← トップへ戻る</a>
+</nav>
+
+<div class="page-header">
+  <p class="header-eyebrow">Questionnaire / CES-D</p>
+  <h1 class="header-title">うつ傾向の測定</h1>
+  <p class="header-sub">この1週間のからだや心の状態についてお聞きします。</p>
+</div>
+
+<main id="mainContent">
+  <!-- JavaScript で動的に描画 -->
+</main>
+
+<footer>
+  <p>© 2026 池田研究室 ― 尚絅学院大学 心理部門　|　倫理審査承認番号：2026-002</p>
+</footer>
+
+<!-- 隠しiframe（GAS送信用） -->
+<iframe id="gasIframe" name="gasIframe" style="display:none;"></iframe>
+
+<script>
+// ══════════════════════════════════════════════
+//  設定
+// ══════════════════════════════════════════════
+const GAS_URL = 'https://script.google.com/macros/s/AKfycby5FYl7ruaqdoQvbxhCrUxUG8IMpxYHY6cUFwASDWxwplmTA49eOV6-24hgDD0grCSV/exec';
+const ID_KEY  = 'study1_participant_id';
+
+// 同一端末での当日の二重送信を防ぐキー
+// （端末をまたいだセッション管理はGAS側で行う）
+function getTodaySubmitKey(pid) {
+  return `cesd_submitted_${pid}_${new Date().toDateString()}`;
+}
+
+// CES-D 20項目（島ら,1985 付録B）
+const QUESTIONS = [
+  { id: 1,  text: '普段は何でもないことが煩わしい。',                    rev: false },
+  { id: 2,  text: '食べたくない。食欲が落ちた。',                        rev: false },
+  { id: 3,  text: '家族や友達から励ましてもらっても，気分が晴れない。',   rev: false },
+  { id: 4,  text: '他の人と同じ程度には，能力があると思う。',            rev: true  },
+  { id: 5,  text: '物事に集中できない。',                               rev: false },
+  { id: 6,  text: '憂うつだ。',                                         rev: false },
+  { id: 7,  text: '何をするのも面倒だ。',                               rev: false },
+  { id: 8,  text: 'これから先のことについて積極的に考えることができる。', rev: true  },
+  { id: 9,  text: '過去のことについてくよくよ考える。',                  rev: false },
+  { id: 10, text: '何か恐ろしい気持がする。',                            rev: false },
+  { id: 11, text: 'なかなか眠れない。',                                  rev: false },
+  { id: 12, text: '生活について不満なくすごせる。',                      rev: true  },
+  { id: 13, text: '普段より口数が少ない。口が重い。',                    rev: false },
+  { id: 14, text: '一人ぼっちで寂しい。',                               rev: false },
+  { id: 15, text: '皆がよそよそしいと思う。',                            rev: false },
+  { id: 16, text: '毎日が楽しい。',                                      rev: true  },
+  { id: 17, text: '急に泣きだすことがある。',                            rev: false },
+  { id: 18, text: '悲しいと感じる。',                                    rev: false },
+  { id: 19, text: '皆が自分を嫌っていると感じる。',                      rev: false },
+  { id: 20, text: '仕事が手につかない。',                               rev: false },
+];
+
+// 選択肢ラベル
+const OPTIONS = [
+  { key: 'A', freq: '全くないか\n1日未満' },
+  { key: 'B', freq: '1〜2日\nあった' },
+  { key: 'C', freq: '3〜4日\nあった' },
+  { key: 'D', freq: '5日以上\nあった' },
+];
+
+// ══════════════════════════════════════════════
+//  採点
+// ══════════════════════════════════════════════
+function calcScore(answers) {
+  // answers: { 1: 'A', 2: 'B', ... }
+  let total = 0;
+  const scores = {};
+  QUESTIONS.forEach(q => {
+    const ans = answers[q.id]; // 'A','B','C','D'
+    const idx = ['A','B','C','D'].indexOf(ans);
+    const score = q.rev ? 3 - idx : idx;
+    scores[q.id] = score;
+    total += score;
+  });
+  return { total, scores };
+}
+
+// ══════════════════════════════════════════════
+//  描画
+// ══════════════════════════════════════════════
+function render() {
+  const pid  = localStorage.getItem(ID_KEY);
+  const main = document.getElementById('mainContent');
+
+  // ID未設定
+  if (!pid) {
+    main.innerHTML = `
+      <div class="state-panel already" style="display:block;">
+        <div class="state-icon">🔒</div>
+        <h2>参加者IDが未設定です</h2>
+        <p>トップページで参加者IDを入力・保存してから戻ってきてください。</p>
+        <a href="index.html" class="back-link">← トップページへ戻る</a>
+      </div>`;
+    return;
+  }
+
+  // 当日すでに送信済み（同一端末での二重送信防止）
+  if (localStorage.getItem(getTodaySubmitKey(pid))) {
+    main.innerHTML = `
+      <div class="state-panel already" style="display:block;">
+        <div class="state-icon">✅</div>
+        <h2>本日の回答は完了しています</h2>
+        <p>
+          本日分のCES-Dへの回答はすでに送信されています。<br>
+          次回の回答日（7日目または最終日）にまたアクセスしてください。<br><br>
+          <span style="font-size:0.8rem; color:var(--gray);">
+            ※ 異なる端末から誤って表示されている場合は，<br>研究担当者にご連絡ください。
+          </span>
+        </p>
+        <a href="index.html" class="back-link">← トップページへ戻る</a>
+      </div>`;
+    return;
+  }
+
+  // 質問紙を描画
+  main.innerHTML = `
+    <div class="instruction-card">
+      <p>この1週間のあなたのからだや心の状態についてお聞きします。<br>
+         各項目について，この1週間に当てはまる頻度を選んでください。</p>
+      <div class="scale-row">
+        <div class="scale-item"><span class="key">A</span><span class="val">全くないか<br>1日未満</span></div>
+        <div class="scale-item"><span class="key">B</span><span class="val">1〜2日<br>あった</span></div>
+        <div class="scale-item"><span class="key">C</span><span class="val">3〜4日<br>あった</span></div>
+        <div class="scale-item"><span class="key">D</span><span class="val">5日以上<br>あった</span></div>
+      </div>
+    </div>
+
+    <p class="progress-label">回答済み：<span id="progressCount">0</span> / ${QUESTIONS.length} 問</p>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progressBar" style="width:0%"></div>
+    </div>
+
+    <div id="questionList">
+      ${QUESTIONS.map(q => `
+        <div class="q-card" id="qcard-${q.id}">
+          <div class="q-header">
+            <span class="q-num">Q${String(q.id).padStart(2,'0')}</span>
+            <span class="q-text">${q.text}</span>
+          </div>
+          <div class="q-options">
+            ${OPTIONS.map(opt => `
+              <div class="q-option">
+                <input type="radio" name="q${q.id}" id="q${q.id}_${opt.key}" value="${opt.key}" onchange="onAnswer(${q.id})">
+                <label for="q${q.id}_${opt.key}">
+                  <span class="opt-key">${opt.key}</span>
+                  <span class="opt-freq">${opt.freq.replace('\n','<br>')}</span>
+                </label>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="submit-area">
+      <button class="btn-submit" id="submitBtn" onclick="submitForm()" disabled>
+        回答を送信する
+      </button>
+      <p class="submit-note">全${QUESTIONS.length}問に回答してから送信できます</p>
+      <p class="error-msg" id="errorMsg">すべての項目に回答してください。</p>
+    </div>
+
+    <!-- 送信完了パネル（初期非表示） -->
+    <div class="state-panel done" id="donePanel">
+      <div class="state-icon">✅</div>
+      <h2>回答が完了しました</h2>
+      <p>ご回答ありがとうございました。</p>
+      <div class="next-info">
+        次回の回答は，<strong>7日目または最終日（14日目）</strong>に実施してください。<br>
+        3回すべて完了すると，CES-Dの測定は終了です。
+      </div>
+      <a href="index.html" class="back-link">← トップページへ戻る</a>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════
+//  回答進捗の更新
+// ══════════════════════════════════════════════
+function onAnswer(qId) {
+  const card = document.getElementById(`qcard-${qId}`);
+  if (card) card.classList.add('answered');
+  updateProgress();
+}
+function updateProgress() {
+  const answered = QUESTIONS.filter(q => {
+    return document.querySelector(`input[name="q${q.id}"]:checked`);
+  }).length;
+  document.getElementById('progressCount').textContent = answered;
+  const pct = (answered / QUESTIONS.length) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('submitBtn').disabled = (answered < QUESTIONS.length);
+}
+
+// ══════════════════════════════════════════════
+//  送信処理
+// ══════════════════════════════════════════════
+function submitForm() {
+  const pid = localStorage.getItem(ID_KEY);
+
+  // 全問チェック
+  const answers = {};
+  let allAnswered = true;
+  QUESTIONS.forEach(q => {
+    const el = document.querySelector(`input[name="q${q.id}"]:checked`);
+    if (!el) { allAnswered = false; return; }
+    answers[q.id] = el.value;
+  });
+  if (!allAnswered) {
+    document.getElementById('errorMsg').style.display = 'block';
+    return;
+  }
+  document.getElementById('errorMsg').style.display = 'none';
+
+  // 採点
+  const { total, scores } = calcScore(answers);
+
+  // 送信データ作成
+  // ※ セッション番号はGAS側で自動判定する
+  const now = new Date().toLocaleString('ja-JP');
+  const payload = {
+    参加者ID:    pid,
+    送信日時:    now,
+    合計得点:    total,
+    カットオフ超: total >= 16 ? '要確認（16点以上）' : '範囲内',
+  };
+  QUESTIONS.forEach(q => {
+    payload[`Q${String(q.id).padStart(2,'0')}_回答`] = answers[q.id];
+    payload[`Q${String(q.id).padStart(2,'0')}_得点`] = scores[q.id];
+  });
+
+  // オーバーレイ表示
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('submitBtn').disabled = true;
+
+  // 隠しフォームで送信
+  const gasForm = document.createElement('form');
+  gasForm.action  = GAS_URL;
+  gasForm.method  = 'POST';
+  gasForm.target  = 'gasIframe';
+  gasForm.style.display = 'none';
+  Object.entries(payload).forEach(([k, v]) => {
+    const input = document.createElement('input');
+    input.type  = 'hidden';
+    input.name  = k;
+    input.value = v;
+    gasForm.appendChild(input);
+  });
+  document.body.appendChild(gasForm);
+
+  setTimeout(() => {
+    gasForm.submit();
+    document.body.removeChild(gasForm);
+    document.getElementById('overlay').classList.remove('show');
+
+    // 当日送信済みフラグをlocalStorageに記録（同一端末の二重送信防止）
+    localStorage.setItem(getTodaySubmitKey(pid), '1');
+
+    // 完了パネルを表示
+    document.getElementById('questionList').style.display  = 'none';
+    document.querySelector('.submit-area').style.display   = 'none';
+    document.querySelector('.instruction-card').style.display = 'none';
+    document.querySelector('.progress-bar-wrap').style.display = 'none';
+    document.querySelector('.progress-label').style.display = 'none';
+    document.getElementById('donePanel').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 2000);
+}
+
+// ══════════════════════════════════════════════
+//  初期化
+// ══════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', render);
+</script>
+</body>
+</html>
