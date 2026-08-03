@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Garmin vivosmart 5 使い方ガイド | 研究1</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:        #1A2340;
+    --navy-mid:    #243055;
+    --green:       #2EAA6E;
+    --green-light: #EBF7F2;
+    --green-dim:   #1E7A4E;
+    --amber:       #E8973A;
+    --amber-light: #FFF8EC;
+    --red:         #E05252;
+    --gray:        #8A94A6;
+    --gray-light:  #F4F6FA;
+    --border:      #E2E8F0;
+    --white:       #FFFFFF;
+    --text:        #1A2340;
+    --mono:        'DM Mono', monospace;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Noto Sans JP', sans-serif; color: var(--text); background: var(--gray-light); line-height: 1.8; }
+
+  /* NAV */
+  nav {
+    background: var(--navy); display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5%; height: 56px; position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo { color: var(--white); font-family: 'Noto Serif JP', serif; font-size: 0.85rem; text-decoration: none; letter-spacing: 0.05em; }
+  .nav-back { color: rgba(255,255,255,0.7); font-size: 0.82rem; text-decoration: none; transition: color .2s; }
+  .nav-back:hover { color: var(--green); }
+
+  /* HEADER */
+  .page-header { background: var(--navy); padding: 40px 5% 36px; position: relative; overflow: hidden; }
+  .page-header::after { content: 'GARMIN'; position: absolute; right: 3%; top: 50%; transform: translateY(-50%); font-family: var(--mono); font-size: clamp(3rem, 8vw, 6rem); color: rgba(255,255,255,0.04); pointer-events: none; }
+  .header-eyebrow { font-family: var(--mono); font-size: 0.7rem; color: var(--green); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.6rem; }
+  .header-title { font-family: 'Noto Serif JP', serif; font-size: clamp(1.3rem, 3vw, 1.8rem); color: var(--white); margin-bottom: 0.6rem; }
+  .header-sub { color: rgba(255,255,255,0.55); font-size: 0.83rem; max-width: 520px; line-height: 1.9; }
+
+  /* TOC */
+  .toc-bar {
+    background: var(--white); border-bottom: 1.5px solid var(--border);
+    padding: 0 5%; display: flex; overflow-x: auto; scrollbar-width: none;
+    position: sticky; top: 56px; z-index: 90;
+  }
+  .toc-bar::-webkit-scrollbar { display: none; }
+  .toc-link { padding: 0.7rem 1rem; font-size: 0.78rem; font-weight: 500; color: var(--gray); text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent; transition: all .2s; flex-shrink: 0; }
+  .toc-link:hover { color: var(--navy); border-bottom-color: var(--green); }
+
+  /* MAIN */
+  main { max-width: 800px; margin: 0 auto; padding: 36px 5% 80px; }
+
+  /* GUIDE SECTION */
+  .guide-section { background: var(--white); border: 1.5px solid var(--border); border-radius: 3px; margin-bottom: 1.5rem; overflow: hidden; }
+  .section-header { background: var(--navy); padding: 1rem 1.6rem; display: flex; align-items: center; gap: 0.9rem; }
+  .section-header.garmin-blue { background: #005B8E; }
+  .section-header.labfront-purple { background: #3B2D8F; }
+  .section-icon { font-size: 1.3rem; }
+  .section-title { font-family: 'Noto Serif JP', serif; font-size: 1.05rem; color: var(--white); }
+  .section-body { padding: 1.6rem; }
+
+  /* STEP */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step { display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .step:last-child { border-bottom: none; padding-bottom: 0; }
+  .step-num { width: 30px; height: 30px; background: var(--green); color: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 0.8rem; font-weight: 500; flex-shrink: 0; margin-top: 0.1rem; }
+  .step-num.blue { background: #005B8E; }
+  .step-num.purple { background: #3B2D8F; }
+  .step-num.skip { background: var(--gray); }
+  .step-content { flex: 1; }
+  .step-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 0.2rem; }
+  .step-desc { font-size: 0.85rem; color: #4A5568; line-height: 1.8; }
+
+  /* SKIP BADGE */
+  .skip-badge {
+    display: inline-block; font-size: 0.68rem; font-family: var(--mono);
+    background: var(--gray-light); color: var(--gray); border: 1px solid var(--border);
+    border-radius: 2px; padding: 0.1rem 0.45rem; margin-left: 0.4rem; vertical-align: middle; letter-spacing: 0.06em;
+  }
+
+  /* ALERT */
+  .alert { border-radius: 2px; padding: 0.9rem 1.1rem; font-size: 0.83rem; line-height: 1.8; margin: 0.8rem 0; }
+  .alert-warn { background: var(--amber-light); border-left: 3px solid var(--amber); color: #7A5000; }
+  .alert-info { background: var(--green-light); border-left: 3px solid var(--green); color: #1A5C3A; }
+
+  /* INVITE CODE BOX */
+  .code-box {
+    margin: 0.8rem 0;
+    background: var(--gray-light);
+    border: 2px solid #3B2D8F;
+    border-radius: 4px;
+    padding: 0.9rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .code-box code {
+    font-family: var(--mono);
+    font-size: 1.15rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    color: var(--navy);
+    user-select: all;
+    -webkit-user-select: all;
+  }
+  .btn-copy {
+    background: #3B2D8F;
+    color: var(--white);
+    border: none;
+    border-radius: 3px;
+    padding: 0.5rem 1rem;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* APP DOWNLOAD CARDS */
+  .app-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.2rem; }
+  .app-card {
+    display: flex; align-items: center; gap: 0.8rem;
+    background: var(--gray-light);
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    padding: 0.9rem 1rem;
+    text-decoration: none;
+    transition: border-color .2s;
+  }
+  .app-card:hover { border-color: var(--green); }
+  .app-card-icon { font-size: 2rem; flex-shrink: 0; }
+  .app-card-os { font-size: 0.7rem; color: var(--gray); font-family: var(--mono); letter-spacing: 0.1em; margin-bottom: 0.2rem; }
+  .app-card-label { font-size: 0.88rem; font-weight: 700; color: var(--navy); }
+  .app-card-action { font-size: 0.75rem; color: var(--green); }
+
+  /* SUBSTEP */
+  .substep { display: flex; gap: 0.7rem; margin: 0.4rem 0; align-items: flex-start; }
+  .substep-num { width: 20px; height: 20px; background: var(--gray-light); border: 1.5px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-family: var(--mono); color: var(--navy); flex-shrink: 0; margin-top: 0.2rem; }
+  .substep p { font-size: 0.84rem; color: #4A5568; line-height: 1.7; }
+
+  /* BACK BTN */
+  .back-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--navy); color: var(--white); text-decoration: none; padding: 0.7rem 1.4rem; border-radius: 2px; font-size: 0.85rem; font-weight: 700; margin-top: 1rem; transition: background .2s; }
+  .back-btn:hover { background: var(--navy-mid); }
+
+  /* OVERVIEW CARD */
+  .overview-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+  .overview-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 3px; padding: 1.2rem 1.4rem; }
+  .overview-card-icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+  .overview-card h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.3rem; }
+  .overview-card p { font-size: 0.8rem; color: #4A5568; line-height: 1.7; }
+
+  footer { background: #111827; padding: 1.2rem 5%; text-align: center; }
+  footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
+
+  @media (max-width: 600px) {
+    .app-cards, .overview-cards { grid-template-columns: 1fr; }
+    .section-body { padding: 1.2rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">研究1 参加者ページ</a>
+  <a href="index.html" class="nav-back">← トップへ戻る</a>
+</nav>
+
+<div class="page-header">
+  <p class="header-eyebrow">Guide / Garmin vivosmart 5</p>
+  <h1 class="header-title">Garmin vivosmart 5 使い方ガイド</h1>
+  <p class="header-sub">このページでは，Garmin Connectアプリの初期設定と，データ収集に使用するLabfrontアプリの設定手順を説明します。</p>
+</div>
+
+<!-- TOC -->
+<div class="toc-bar">
+  <a class="toc-link" href="#overview">はじめに</a>
+  <a class="toc-link" href="#garmin-dl">① アプリDL</a>
+  <a class="toc-link" href="#garmin-account">② アカウント作成</a>
+  <a class="toc-link" href="#garmin-device">③ デバイスのペアリング</a>
+  <a class="toc-link" href="#garmin-profile">④ プロフィール設定</a>
+  <a class="toc-link" href="#garmin-sync">⑤ 同期・完了</a>
+  <a class="toc-link" href="#garmin-charge">⑥ 充電</a>
+  <a class="toc-link" href="#labfront">⑦ Labfrontの設定</a>
+</div>
+
+<main>
+
+  <!-- はじめに -->
+  <div id="overview" class="overview-cards">
+    <div class="overview-card">
+      <div class="overview-card-icon">⌚</div>
+      <h3>Garmin Connect</h3>
+      <p>スマートウォッチ（Garmin vivosmart 5）を管理するための公式アプリです。初回のみ設定が必要です。</p>
+    </div>
+    <div class="overview-card">
+      <div class="overview-card-icon">🔬</div>
+      <h3>Labfront</h3>
+      <p>研究データを収集するためのアプリです。招待コードを入力して研究に参加します。</p>
+    </div>
+  </div>
+
+  <!-- ① Garmin Connect ダウンロード -->
+  <div class="guide-section" id="garmin-dl">
+    <div class="section-header garmin-blue">
+      <span class="section-icon">📥</span>
+      <h2 class="section-title">① Garmin Connect アプリをダウンロード</h2>
+    </div>
+    <div class="section-body">
+      <div class="app-cards">
+        <a href="https://apps.apple.com/jp/app/garmin-connect/id583446403"
+           target="_blank" rel="noopener" class="app-card">
+          <div class="app-card-icon">🍎</div>
+          <div>
+            <p class="app-card-os">iPhone / iPad</p>
+            <p class="app-card-label">App Store で開く</p>
+            <p class="app-card-action">タップしてダウンロード →</p>
+          </div>
+        </a>
+        <a href="https://play.google.com/store/apps/details?id=com.garmin.android.apps.connectmobile"
+           target="_blank" rel="noopener" class="app-card">
+          <div class="app-card-icon">🤖</div>
+          <div>
+            <p class="app-card-os">Android</p>
+            <p class="app-card-label">Google Play で開く</p>
+            <p class="app-card-action">タップしてダウンロード →</p>
+          </div>
+        </a>
+      </div>
+      <div class="alert alert-info">
+        ダウンロード後，アプリを起動してください。次のステップへ進みます。
+      </div>
+    </div>
+  </div>
+
+  <!-- ② アカウント作成 -->
+  <div class="guide-section" id="garmin-account">
+    <div class="section-header garmin-blue">
+      <span class="section-icon">👤</span>
+      <h2 class="section-title">② アカウントの作成</h2>
+    </div>
+    <div class="section-body">
+      <div class="steps">
+        <div class="step">
+          <div class="step-num blue">1</div>
+          <div class="step-content">
+            <p class="step-title">生年月日・地域を入力する</p>
+            <p class="step-desc">アプリの指示に従い，生年月日と地域（日本）を入力・設定してください。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num blue">2</div>
+          <div class="step-content">
+            <p class="step-title">名前・メールアドレス・パスワードを入力し，アカウントを作成する</p>
+            <p class="step-desc">お名前，メールアドレス，パスワードを入力してください。利用規約への同意にチェックを入れてから，「<strong>アカウント作成</strong>」ボタンをタップしてください。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ デバイスのペアリング -->
+  <div class="guide-section" id="garmin-device">
+    <div class="section-header garmin-blue">
+      <span class="section-icon">🔗</span>
+      <h2 class="section-title">③ デバイスのペアリング</h2>
+    </div>
+    <div class="section-body">
+      <div class="alert alert-warn" style="margin-bottom:1rem;">
+        <strong>事前確認：</strong>スマートフォンのBluetoothをオンにしてから，以下の手順を進めてください。
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num blue">1</div>
+          <div class="step-content">
+            <p class="step-title">「近くのアクセサリを探す」をタップする</p>
+            <p class="step-desc">アプリがBluetoothで近くのGarminデバイスを自動的に検索します。しばらく待つと「Garmin vivosmart 5」が表示されます。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num blue">2</div>
+          <div class="step-content">
+            <p class="step-title">「設定」をタップする</p>
+            <p class="step-desc">表示されたデバイス名の横にある「<strong>設定</strong>」をタップしてペアリングを開始します。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num blue">3</div>
+          <div class="step-content">
+            <p class="step-title">6桁の確認コードを入力する</p>
+            <p class="step-desc">スマートウォッチの画面に6桁の数字が表示されます。その数字をアプリに入力してください。</p>
+            <div class="alert alert-info" style="margin-top:0.5rem;">コードはペアリングのたびに変わります。必ずスマートウォッチの画面に表示されている数字を確認してください。</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num blue">4</div>
+          <div class="step-content">
+            <p class="step-title">「完了」ボタンをタップする</p>
+            <p class="step-desc">コードが一致するとペアリングが完了します。「<strong>完了</strong>」ボタンをタップして次へ進みます。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ プロフィール設定 -->
+  <div class="guide-section" id="garmin-profile">
+    <div class="section-header garmin-blue">
+      <span class="section-icon">⚙️</span>
+      <h2 class="section-title">④ プロフィールの設定</h2>
+    </div>
+    <div class="section-body">
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-num skip">1</div>
+          <div class="step-content">
+            <p class="step-title">写真設定<span class="skip-badge">スキップ</span></p>
+            <p class="step-desc">写真の設定画面は「<strong>次へ</strong>」をタップしてスキップしてください。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num blue">2</div>
+          <div class="step-content">
+            <p class="step-title">性別を選択する</p>
+            <p class="step-desc">ご自身の性別を選択してください。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num blue">3</div>
+          <div class="step-content">
+            <p class="step-title">身長を入力する</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num blue">4</div>
+          <div class="step-content">
+            <p class="step-title">体重を入力する</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num blue">5</div>
+          <div class="step-content">
+            <p class="step-title">就寝時刻を入力する</p>
+            <p class="step-desc">おおよその就寝時刻で構いません。普段寝ている時間を入力してください。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num skip">6</div>
+          <div class="step-content">
+            <p class="step-title">アクティビティ<span class="skip-badge">スキップ</span></p>
+            <p class="step-desc">アクティビティの設定画面は，デフォルトのまま「<strong>次へ</strong>」をタップしてください。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num blue">7</div>
+          <div class="step-content">
+            <p class="step-title">着用する手首を選択する</p>
+            <p class="step-desc">スマートウォッチを着ける手首を選択します。<strong>基本は利き手の逆</strong>（右利きの方は左手首）を選んでください。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num blue">8</div>
+          <div class="step-content">
+            <p class="step-title">「デフォルトの目標を維持」をタップする</p>
+            <p class="step-desc">歩数などの目標設定は，「<strong>デフォルトの目標を維持</strong>」をタップしてそのまま進んでください。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num skip">9</div>
+          <div class="step-content">
+            <p class="step-title">カレンダーアクセス<span class="skip-badge">スキップ</span></p>
+            <p class="step-desc">「<strong>スキップ</strong>」をタップしてください。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num skip">10</div>
+          <div class="step-content">
+            <p class="step-title">位置権限<span class="skip-badge">スキップ</span></p>
+            <p class="step-desc">「<strong>スキップ</strong>」をタップしてください。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num skip">11</div>
+          <div class="step-content">
+            <p class="step-title">スマートフォンの権限<span class="skip-badge">スキップ</span></p>
+            <p class="step-desc">「<strong>スキップ</strong>」をタップしてください。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num blue">12</div>
+          <div class="step-content">
+            <p class="step-title">データ保存と処理に関する同意をする</p>
+            <p class="step-desc">内容をご確認のうえ，「<strong>同意する</strong>」をタップしてください。</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ 同期・完了 -->
+  <div class="guide-section" id="garmin-sync">
+    <div class="section-header garmin-blue">
+      <span class="section-icon">🔄</span>
+      <h2 class="section-title">⑤ 同期して設定を完了する</h2>
+    </div>
+    <div class="section-body">
+      <div class="steps">
+        <div class="step">
+          <div class="step-num blue">1</div>
+          <div class="step-content">
+            <p class="step-title">「今すぐ同期」をタップする</p>
+            <p class="step-desc">スマートウォッチとアプリが同期し，設定内容が反映されます。スマートウォッチとスマートフォンを近づけた状態でタップしてください。</p>
+            <div class="alert alert-info" style="margin-top:0.5rem;">同期できない場合は「<strong>スキップ</strong>」をタップしても構いません。後から自動で同期されます。</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num blue">2</div>
+          <div class="step-content">
+            <p class="step-title">Garmin Connectの設定完了</p>
+            <p class="step-desc">以上でGarmin Connectの初期設定は完了です。続いて，研究データの収集に使用する「<strong>Labfront</strong>」アプリの設定に進んでください。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 一時的な取り外しについて -->
+  <div class="guide-section">
+    <div class="section-header garmin-blue">
+      <span class="section-icon">👟</span>
+      <h2 class="section-title">一時的に腕への装着ができない場合</h2>
+    </div>
+    <div class="section-body">
+      <p style="font-size:0.85rem; color:#4A5568; margin-bottom:1rem;">バイトや仕事など，職場の都合で腕への装着ができなくなる時間帯が生じる場合があります。そのような場合は，以下の対応をお願いします。</p>
+      <div class="alert alert-info">
+        <strong>装着部位を足首に切り替えてください。</strong><br>
+        腕への装着が一時的にできない時間帯は，<strong>足首への装着に切り替えて</strong>そのままお過ごしください。その後，腕への装着が再び可能になったタイミングで，腕に戻していただければ問題ありません。
+      </div>
+      <div class="alert alert-warn" style="margin-top:0.8rem;">
+        <strong>取り外したままにしないでください。</strong>装着していない時間はデータが収集できません。腕への装着が難しい場合でも，足首への装着に切り替えることで，データの欠損を最小限に抑えることができます。
+      </div>
+    </div>
+  </div>
+    <div class="section-header garmin-blue">
+      <span class="section-icon">🔋</span>
+      <h2 class="section-title">充電について</h2>
+    </div>
+    <div class="section-body">
+
+      <div class="alert alert-warn" style="margin-bottom:1.2rem;">
+        <strong>充電が切れるとデータが収集できなくなります。</strong>1日に1回は画面の充電状況を確認し，必要であれば充電を行なってください。
+      </div>
+
+      <h3 style="font-size:0.92rem; font-weight:700; margin-bottom:0.8rem; color:var(--navy);">基本情報</h3>
+      <div class="overview-cards" style="margin-bottom:1.2rem;">
+        <div class="overview-card">
+          <div class="overview-card-icon">⏱️</div>
+          <h3>フル充電にかかる時間</h3>
+          <p>最大約 <strong>2〜3時間</strong></p>
+        </div>
+        <div class="overview-card">
+          <div class="overview-card-icon">📅</div>
+          <h3>1回の満充電で使用できる期間</h3>
+          <p>最大約 <strong>7日間</strong></p>
+        </div>
+      </div>
+
+      <div class="alert alert-info" style="margin-bottom:1.2rem;">
+        <strong>充電のタイミングのヒント：</strong>入浴時の数十分間だけ充電するだけで，1日分の充電チャージが可能です。入浴のたびに充電する習慣をつけると，充電切れを防ぎやすくなります。
+      </div>
+
+      <h3 style="font-size:0.92rem; font-weight:700; margin-bottom:0.8rem; color:var(--navy);">充電手順</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num blue">1</div>
+          <div class="step-content">
+            <p class="step-title">端子の汚れ・水分を取り除く</p>
+            <p class="step-desc">本体およびチャージングケーブルの端子やその周辺に付着した汚れや水分は，充電またはPCに接続する前に必ずクリーニングしてください。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num blue">2</div>
+          <div class="step-content">
+            <p class="step-title">チャージングケーブルの端子をデバイスに接続する</p>
+            <p class="step-desc">付属の専用チャージングケーブルの端子を，デバイス裏面の充電端子にしっかりと接続します。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num blue">3</div>
+          <div class="step-content">
+            <p class="step-title">USBをPC・USB電源に差し込む</p>
+            <p class="step-desc">チャージングケーブルのUSB端子を，PCなどのUSB接続口またはUSB電源アダプターに差し込みます。画面にバッテリー残量が表示されれば，充電が開始されています。</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="guide-section" id="labfront">
+    <div class="section-header labfront-purple">
+      <span class="section-icon">🔬</span>
+      <h2 class="section-title">⑦ Labfront アプリの設定</h2>
+    </div>
+    <div class="section-body">
+
+      <div class="app-cards" style="margin-bottom:1.2rem;">
+        <a href="https://apps.apple.com/jp/app/labfront-companion/id1626813782"
+           target="_blank" rel="noopener" class="app-card">
+          <div class="app-card-icon">🍎</div>
+          <div>
+            <p class="app-card-os">iPhone / iPad</p>
+            <p class="app-card-label">App Store で開く</p>
+            <p class="app-card-action">タップしてダウンロード →</p>
+          </div>
+        </a>
+        <a href="https://play.google.com/store/apps/details?id=com.labfront.production&hl=ja"
+           target="_blank" rel="noopener" class="app-card">
+          <div class="app-card-icon">🤖</div>
+          <div>
+            <p class="app-card-os">Android</p>
+            <p class="app-card-label">Google Play で開く</p>
+            <p class="app-card-action">タップしてダウンロード →</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="alert alert-warn" style="margin-bottom:1rem;">
+        <strong>重要：</strong>Labfrontのアプリストアページが見つからない場合は，研究担当者にお知らせください。担当者から直接インストール用のリンクをお送りします。
+      </div>
+
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-num purple">1</div>
+          <div class="step-content">
+            <p class="step-title">Bluetoothの使用を許可する</p>
+            <p class="step-desc">アプリ起動後，Bluetoothの使用許可を求める画面が表示されます。「<strong>許可</strong>」をタップしてください。GarminデバイスとLabfrontの通信に必要です。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num purple">2</div>
+          <div class="step-content">
+            <p class="step-title">通知の送信を許可する</p>
+            <p class="step-desc">通知の許可を求める画面が表示されます。「<strong>許可</strong>」をタップしてください。研究に関するリマインダーや連絡を受け取るために必要です。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num purple">3</div>
+          <div class="step-content">
+            <p class="step-title">招待コードを入力する</p>
+            <p class="step-desc">研究担当者から提示された「<strong>招待コード</strong>」を入力してください。招待コードは，初回来室時に研究担当者から直接お渡しします。</p>
+            <div class="alert alert-info" style="margin-top:0.6rem;">
+              招待コードは参加者ごとに異なります。初回来室時に研究担当者から直接お渡しします。
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="alert alert-info" style="margin-top:1rem;">
+        <strong>設定完了後：</strong>Labfrontアプリ上でGarminデバイスが認識されていることを確認してください。認識されていない場合は，BluetoothがオンになっているかとGarmin Connectアプリが起動中であるかを確認し，研究担当者へご連絡ください。
+      </div>
+
+    </div>
+  </div>
+
+  <a href="index.html" class="back-btn">← 参加者トップページへ戻る</a>
+
+</main>
+
+<footer>
+  <p>© 2026 池田研究室 ― 尚絅学院大学 心理部門　|　倫理審査承認番号：2026-002</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeStyle リブレ2 使い方ガイド | 研究1</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:   #1A2340;
+    --green:  #2EAA6E;
+    --green-light: #EBF7F2;
+    --green-dim: #1E7A4E;
+    --amber:  #E8973A;
+    --amber-light: #FFF8EC;
+    --red:    #E05252;
+    --gray:   #8A94A6;
+    --gray-light: #F4F6FA;
+    --border: #E2E8F0;
+    --white:  #FFFFFF;
+    --text:   #1A2340;
+    --mono:   'DM Mono', monospace;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Noto Sans JP', sans-serif; color: var(--text); background: var(--gray-light); line-height: 1.8; }
+
+  /* NAV */
+  nav {
+    background: var(--navy); display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5%; height: 56px; position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo { color: var(--white); font-family: 'Noto Serif JP', serif; font-size: 0.85rem; text-decoration: none; letter-spacing: 0.05em; }
+  .nav-back { color: rgba(255,255,255,0.7); font-size: 0.82rem; text-decoration: none; transition: color .2s; }
+  .nav-back:hover { color: var(--green); }
+
+  /* HEADER */
+  .page-header { background: var(--navy); padding: 40px 5% 36px; position: relative; overflow: hidden; }
+  .page-header::after { content: 'LIBRE 2'; position: absolute; right: 3%; top: 50%; transform: translateY(-50%); font-family: var(--mono); font-size: clamp(3rem, 8vw, 6rem); color: rgba(255,255,255,0.04); pointer-events: none; }
+  .header-eyebrow { font-family: var(--mono); font-size: 0.7rem; color: var(--green); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.6rem; }
+  .header-title { font-family: 'Noto Serif JP', serif; font-size: clamp(1.3rem, 3vw, 1.8rem); color: var(--white); margin-bottom: 0.6rem; }
+  .header-sub { color: rgba(255,255,255,0.55); font-size: 0.83rem; max-width: 520px; line-height: 1.9; }
+
+  /* TOC */
+  .toc-bar {
+    background: var(--white); border-bottom: 1.5px solid var(--border);
+    padding: 0 5%; display: flex; gap: 0; overflow-x: auto;
+    scrollbar-width: none; position: sticky; top: 56px; z-index: 90;
+  }
+  .toc-bar::-webkit-scrollbar { display: none; }
+  .toc-link {
+    padding: 0.7rem 1rem; font-size: 0.78rem; font-weight: 500; color: var(--gray);
+    text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent;
+    transition: all .2s; flex-shrink: 0;
+  }
+  .toc-link:hover { color: var(--navy); border-bottom-color: var(--green); }
+
+  /* MAIN */
+  main { max-width: 800px; margin: 0 auto; padding: 36px 5% 80px; }
+
+  /* SECTION */
+  .guide-section {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 3px; margin-bottom: 1.5rem; overflow: hidden;
+  }
+  .section-header {
+    background: var(--navy); padding: 1rem 1.6rem;
+    display: flex; align-items: center; gap: 0.9rem;
+  }
+  .section-icon { font-size: 1.3rem; }
+  .section-title { font-family: 'Noto Serif JP', serif; font-size: 1.05rem; color: var(--white); }
+  .section-body { padding: 1.6rem; }
+
+  /* STEP */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex; gap: 1rem; padding: 1rem 0;
+    border-bottom: 1px solid var(--border); align-items: flex-start;
+  }
+  .step:last-child { border-bottom: none; padding-bottom: 0; }
+  .step-num {
+    width: 30px; height: 30px; background: var(--green); color: var(--white);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 0.8rem; font-weight: 500; flex-shrink: 0; margin-top: 0.1rem;
+  }
+  .step-content { flex: 1; }
+  .step-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 0.3rem; }
+  .step-desc { font-size: 0.85rem; color: #4A5568; line-height: 1.8; }
+
+  /* ALERT BOX */
+  .alert {
+    border-radius: 2px; padding: 0.9rem 1.1rem;
+    font-size: 0.83rem; line-height: 1.8; margin: 0.8rem 0;
+  }
+  .alert-warn {
+    background: var(--amber-light); border-left: 3px solid var(--amber); color: #7A5000;
+  }
+  .alert-info {
+    background: var(--green-light); border-left: 3px solid var(--green); color: #1A5C3A;
+  }
+  .alert-danger {
+    background: #FFF0F0; border-left: 3px solid var(--red); color: #8B1A1A;
+  }
+  .alert strong { font-weight: 700; }
+
+  /* OS TABS */
+  .os-tabs { display: flex; gap: 0; margin-bottom: 1rem; border: 1.5px solid var(--border); border-radius: 3px; overflow: hidden; }
+  .os-tab {
+    flex: 1; padding: 0.55rem 0.8rem; font-size: 0.82rem; font-weight: 700;
+    background: var(--gray-light); color: var(--gray); border: none; cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif; transition: all .2s;
+  }
+  .os-tab.active { background: var(--navy); color: var(--white); }
+  .os-panel { display: none; }
+  .os-panel.active { display: block; }
+
+  /* CARD GRID */
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.8rem; }
+  .info-card { background: var(--gray-light); border-radius: 2px; padding: 1rem; }
+  .info-card-icon { font-size: 1.4rem; margin-bottom: 0.4rem; }
+  .info-card h4 { font-size: 0.88rem; font-weight: 700; margin-bottom: 0.3rem; }
+  .info-card p { font-size: 0.8rem; color: #4A5568; line-height: 1.7; }
+
+  /* Q&A */
+  .qa-item { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+  .qa-item:last-child { border-bottom: none; }
+  .qa-q { display: flex; align-items: flex-start; gap: 0.6rem; margin-bottom: 0.5rem; }
+  .qa-badge { background: var(--navy); color: var(--white); font-family: var(--mono); font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 2px; flex-shrink: 0; margin-top: 0.2rem; }
+  .qa-badge-a { background: var(--green); color: var(--white); font-family: var(--mono); font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 2px; flex-shrink: 0; margin-top: 0.2rem; }
+  .qa-text { font-size: 0.9rem; font-weight: 700; }
+  .qa-a { display: flex; align-items: flex-start; gap: 0.6rem; }
+  .qa-a-text { font-size: 0.85rem; color: #4A5568; line-height: 1.8; }
+
+  /* SUBSTEP */
+  .substep { display: flex; gap: 0.7rem; margin-bottom: 0.6rem; align-items: flex-start; }
+  .substep-num { width: 20px; height: 20px; background: var(--gray-light); border: 1.5px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-family: var(--mono); color: var(--navy); flex-shrink: 0; margin-top: 0.2rem; }
+  .substep p { font-size: 0.84rem; color: #4A5568; line-height: 1.7; }
+
+  /* BACK BTN */
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--navy); color: var(--white); text-decoration: none;
+    padding: 0.7rem 1.4rem; border-radius: 2px; font-size: 0.85rem;
+    font-weight: 700; margin-top: 1rem; transition: background .2s;
+  }
+  .back-btn:hover { background: #243055; }
+
+  /* SUPPORT */
+  .support-box {
+    background: var(--navy); border-radius: 3px; padding: 1.4rem 1.6rem;
+    margin-top: 1.5rem; display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
+  }
+  .support-box .label { font-size: 0.75rem; color: rgba(255,255,255,0.55); font-family: var(--mono); letter-spacing: 0.1em; margin-bottom: 0.3rem; }
+  .support-box .tel { font-family: var(--mono); font-size: 1.5rem; font-weight: 500; color: var(--green); }
+  .support-box .hours { font-size: 0.78rem; color: rgba(255,255,255,0.55); margin-top: 0.2rem; }
+
+  footer { background: #111827; padding: 1.2rem 5%; text-align: center; }
+  footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
+
+  @media (max-width: 600px) {
+    .card-grid { grid-template-columns: 1fr; }
+    .section-body { padding: 1.2rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">研究1 参加者ページ</a>
+  <a href="index.html" class="nav-back">← トップへ戻る</a>
+</nav>
+
+<div class="page-header">
+  <p class="header-eyebrow">Guide / FreeStyle LibreLink</p>
+  <h1 class="header-title">FreeStyle リブレ2 使い方ガイド</h1>
+  <p class="header-sub">このページでは，センサーの装着から起動・日常使用まで，研究に必要な手順を説明します。</p>
+</div>
+
+<!-- TOC -->
+<div class="toc-bar">
+  <a class="toc-link" href="#account">① アカウント作成</a>
+  <a class="toc-link" href="#attach">② センサーの装着</a>
+  <a class="toc-link" href="#start">③ センサーの起動</a>
+  <a class="toc-link" href="#permission">④ 各種許可の設定</a>
+  <a class="toc-link" href="#qa">⑤ 装着中の注意</a>
+  <a class="toc-link" href="#remove">⑥ センサーの取り外し</a>
+  <a class="toc-link" href="#share">⑦ データ共有</a>
+</div>
+
+<main>
+
+  <!-- ① アカウント作成 -->
+  <div class="guide-section" id="account">
+    <div class="section-header">
+      <span class="section-icon">📱</span>
+      <h2 class="section-title">① FreeStyleリブレLink アカウント作成</h2>
+    </div>
+    <div class="section-body">
+      <div class="alert alert-info">
+        <strong>まず始めに：</strong>App Store（iOS）または Google Play（Android）から「<strong>リブレLink</strong>」と検索し，FreeStyleリブレLinkアプリをダウンロードしてください。ご使用にはNFC設定を有効にすることが必要です。
+      </div>
+      <div class="card-grid" style="margin-bottom:1.2rem;">
+        <a href="https://apps.apple.com/jp/app/freestyle-librelink-jp/id1449296861"
+           target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="info-card" style="display:flex; align-items:center; gap:0.8rem; border:1.5px solid var(--border); transition:border-color .2s;"
+               onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:2rem; flex-shrink:0;">🍎</div>
+            <div>
+              <p style="font-size:0.7rem; color:var(--gray); font-family:var(--mono); letter-spacing:0.1em; margin-bottom:0.2rem;">iPhone / iPad</p>
+              <p style="font-size:0.88rem; font-weight:700; color:var(--navy);">App Store で開く</p>
+              <p style="font-size:0.75rem; color:var(--green);">タップしてダウンロード →</p>
+            </div>
+          </div>
+        </a>
+        <a href="https://play.google.com/store/apps/details?id=com.freestylelibre.app.jp&hl=ja"
+           target="_blank" rel="noopener" style="text-decoration:none;">
+          <div class="info-card" style="display:flex; align-items:center; gap:0.8rem; border:1.5px solid var(--border); transition:border-color .2s;"
+               onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:2rem; flex-shrink:0;">🤖</div>
+            <div>
+              <p style="font-size:0.7rem; color:var(--gray); font-family:var(--mono); letter-spacing:0.1em; margin-bottom:0.2rem;">Android</p>
+              <p style="font-size:0.88rem; font-weight:700; color:var(--navy);">Google Play で開く</p>
+              <p style="font-size:0.75rem; color:var(--green);">タップしてダウンロード →</p>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="alert alert-info" style="margin-bottom:1rem;">
+        <strong>ダウンロード前の確認：</strong>スマートフォンのNFC機能が有効になっていることを確認してください。NFCが無効の場合，センサーのスキャンができません。
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <p class="step-title">アプリを起動し，利用規約を確認する</p>
+            <p class="step-desc">ダウンロードしたアプリをタップして立ち上げます。最初に利用規約・プライバシーポリシーを確認してください。同意しない場合はアプリを使用できません。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <p class="step-title">リブレViewへのアカウント登録を開始する</p>
+            <p class="step-desc">一番下の「<strong>今すぐ始めましょう</strong>」をタップして進めます。お住まいの国が「<strong>日本</strong>」であることを確認して「次へ」をタップしてください。</p>
+            <div class="alert alert-info" style="margin-top:0.5rem;">すでにリブレViewアカウントをお持ちの方は「サインイン」より登録済みのアカウント情報を入力してください。</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <p class="step-title">必要事項を入力してアカウントを作成する</p>
+            <p class="step-desc">氏名，生年月日，メールアドレス，パスワード等の必要事項を入力し，アカウントを作成します。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <p class="step-title">Abbottのデータ使用への同意を選択する</p>
+            <p class="step-desc">Abbottが製品改善や研究のためにアプリのデータを使用することについて同意の選択をします。氏名等の個人情報は使用されません。同意選択は後日 libreview.com 上のアカウント設定で変更可能です。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <p class="step-title">測定単位を確認し，炭水化物量の単位を設定する</p>
+            <p class="step-desc">測定単位（グルコース値の単位）が正しいことを確認し，食事量の入力に使用する炭水化物量の単位を設定します。日本の場合，グルコース値は <strong>mg/dL</strong> です。（炭水化物量の単位がわからない場合は<strong>グラム</strong>を選択してください）。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">6</div>
+          <div class="step-content">
+            <p class="step-title">初期設定の完了を確認する</p>
+            <p class="step-desc">「<strong>ようこそ！</strong>」の画面が表示されればアプリの初期設定は完了です。リアルタイム測定の概要を説明する画面が表示されますので，確認のうえ，センサーの装着へ進んでください。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ② センサーの装着方法 -->
+  <div class="guide-section" id="attach">
+    <div class="section-header">
+      <span class="section-icon">📡</span>
+      <h2 class="section-title">② センサーの装着方法</h2>
+    </div>
+    <div class="section-body">
+
+      <h3 style="font-size:0.92rem; font-weight:700; margin-bottom:0.8rem; color:var(--navy);">1. 装着部位の準備</h3>
+      <div class="alert alert-warn">
+        <strong>装着部位について：</strong><br>
+        ・センサーの装着部位は，<strong>上腕の裏側</strong>が推奨され，承認されています。ほくろ，傷跡は避けてください。<br>
+        ・通常の日常活動において，あまり動かない（曲げたり，折ったりしない）皮膚の部位を選んでください。
+      </div>
+      <div class="steps" style="margin-top:0.8rem;">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <p class="step-title">装着部位の消毒</p>
+            <p class="step-desc">アルコール綿で装着部位を拭き，皮膚を自然乾燥させます。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <p class="step-title">装着部位の乾燥を確認する</p>
+            <p class="step-desc">センサーを装着前に，装着部位が完全に乾いていることを確認してください。シャワーや水泳の後にセンサーを装着する場合は，特に注意してください。</p>
+          </div>
+        </div>
+      </div>
+
+      <hr style="border:none; border-top:1.5px solid var(--border); margin:1.4rem 0;">
+
+      <h3 style="font-size:0.92rem; font-weight:700; margin-bottom:0.8rem; color:var(--navy);">2. センサーの準備</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <p class="step-title">センサーパックのフタをはがす</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <p class="step-title">センサーアプリケーターのキャップを回して外す</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <p class="step-title">黒線マークを合わせる</p>
+            <p class="step-desc">センサーパックの黒線マークにセンサーアプリケーターの黒線マークを合わせます。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <p class="step-title">アプリケーターをセンサーパックに押し下げる</p>
+            <p class="step-desc"><strong>テーブルなど平らで硬い場所の上で</strong>，センサーアプリケーターを上からセンサーパックに強く，止まるまで押し下げます。</p>
+            <div class="alert alert-warn" style="margin-top:0.5rem;"><strong>重要：</strong>センサーを正しく接続するため，この作業は平らな場所で行ってください。</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <p class="step-title">アプリケーターを取り外す</p>
+            <p class="step-desc">センサーパックからセンサーアプリケーターを取り外します。これでセンサー装着の準備が整いました。</p>
+          </div>
+        </div>
+      </div>
+
+      <hr style="border:none; border-top:1.5px solid var(--border); margin:1.4rem 0;">
+
+      <h3 style="font-size:0.92rem; font-weight:700; margin-bottom:0.8rem; color:var(--navy);">3. センサーの装着</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <p class="step-title">センサーアプリケーターを装着部位に置く</p>
+            <p class="step-desc">先ほど清潔にした装着部位（上腕裏側）に置きます。<strong>青いパネルに指を触れないようにしてください</strong>。大きなクリック音がするまでしっかりと押し上げます。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <p class="step-title">センサーアプリケーターをそっと引き離す</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <p class="step-title">センサーを手で持ち，正しく貼り付ける</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <p class="step-title">装着を確認し，テープをならす</p>
+            <p class="step-desc">センサーがしっかり装着されていることを確認してください。テープの粘着力を高めるため，センサーの周囲を軽くならしてください。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ センサーの起動 -->
+  <div class="guide-section" id="start">
+    <div class="section-header">
+      <span class="section-icon">▶️</span>
+      <h2 class="section-title">③ FreeStyleリブレLink を使用した新しいセンサーの起動</h2>
+    </div>
+    <div class="section-body">
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <p class="step-title">FreeStyleリブレLinkアプリを開く</p>
+            <p class="step-desc">センサーを装着した後，アプリを開いてスキャンします。お使いの端末によって操作が異なります。</p>
+
+            <div class="os-tabs" style="margin-top:0.8rem;">
+              <button class="os-tab active" onclick="switchOs('ios', this)">iPhone（iOS）</button>
+              <button class="os-tab" onclick="switchOs('android', this)">Android</button>
+            </div>
+
+            <div id="ios" class="os-panel active">
+              <div class="substep"><div class="substep-num">a</div><p>「<strong>新しいセンサーをスキャン</strong>」をタップします。</p></div>
+              <div class="substep"><div class="substep-num">b</div><p>タップ後，<strong>iPhoneをセンサーに近づけてスキャン</strong>します。NFCアンテナは上部にあります。ブザー音または振動が<strong>1回</strong>作動するのを待ってから，センサーから離してください。</p></div>
+            </div>
+
+            <div id="android" class="os-panel">
+              <div class="substep"><div class="substep-num">a</div><p>タップは不要です。<strong>Android端末をセンサーに近づけてスキャン</strong>します。NFCアンテナは通常背面中央にあります（メーカーにより異なる場合があります）。</p></div>
+              <div class="substep"><div class="substep-num">b</div><p>ブザー音または振動が<strong>2回</strong>作動するのを待ってからセンサーから離してください。</p></div>
+            </div>
+
+            <div class="alert alert-warn" style="margin-top:0.8rem;">
+              <strong>スキャン時の注意：</strong><br>
+              スマートフォンのNFCアンテナをセンサーの真上にかざしてスキャンしてください。かさばるケースや金属製のケースは，NFC信号を妨げてしまうことがあります。
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <p class="step-title">センサーの起動が完了するまで60分間待つ</p>
+            <p class="step-desc">起動中に他のアプリを使用することも可能です。センサーの準備完了時刻がアプリに表示されます。</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <p class="step-title">グルコース測定値を確認する</p>
+            <p class="step-desc">センサーの準備が完了すると，グルコース測定値が確認できます。グルコース値は<strong>1分ごとにアプリで自動的に更新</strong>されます。スキャン操作は不要です。</p>
+            <div class="alert alert-info" style="margin-top:0.5rem;"><strong>リアルタイム測定のために：</strong>センサーとスマートフォンが遮蔽物のない<strong>6メートル以内</strong>にあるようにしてください。受信圏外となった場合はスキャンして再接続させてください。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-warn" style="margin-top:1rem;">
+        <strong>Bluetoothを有効にしてください：</strong>リアルタイムグルコース測定をご使用の際は，Bluetoothを有効にし，アプリをバックグラウンドで起動した状態でのご使用が必要です。アプリを閉じるとリアルタイム測定ができません。
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ 各種許可の設定 -->
+  <div class="guide-section" id="permission">
+    <div class="section-header">
+      <span class="section-icon">🔔</span>
+      <h2 class="section-title">④ 各種許可の設定</h2>
+    </div>
+    <div class="section-body">
+      <p style="font-size:0.85rem; color:#4A5568; margin-bottom:1rem;">センサーのリアルタイム測定とアラートを正しく受信するために，以下の設定を行ってください。</p>
+
+      <div class="card-grid">
+        <div class="info-card">
+          <div class="info-card-icon">🔵</div>
+          <h4>① Bluetoothの使用許可</h4>
+          <p>FreeStyleリブレ 2 センサーでリアルタイムにアプリで測定値を確認するためには，Bluetoothの使用許可を <strong>OK</strong> としてください。センサーとアプリ間の通信にBluetoothを使用します。</p>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">🔔</div>
+          <h4>② 通知の送信許可</h4>
+          <p>アプリからの通知を許可する場合は設定を許可してください。グルコース値アラートを受信するためには，必ず通知設定を許可してください。</p>
+        </div>
+      </div>
+
+      <div class="os-tabs" style="margin-top:1.2rem;">
+        <button class="os-tab active" onclick="switchOs2('ios2', this)">iPhone（iOS）の設定</button>
+        <button class="os-tab" onclick="switchOs2('android2', this)">Androidの設定</button>
+      </div>
+
+      <div id="ios2" class="os-panel active">
+        <h4 style="font-size:0.85rem; font-weight:700; margin-bottom:0.6rem; color:var(--navy);">Bluetooth・通知の許可設定</h4>
+        <div class="substep"><div class="substep-num">1</div><p>iPhoneの「設定」から「LibreLink」を選択し，設定画面から <strong>Bluetoothをオン</strong>にする。</p></div>
+        <div class="substep"><div class="substep-num">2</div><p>iPhoneの「設定」から「LibreLink」を選択し，設定画面から「<strong>通知</strong>」を選択する。</p></div>
+        <div class="substep"><div class="substep-num">3</div><p>「<strong>通知を許可</strong>」をタップしてオンにする。</p></div>
+
+        <div class="alert alert-warn" style="margin-top:0.8rem;">
+          <strong>「重大な通知」の許可設定：</strong>iPhoneでおやすみモードを上書きして使用するには「重大な通知」の許可が必要です。初期設定時に表示されるポップアップから許可をするか，設定より許可をします。（「設定」→「LibreLink」→「通知」→「重大な通知」をオン）
+        </div>
+        <div class="alert alert-info" style="margin-top:0.6rem;">
+          <strong>iPhoneスタンバイモード・集中モードをご使用の方：</strong>アプリからの通知が即時に届かない場合があります。「設定」→「集中モード」→「LibreLink」を追加して通知をオンにしてください。
+        </div>
+      </div>
+
+      <div id="android2" class="os-panel">
+        <h4 style="font-size:0.85rem; font-weight:700; margin-bottom:0.6rem; color:var(--navy);">Android 12以上：付近のデバイスの権限許可</h4>
+        <div class="substep"><div class="substep-num">1</div><p>スマートフォンの「設定」→「アプリ」から「LibreLink」を選択する。</p></div>
+        <div class="substep"><div class="substep-num">2</div><p>アプリ情報で「権限」→「付近のデバイス」→「<strong>許可</strong>」をタップする。</p></div>
+
+        <h4 style="font-size:0.85rem; font-weight:700; margin:0.8rem 0 0.6rem; color:var(--navy);">Android 13以上：通知の許可</h4>
+        <div class="substep"><div class="substep-num">1</div><p>スマートフォンの「設定」→「アプリ」から「LibreLink」を選択する。</p></div>
+        <div class="substep"><div class="substep-num">2</div><p>アプリ情報で「通知」をタップする。</p></div>
+        <div class="substep"><div class="substep-num">3</div><p>通知をタップして <strong>オン</strong>にする。</p></div>
+        <div class="alert alert-info" style="margin-top:0.6rem;">Androidの設定方法や画面は，使用端末やOSバージョンにより異なる場合があります。詳しくは使用端末のマニュアルをご確認ください。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ 装着したままできること -->
+  <div class="guide-section" id="qa">
+    <div class="section-header">
+      <span class="section-icon">❓</span>
+      <h2 class="section-title">⑤ センサーを装着したままできること</h2>
+    </div>
+    <div class="section-body">
+      <div class="qa-item">
+        <div class="qa-q">
+          <span class="qa-badge">Q</span>
+          <span class="qa-text">入浴・シャワー・水泳はできますか？</span>
+        </div>
+        <div class="qa-a">
+          <span class="qa-badge-a">A</span>
+          <span class="qa-a-text">いずれも<strong>可能</strong>です。センサーは耐水性があり，装着したままご使用いただけます。<strong>水深1メートル，30分間まで</strong>は問題なくご使用いただけます。30分以上水に浸さないようご注意ください。</span>
+        </div>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q">
+          <span class="qa-badge">Q</span>
+          <span class="qa-text">運動はできますか？</span>
+        </div>
+        <div class="qa-a">
+          <span class="qa-badge-a">A</span>
+          <span class="qa-a-text">センサーを装着したまま運動が可能です。ただし，激しい動きでセンサーが剥がれる場合があります。センサー周辺のテープをしっかり固定しておくことをお勧めします。</span>
+        </div>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q">
+          <span class="qa-badge">Q</span>
+          <span class="qa-text">X線・CT検査を受ける場合は？</span>
+        </div>
+        <div class="qa-a">
+          <span class="qa-badge-a">A</span>
+          <span class="qa-a-text">
+            2026年7月31日のPMDA（医薬品医療機器総合機構）による添付文書の改訂により，<strong>X線検査およびCT検査についてはセンサーを装着したまま受けることができる</strong>ようになりました。検査中も中断なくグルコースモニタリングが可能です。<br>
+            ただし，センサーを装着したままX線撮影やCT撮影を受けた場合，<strong>撮影部位や撮影条件によってはセンサーが画像に写り込む可能性</strong>があります。検査前に医療スタッフへセンサーを装着していることをお伝えください。<br>
+            なお，<strong>MRIスキャンについては引き続きセンサーの取り外しが必要</strong>です。MRI検査の予定がある場合は研究担当者にご連絡ください。
+          </span>
+        </div>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q">
+          <span class="qa-badge">Q</span>
+          <span class="qa-text">飛行機に搭乗する場合は？</span>
+        </div>
+        <div class="qa-a">
+          <span class="qa-badge-a">A</span>
+          <span class="qa-a-text">セキュリティシステムを通過する際には，保安検査係員にFreeStyleリブレ 2 を装着していることをお伝えください。機内では乗務員による指示に従って，搭乗中もシステムを使用することができます。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑥ センサーの取り外し -->
+  <div class="guide-section" id="remove">
+    <div class="section-header">
+      <span class="section-icon">🗑️</span>
+      <h2 class="section-title">⑥ センサーの取り外し</h2>
+    </div>
+    <div class="section-body">
+      <div class="alert alert-info">FreeStyleリブレLinkがセンサーの交換時期を知らせてくれます。アプリの通知を確認してください。</div>
+      <div class="steps" style="margin-top:1rem;">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <p class="step-title">センサーの外側をこすりつける</p>
+            <p class="step-desc">ウェットティッシュまたはベビーオイルを染み込ませた脱脂綿をセンサーの外側にこすりつけます。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <p class="step-title">粘着剤の端を引っ張って剥がす</p>
+            <p class="step-desc">センサーを皮膚に固定している粘着剤の端を引っ張ります。そして<strong>ゆっくりと一気に剥がします</strong>。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <p class="step-title">新しいセンサーを装着する場合は別の部位を選択する</p>
+            <p class="step-desc">新しいセンサーを装着する場合は，別の部位（反対側の上腕など）を選択してください。</p>
+          </div>
+        </div>
+      </div>
+      <div class="alert alert-warn" style="margin-top:0.8rem;"><strong>取り外した後は：</strong>取り外したセンサーは研究担当者にお渡しください。センサーの交換が必要な場合は，研究担当者にご連絡ください。</div>
+    </div>
+  </div>
+
+  <!-- ⑦ 医療従事者へのデータ共有 -->
+  <div class="guide-section" id="share">
+    <div class="section-header">
+      <span class="section-icon">🔗</span>
+      <h2 class="section-title">⑦ 研究担当者へのデータ共有（リブレView連携）</h2>
+    </div>
+    <div class="section-body">
+      <p style="font-size:0.85rem; color:#4A5568; margin-bottom:1rem;">研究担当者から提供された医療プラクティスIDを入力して連携します。</p>
+
+      <h3 style="font-size:0.88rem; font-weight:700; margin-bottom:0.8rem; color:var(--navy);">医療プラクティスIDを入力して連携する</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <p class="step-title">アプリのメニューから「連携アプリ」を選択する</p>
+            <p class="step-desc">FreeStyleリブレLinkのメニュー画面（左上のメニューアイコン）から「<strong>連携アプリ</strong>」を選択します。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <p class="step-title">「リブレView」の「連携する」をタップする</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <p class="step-title">医療プラクティスIDを入力してデータ連携する</p>
+            <p class="step-desc">研究担当者から提供された「<strong>医療プラクティスID</strong>」を入力し，データ連携をします。本研究で使用するIDは以下の通りです。下のIDをタップして長押しするとコピーできます。</p>
+            <div style="
+              margin: 0.8rem 0;
+              background: var(--gray-light);
+              border: 2px solid var(--green);
+              border-radius: 4px;
+              padding: 0.9rem 1rem;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 0.8rem;
+              flex-wrap: wrap;
+            ">
+              <code id="practiceId" style="
+                font-family: var(--mono);
+                font-size: 1.15rem;
+                font-weight: 500;
+                letter-spacing: 0.12em;
+                color: var(--navy);
+                user-select: all;
+                -webkit-user-select: all;
+              ">403ff696a202f9d7</code>
+              <button onclick="copyId()" id="copyBtn" style="
+                background: var(--green);
+                color: var(--white);
+                border: none;
+                border-radius: 3px;
+                padding: 0.5rem 1rem;
+                font-family: 'Noto Sans JP', sans-serif;
+                font-size: 0.82rem;
+                font-weight: 700;
+                cursor: pointer;
+                white-space: nowrap;
+                flex-shrink: 0;
+                -webkit-tap-highlight-color: transparent;
+              ">コピーする</button>
+            </div>
+            <p style="font-size:0.78rem; color:var(--gray); line-height:1.6;">※ 「コピーする」ボタンをタップするか，IDを長押しして選択→コピーしてください。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <p class="step-title">連携完了</p>
+            <p class="step-desc">データ連携後は，あなたが測定したデータやレポートに担当研究者がリブレViewを通してアクセスすることが可能となります。</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- サポート情報 -->
+  <div class="support-box">
+    <div>
+      <p class="label">お客様相談窓口（Abbott）</p>
+      <p class="tel">0120-37-8055</p>
+      <p class="hours">営業時間 8:00〜20:00（平日）/ 8:00〜17:00（祝日）※土日除く</p>
+    </div>
+    <div style="font-size:0.8rem; color:rgba(255,255,255,0.55); line-height:1.7;">
+      ご不明な点は研究担当者または<br>上記Abbottお客様相談窓口へご連絡ください。
+    </div>
+  </div>
+
+  <a href="index.html" class="back-btn">← 参加者トップページへ戻る</a>
+
+</main>
+
+<footer>
+  <p>© 2026 池田研究室 ― 尚絅学院大学 心理部門　|　倫理審査承認番号：2026-002</p>
+</footer>
+
+<script>
+  function copyId() {
+    const id = document.getElementById('practiceId').textContent;
+    navigator.clipboard.writeText(id).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'コピーしました ✓';
+      btn.style.background = 'var(--green-dim)';
+      setTimeout(() => {
+        btn.textContent = 'コピーする';
+        btn.style.background = 'var(--green)';
+      }, 2500);
+    }).catch(() => {
+      // クリップボードAPIが使えない場合のフォールバック
+      const range = document.createRange();
+      range.selectNode(document.getElementById('practiceId'));
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      document.execCommand('copy');
+      window.getSelection().removeAllRanges();
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'コピーしました ✓';
+      btn.style.background = 'var(--green-dim)';
+      setTimeout(() => {
+        btn.textContent = 'コピーする';
+        btn.style.background = 'var(--green)';
+      }, 2500);
+    });
+  }
+
+  function switchOs(id, btn) {
+    document.querySelectorAll('#ios, #android').forEach(p => p.classList.remove('active'));
+    btn.parentElement.querySelectorAll('.os-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+  function switchOs2(id, btn) {
+    document.querySelectorAll('#ios2, #android2').forEach(p => p.classList.remove('active'));
+    btn.parentElement.querySelectorAll('.os-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
