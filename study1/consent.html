@@ -130,7 +130,11 @@
 <script>
 const GAS_URL       = 'https://script.google.com/macros/s/AKfycby5FYl7ruaqdoQvbxhCrUxUG8IMpxYHY6cUFwASDWxwplmTA49eOV6-24hgDD0grCSV/exec';
 const ID_KEY        = 'study1_participant_id';
-const CONSENT_KEY   = 'study1_consent_done';
+
+// 同意完了フラグは参加者IDに紐づけて管理する
+function getConsentKey(pid) {
+  return `study1_consent_done_${pid}`;
+}
 
 // 同意確認10項目
 const CONSENT_ITEMS = [
@@ -163,7 +167,7 @@ function render() {
   }
 
   // 同意済み
-  if (localStorage.getItem(CONSENT_KEY)) {
+  if (localStorage.getItem(getConsentKey(pid))) {
     main.innerHTML = `
       <div class="state-panel already" style="display:block;">
         <div class="state-icon">✅</div>
@@ -294,8 +298,8 @@ function submitConsent() {
     document.body.removeChild(gasForm);
     document.getElementById('overlay').classList.remove('show');
 
-    // 同意完了フラグを保存
-    localStorage.setItem(CONSENT_KEY, now);
+    // 同意完了フラグを参加者IDに紐づけて保存
+    localStorage.setItem(getConsentKey(pid), now);
 
     // 完了パネルを表示
     document.querySelector('.summary-card').style.display  = 'none';
