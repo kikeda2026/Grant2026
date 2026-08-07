@@ -499,7 +499,23 @@
       <span class="menu-card-arrow">›</span>
     </a>
 
-    <!-- 4. 認知課題 -->
+    <!-- 4. 夕食記録・リマインダー -->
+    <a href="dinner.html" class="menu-card" id="link-dinner">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-icon">🍽️</div>
+        <div class="menu-card-text">
+          <div class="menu-card-title">
+            夕食記録・リマインダー
+            <span class="badge badge-daily">毎日実施</span>
+          </div>
+          <p class="menu-card-desc">夕食を始めたらここをタップして記録してください。60分後に認知課題のリマインダーメールが届きます。</p>
+        </div>
+      </div>
+      <span class="menu-card-arrow">›</span>
+    </a>
+
+    <!-- 5. 認知課題 -->
     <a href="cognitive.html" class="menu-card" id="link-cognitive">
       <div class="menu-card-bar"></div>
       <div class="menu-card-body">
@@ -515,7 +531,7 @@
       <span class="menu-card-arrow">›</span>
     </a>
 
-    <!-- 5. CES-D -->
+    <!-- 6. CES-D -->
     <a href="cesd.html" class="menu-card" id="link-cesd">
       <div class="menu-card-bar"></div>
       <div class="menu-card-body">
@@ -590,7 +606,7 @@
   const ID_KEY = 'study1_participant_id';
 
   // データ収集があるページ（IDが必須）
-  const LOCKED_LINKS = ['link-consent', 'link-cognitive', 'link-cesd'];
+  const LOCKED_LINKS = ['link-consent', 'link-dinner', 'link-cognitive', 'link-cesd'];
 
   // ── ページ読み込み時 ──
   window.addEventListener('DOMContentLoaded', () => {
