@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>夕食記録 | 研究1</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:       #1A2340;
+    --green:      #2EAA6E;
+    --green-light:#EBF7F2;
+    --green-dim:  #1E7A4E;
+    --amber:      #E8973A;
+    --amber-light:#FFF8EC;
+    --gray:       #8A94A6;
+    --gray-light: #F4F6FA;
+    --border:     #E2E8F0;
+    --white:      #FFFFFF;
+  }
+  body { font-family: 'Noto Sans JP', sans-serif; color: var(--navy); background: var(--gray-light); line-height: 1.8; min-height: 100vh; }
+  nav { background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 56px; }
+  .nav-logo { color: var(--white); font-family: 'Noto Serif JP', serif; font-size: 0.85rem; text-decoration: none; }
+  .nav-back  { color: rgba(255,255,255,0.7); font-size: 0.82rem; text-decoration: none; }
+
+  .page-header { background: var(--navy); padding: 36px 5% 32px; }
+  .header-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--green); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .header-title { font-family: 'Noto Serif JP', serif; font-size: clamp(1.2rem, 3vw, 1.6rem); color: var(--white); }
+
+  main { max-width: 480px; margin: 0 auto; padding: 32px 5% 80px; }
+
+  /* カード */
+  .card { background: var(--white); border: 1.5px solid var(--border); border-radius: 4px; padding: 2rem 1.8rem; margin-bottom: 1.2rem; }
+
+  /* メール入力 */
+  .field-label { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.5rem; display: block; }
+  .field-input { width: 100%; border: 1.5px solid var(--border); border-radius: 3px; padding: 0.7rem 1rem; font-family: 'Noto Sans JP', sans-serif; font-size: 0.95rem; color: var(--navy); outline: none; transition: border-color .2s; }
+  .field-input:focus { border-color: var(--green); }
+  .field-note { font-size: 0.75rem; color: var(--gray); margin-top: 0.4rem; }
+
+  /* 大ボタン */
+  .btn-dinner {
+    width: 100%; padding: 1.4rem 1rem; font-size: 1.1rem; font-family: 'Noto Sans JP', sans-serif; font-weight: 700;
+    background: var(--green); color: var(--white); border: none; border-radius: 4px; cursor: pointer;
+    letter-spacing: 0.06em; transition: background .2s; margin-top: 1rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-dinner:hover { background: var(--green-dim); }
+  .btn-dinner:disabled { background: var(--gray); cursor: not-allowed; }
+  .btn-small { display: inline-block; padding: 0.5rem 1.2rem; font-size: 0.82rem; font-family: 'Noto Sans JP', sans-serif; font-weight: 700; background: var(--green); color: var(--white); border: none; border-radius: 3px; cursor: pointer; margin-top: 1rem; }
+
+  /* ステータス */
+  .status-done { background: var(--green-light); border: 2px solid var(--green); border-radius: 4px; padding: 1.4rem 1.6rem; text-align: center; }
+  .status-done .icon { font-size: 2.5rem; margin-bottom: 0.6rem; display: block; }
+  .status-done h2 { font-family: 'Noto Serif JP', serif; font-size: 1.15rem; color: var(--green-dim); margin-bottom: 0.4rem; }
+  .status-done p { font-size: 0.85rem; color: #2A6A45; line-height: 1.8; }
+  .status-done .time { font-family: 'DM Mono', monospace; font-size: 1.2rem; font-weight: 700; color: var(--navy); display: block; margin: 0.6rem 0; }
+
+  .alert { border-radius: 3px; padding: 0.8rem 1rem; font-size: 0.83rem; line-height: 1.8; margin-bottom: 1rem; }
+  .alert-info { background: var(--green-light); border-left: 3px solid var(--green); color: #1A5C3A; }
+  .alert-warn { background: var(--amber-light); border-left: 3px solid var(--amber); color: #7A5000; }
+
+  .back-link { display: inline-block; margin-top: 1.2rem; color: var(--green); font-size: 0.85rem; text-decoration: none; font-weight: 700; }
+
+  /* ロック画面 */
+  .lock-panel { text-align: center; padding: 2.5rem 1.5rem; }
+  .lock-panel .icon { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
+  .lock-panel h2 { font-family: 'Noto Serif JP', serif; font-size: 1.1rem; margin-bottom: 0.6rem; color: var(--amber); }
+
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(26,35,64,0.5); z-index: 200; align-items: center; justify-content: center; }
+  .overlay.show { display: flex; }
+  .overlay-box { background: var(--white); padding: 1.8rem 2.2rem; text-align: center; border-radius: 4px; }
+  .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 0.8rem; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  footer { background: #111827; padding: 1.2rem 5%; text-align: center; }
+  footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-box">
+    <div class="spinner"></div>
+    <p style="font-size:0.88rem;color:#4A5568;">記録中です…</p>
+  </div>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">研究1 参加者ページ</a>
+  <a href="index.html" class="nav-back">← トップへ戻る</a>
+</nav>
+
+<div class="page-header">
+  <p class="header-eyebrow">Dinner / 毎日実施</p>
+  <h1 class="header-title">夕食記録・リマインダー</h1>
+</div>
+
+<main id="mainContent"></main>
+
+<footer>
+  <p>© 2026 池田研究室 ― 尚絅学院大学 心理部門　|　倫理審査承認番号：2026-002</p>
+</footer>
+
+<iframe id="gasIframe" name="gasIframe" style="display:none;"></iframe>
+
+<script>
+const GAS_URL    = 'https://script.google.com/macros/s/AKfycby5FYl7ruaqdoQvbxhCrUxUG8IMpxYHY6cUFwASDWxwplmTA49eOV6-24hgDD0grCSV/exec';
+const ID_KEY     = 'study1_participant_id';
+const EMAIL_KEY  = 'study1_email';
+
+function getTodayKey(pid) {
+  return `dinner_recorded_${pid}_${new Date().toDateString()}`;
+}
+function toJSTString(d) {
+  return d.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+}
+
+// ── メイン描画 ──
+function render() {
+  const pid   = localStorage.getItem(ID_KEY);
+  const main  = document.getElementById('mainContent');
+
+  // ID未設定
+  if (!pid) {
+    main.innerHTML = `
+      <div class="card">
+        <div class="lock-panel">
+          <span class="icon">🔒</span>
+          <h2>参加者IDが未設定です</h2>
+          <p style="font-size:0.85rem;color:#4A5568;">トップページで参加者IDを入力してから戻ってきてください。</p>
+          <a href="index.html" class="back-link">← トップページへ</a>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const email      = localStorage.getItem(EMAIL_KEY);
+  const todayKey   = getTodayKey(pid);
+  const recordedAt = localStorage.getItem(todayKey);
+
+  // 本日すでに記録済み
+  if (recordedAt) {
+    showDone(main, pid, recordedAt, email);
+    return;
+  }
+
+  // メール未登録 → メール入力フォームを先に表示
+  if (!email) {
+    showEmailForm(main, pid);
+    return;
+  }
+
+  // 記録ボタン表示
+  showDinnerButton(main, pid, email);
+}
+
+// ── メール入力フォーム ──
+function showEmailForm(main, pid) {
+  main.innerHTML = `
+    <div class="card">
+      <p class="alert alert-info">
+        リマインダーメールを送信するため，初回のみメールアドレスをご入力ください。<br>
+        以降は自動的に使用されます。
+      </p>
+      <label class="field-label" for="emailInput">メールアドレス</label>
+      <input type="email" id="emailInput" class="field-input" placeholder="example@mail.com" autocomplete="email">
+      <p class="field-note">入力したアドレスに，夕食60分後に自動でリマインダーメールが届きます。</p>
+      <button class="btn-dinner" onclick="saveEmail()">登録して記録ページへ進む</button>
+    </div>`;
+}
+function saveEmail() {
+  const email = document.getElementById('emailInput').value.trim();
+  if (!email || !email.includes('@')) {
+    alert('正しいメールアドレスを入力してください。');
+    return;
+  }
+  localStorage.setItem(EMAIL_KEY, email);
+  render();
+}
+
+// ── 夕食記録ボタン ──
+function showDinnerButton(main, pid, email) {
+  main.innerHTML = `
+    <div class="alert alert-info">
+      夕食を開始したら，下のボタンをタップしてください。<br>
+      60分後に <strong>${email}</strong> へリマインダーメールが届きます。
+    </div>
+    <div class="card" style="text-align:center;">
+      <p style="font-size:0.88rem;color:#4A5568;margin-bottom:0.5rem;">参加者ID：<strong>${pid}</strong></p>
+      <p style="font-size:1rem;font-weight:700;margin-bottom:0.3rem;">夕食を始めましたか？</p>
+      <p style="font-size:0.82rem;color:var(--gray);">ボタンは1日1回のみ有効です</p>
+      <button class="btn-dinner" id="dinnerBtn" onclick="recordDinner()">
+        🍽️　夕食開始を記録する
+      </button>
+    </div>
+    <p style="font-size:0.78rem;color:var(--gray);text-align:center;margin-top:0.5rem;">
+      メールアドレスを変更したい場合は
+      <button onclick="changeEmail()" style="background:none;border:none;color:var(--green);cursor:pointer;font-size:0.78rem;text-decoration:underline;">こちら</button>
+    </p>`;
+}
+function changeEmail() {
+  localStorage.removeItem(EMAIL_KEY);
+  render();
+}
+
+// ── 夕食記録送信 ──
+function recordDinner() {
+  const pid   = localStorage.getItem(ID_KEY);
+  const email = localStorage.getItem(EMAIL_KEY);
+  const now   = new Date();
+  const nowStr = toJSTString(now);
+
+  // localStorageに即時記録
+  localStorage.setItem(getTodayKey(pid), nowStr);
+
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('dinnerBtn').disabled = true;
+
+  // GASへ送信
+  const payload = {
+    タイプ:        '夕食記録',
+    参加者ID:      pid,
+    メールアドレス: email,
+    夕食開始時刻:   nowStr,
+  };
+  const form = document.createElement('form');
+  form.action = GAS_URL;
+  form.method = 'POST';
+  form.target = 'gasIframe';
+  form.style.display = 'none';
+  Object.entries(payload).forEach(([k, v]) => {
+    const input = document.createElement('input');
+    input.type  = 'hidden';
+    input.name  = k;
+    input.value = v;
+    form.appendChild(input);
+  });
+  document.body.appendChild(form);
+
+  setTimeout(() => {
+    form.submit();
+    document.body.removeChild(form);
+    document.getElementById('overlay').classList.remove('show');
+    showDone(document.getElementById('mainContent'), pid, nowStr, email);
+  }, 1500);
+}
+
+// ── 記録完了画面 ──
+function showDone(main, pid, recordedAt, email) {
+  main.innerHTML = `
+    <div class="status-done">
+      <span class="icon">✅</span>
+      <h2>夕食の記録が完了しました</h2>
+      <span class="time">${recordedAt}</span>
+      <p>
+        60分後（<strong id="reminderTime"></strong>ごろ）に<br>
+        <strong>${email || '登録メール'}</strong> へリマインダーが届きます。<br><br>
+        届いたらすぐに認知課題を実施してください。
+      </p>
+    </div>
+    <div class="alert alert-info" style="margin-top:1rem;">
+      <strong>認知課題の目安時間：</strong>夕食後60〜90分以内<br>
+      課題は約8分で完了します。
+    </div>
+    <a href="index.html" class="back-link">← トップページへ戻る</a>`;
+
+  // リマインダー予定時刻を計算して表示
+  try {
+    const baseTime  = new Date(recordedAt);
+    if (!isNaN(baseTime)) {
+      const remind  = new Date(baseTime.getTime() + 60 * 60 * 1000);
+      document.getElementById('reminderTime').textContent =
+        remind.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+    }
+  } catch (e) { /* ignore */ }
+}
+
+window.addEventListener('DOMContentLoaded', render);
+</script>
+</body>
+</html>
