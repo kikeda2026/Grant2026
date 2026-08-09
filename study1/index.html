@@ -467,7 +467,23 @@
       <span class="menu-card-arrow">›</span>
     </a>
 
-    <!-- 2. リブレ2 -->
+    <!-- 2. 認知課題の練習（初回のみ） -->
+    <a href="practice.html" class="menu-card" id="link-practice">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-icon">🧪</div>
+        <div class="menu-card-text">
+          <div class="menu-card-title">
+            認知課題の練習
+            <span class="badge badge-init">初回のみ</span>
+          </div>
+          <p class="menu-card-desc">3つの認知課題（GradCPT・DSM・2-back）の練習を行います。初日に研究者の立会いのもとで実施してください。</p>
+        </div>
+      </div>
+      <span class="menu-card-arrow">›</span>
+    </a>
+
+    <!-- 3. リブレ2 -->
     <a href="libre2.html" class="menu-card" id="link-libre2">
       <div class="menu-card-bar"></div>
       <div class="menu-card-body">
@@ -483,7 +499,7 @@
       <span class="menu-card-arrow">›</span>
     </a>
 
-    <!-- 3. Garmin -->
+    <!-- 4. Garmin -->
     <a href="garmin.html" class="menu-card" id="link-garmin">
       <div class="menu-card-bar"></div>
       <div class="menu-card-body">
@@ -499,7 +515,7 @@
       <span class="menu-card-arrow">›</span>
     </a>
 
-    <!-- 4. 夕食記録・リマインダー -->
+    <!-- 5. 夕食記録・リマインダー -->
     <a href="dinner.html" class="menu-card" id="link-dinner">
       <div class="menu-card-bar"></div>
       <div class="menu-card-body">
@@ -515,7 +531,7 @@
       <span class="menu-card-arrow">›</span>
     </a>
 
-    <!-- 5. 認知課題 -->
+    <!-- 6. 認知課題 -->
     <a href="cognitive.html" class="menu-card" id="link-cognitive">
       <div class="menu-card-bar"></div>
       <div class="menu-card-body">
@@ -531,7 +547,7 @@
       <span class="menu-card-arrow">›</span>
     </a>
 
-    <!-- 6. CES-D -->
+    <!-- 7. CES-D -->
     <a href="cesd.html" class="menu-card" id="link-cesd">
       <div class="menu-card-bar"></div>
       <div class="menu-card-body">
@@ -606,7 +622,7 @@
   const ID_KEY = 'study1_participant_id';
 
   // データ収集があるページ（IDが必須）
-  const LOCKED_LINKS = ['link-consent', 'link-dinner', 'link-cognitive', 'link-cesd'];
+  const LOCKED_LINKS = ['link-consent', 'link-practice', 'link-dinner', 'link-cognitive', 'link-cesd'];
 
   // ── ページ読み込み時 ──
   window.addEventListener('DOMContentLoaded', () => {
