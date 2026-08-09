@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>課題の練習 | 研究1</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:       #1A2340;
+    --green:      #2EAA6E;
+    --green-light:#EBF7F2;
+    --green-dim:  #1E7A4E;
+    --amber:      #E8973A;
+    --amber-light:#FFF8EC;
+    --gray:       #8A94A6;
+    --gray-light: #F4F6FA;
+    --border:     #E2E8F0;
+    --white:      #FFFFFF;
+    --mono:       'DM Mono', monospace;
+  }
+  body { font-family: 'Noto Sans JP', sans-serif; color: var(--navy); background: var(--gray-light); min-height: 100vh; }
+
+  nav { background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 56px; }
+  .nav-logo { color: var(--white); font-family: 'Noto Serif JP', serif; font-size: 0.85rem; text-decoration: none; }
+  .nav-back  { color: rgba(255,255,255,0.7); font-size: 0.82rem; text-decoration: none; }
+
+  .page-header { background: var(--navy); padding: 32px 5% 28px; }
+  .header-eyebrow { font-family: var(--mono); font-size: 0.7rem; color: var(--green); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .header-title { font-family: 'Noto Serif JP', serif; font-size: clamp(1.2rem, 3vw, 1.6rem); color: var(--white); }
+
+  main { max-width: 640px; margin: 0 auto; padding: 28px 5% 80px; }
+
+  /* ステップインジケーター */
+  .step-indicator { display: flex; align-items: center; gap: 0; margin-bottom: 2rem; }
+  .step-dot { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 0.8rem; font-weight: 700; flex-shrink: 0; transition: all .3s; }
+  .step-dot.done  { background: var(--green); color: var(--white); }
+  .step-dot.active{ background: var(--navy); color: var(--white); border: 3px solid var(--green); }
+  .step-dot.todo  { background: var(--gray-light); color: var(--gray); border: 2px solid var(--border); }
+  .step-line { flex: 1; height: 3px; background: var(--border); }
+  .step-line.done { background: var(--green); }
+
+  /* カード */
+  .card { background: var(--white); border: 1.5px solid var(--border); border-radius: 4px; padding: 1.8rem; margin-bottom: 1.2rem; }
+  .card h2 { font-family: 'Noto Serif JP', serif; font-size: 1.1rem; margin-bottom: 0.8rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--green-light); }
+  .card p { font-size: 0.88rem; color: #4A5568; line-height: 1.9; margin-bottom: 0.6rem; }
+  .card ul { font-size: 0.88rem; color: #4A5568; line-height: 2; margin-left: 1.2rem; }
+
+  .task-badge { display: inline-block; font-family: var(--mono); font-size: 0.7rem; background: var(--navy); color: var(--white); padding: 0.2rem 0.6rem; border-radius: 2px; margin-bottom: 0.8rem; letter-spacing: 0.1em; }
+
+  .btn-start { width: 100%; padding: 1.1rem 1rem; font-size: 1rem; font-family: 'Noto Sans JP', sans-serif; font-weight: 700; background: var(--green); color: var(--white); border: none; border-radius: 4px; cursor: pointer; letter-spacing: 0.06em; margin-top: 1rem; transition: background .2s; -webkit-tap-highlight-color: transparent; }
+  .btn-start:hover { background: var(--green-dim); }
+  .btn-start:disabled { background: var(--gray); cursor: not-allowed; }
+
+  .done-panel { background: var(--green-light); border: 2px solid var(--green); border-radius: 4px; padding: 1.2rem 1.4rem; display: flex; align-items: center; gap: 0.8rem; }
+  .done-panel .icon { font-size: 1.5rem; flex-shrink: 0; }
+  .done-panel p { font-size: 0.88rem; color: var(--green-dim); font-weight: 700; }
+
+  .todo-panel { background: var(--gray-light); border: 1.5px solid var(--border); border-radius: 4px; padding: 1rem 1.4rem; font-size: 0.85rem; color: var(--gray); }
+
+  /* 完了画面 */
+  .complete-panel { text-align: center; padding: 2.5rem 1.5rem; background: var(--white); border: 1.5px solid var(--border); border-radius: 4px; }
+  .complete-panel .icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+  .complete-panel h2 { font-family: 'Noto Serif JP', serif; font-size: 1.3rem; color: var(--green); margin-bottom: 0.8rem; }
+  .complete-panel p { font-size: 0.88rem; color: #4A5568; line-height: 1.9; }
+  .btn-home { display: inline-block; margin-top: 1.4rem; padding: 0.8rem 2rem; background: var(--navy); color: var(--white); text-decoration: none; border-radius: 3px; font-size: 0.88rem; font-weight: 700; }
+
+  .alert-info { background: var(--amber-light); border-left: 3px solid var(--amber); padding: 0.8rem 1rem; font-size: 0.82rem; color: #7A5000; border-radius: 2px; margin-bottom: 1rem; line-height: 1.7; }
+
+  footer { background: #111827; padding: 1.2rem 5%; text-align: center; }
+  footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">研究1 参加者ページ</a>
+  <a href="index.html" class="nav-back">← トップへ戻る</a>
+</nav>
+
+<div class="page-header">
+  <p class="header-eyebrow">Practice / 初回のみ</p>
+  <h1 class="header-title">認知課題の練習</h1>
+</div>
+
+<main id="mainContent"></main>
+
+<footer>
+  <p>© 2026 池田研究室 ― 尚絅学院大学 心理部門　|　倫理審査承認番号：2026-002</p>
+</footer>
+
+<script>
+const ID_KEY = 'study1_participant_id';
+
+// 各課題の練習完了フラグ
+const KEYS = {
+  gradcpt: 'study1_practice_gradcpt_done',
+  dsm:     'study1_practice_dsm_done',
+  nback:   'study1_practice_nback_done',
+  all:     'study1_practice_all_done'
+};
+
+// URLのstepパラメータを取得
+function getStep() {
+  const params = new URLSearchParams(window.location.search);
+  return parseInt(params.get('step') || '1');
+}
+
+function render() {
+  const pid  = localStorage.getItem(ID_KEY);
+  const main = document.getElementById('mainContent');
+
+  if (!pid) {
+    main.innerHTML = `
+      <div class="card" style="text-align:center;padding:2.5rem;">
+        <span style="font-size:2.5rem;display:block;margin-bottom:0.8rem;">🔒</span>
+        <h2 style="color:var(--amber);">参加者IDが未設定です</h2>
+        <p>トップページでIDを入力してから戻ってきてください。</p>
+        <a href="index.html" style="display:inline-block;margin-top:1rem;color:var(--green);font-weight:700;">← トップページへ</a>
+      </div>`;
+    return;
+  }
+
+  const step         = getStep();
+  const gradcptDone  = !!localStorage.getItem(KEYS.gradcpt);
+  const dsmDone      = !!localStorage.getItem(KEYS.dsm);
+  const nbackDone    = !!localStorage.getItem(KEYS.nback);
+  const allDone      = gradcptDone && dsmDone && nbackDone;
+
+  // 全完了時
+  if (allDone || step === 4) {
+    localStorage.setItem(KEYS.all, 'true');
+    main.innerHTML = `
+      <div class="complete-panel">
+        <span class="icon">🎉</span>
+        <h2>3つの課題の練習が完了しました！</h2>
+        <p>
+          お疲れさまでした。<br>
+          これで毎日の認知課題の準備が整いました。<br><br>
+          明日の夕食後から，毎日課題を実施してください。<br>
+          夕食を始めたら，トップページの「夕食記録」をタップすることをお忘れなく。
+        </p>
+        <a href="index.html" class="btn-home">← トップページへ戻る</a>
+      </div>`;
+    return;
+  }
+
+  // ステップインジケーター
+  function stepDot(n) {
+    if (n === 1 && gradcptDone) return `<div class="step-dot done">✓</div>`;
+    if (n === 2 && dsmDone)     return `<div class="step-dot done">✓</div>`;
+    if (n === 3 && nbackDone)   return `<div class="step-dot done">✓</div>`;
+    if (n === step)             return `<div class="step-dot active">${n}</div>`;
+    return `<div class="step-dot todo">${n}</div>`;
+  }
+  function stepLine(n) {
+    const done = (n === 1 && gradcptDone) || (n === 2 && dsmDone);
+    return `<div class="step-line ${done ? 'done' : ''}"></div>`;
+  }
+
+  const indicator = `
+    <div class="step-indicator">
+      ${stepDot(1)}${stepLine(1)}${stepDot(2)}${stepLine(2)}${stepDot(3)}
+    </div>`;
+
+  // 各課題カードの描画
+  function doneCard(label) {
+    return `<div class="done-panel"><span class="icon">✅</span><p>${label}の練習が完了しています。</p></div>`;
+  }
+  function todoCard(label) {
+    return `<div class="todo-panel">⬜ ${label}の練習（前の課題完了後に解放されます）</div>`;
+  }
+
+  // Step 1: GradCPT
+  const gradcptCard = gradcptDone ? doneCard('GradCPT') : `
+    <div class="card">
+      <span class="task-badge">STEP 1 / GradCPT（集中力課題）</span>
+      <h2>都市・山の画像に対する注意課題</h2>
+      <p>画面に<b>都市</b>または<b>山</b>の画像が次々と表示されます。</p>
+      <ul>
+        <li>都市の画像 → <b>できるだけ早くタップ（またはスペースキー）</b></li>
+        <li>山の画像 → <b>反応しない</b></li>
+      </ul>
+      <p style="margin-top:0.8rem;">所要時間：練習のみ約3〜4分</p>
+      <div class="alert-info">
+        ⚠️ 次の画面では英語の操作ガイドが表示される場合があります。「タップ / スペースキー」の選択後，日本語の説明が表示されます。
+      </div>
+      <button class="btn-start" onclick="startGradCPT()">
+        GradCPTの練習を始める →
+      </button>
+    </div>`;
+
+  // Step 2: DSM
+  const dsmCard = dsmDone ? doneCard('デジットシンボルマッチング（DSM）') :
+    (gradcptDone ? `
+    <div class="card">
+      <span class="task-badge">STEP 2 / DSM（処理速度課題）</span>
+      <h2>数字とシンボルの対応課題</h2>
+      <p>画面上部に数字とシンボルの対応表が常に表示されます。</p>
+      <ul>
+        <li>提示された数字に対応するシンボルを<b>できるだけ速く選択</b></li>
+        <li>制限時間：90秒</li>
+      </ul>
+      <p style="margin-top:0.8rem;">所要時間：練習のみ約2分</p>
+      <button class="btn-start" onclick="startDSM()">
+        DSMの練習を始める →
+      </button>
+    </div>` : todoCard('デジットシンボルマッチング（DSM）'));
+
+  // Step 3: 2-back
+  const nbackCard = nbackDone ? doneCard('2-backタスク') :
+    (dsmDone ? `
+    <div class="card">
+      <span class="task-badge">STEP 3 / 2-backタスク（ワーキングメモリ課題）</span>
+      <h2>2つ前の文字と一致するか判断する課題</h2>
+      <p>文字が1つずつ表示されます。</p>
+      <ul>
+        <li>現在の文字が<b>2つ前の文字と同じ</b>なら → <b>タップ（またはスペースキー）</b></li>
+        <li>違う場合 → <b>反応しない</b></li>
+      </ul>
+      <p style="margin-top:0.8rem;">所要時間：練習のみ約3分</p>
+      <button class="btn-start" onclick="startNback()">
+        2-backタスクの練習を始める →
+      </button>
+    </div>` : todoCard('2-backタスク'));
+
+  main.innerHTML = indicator + gradcptCard + dsmCard + nbackCard;
+}
+
+// ── 各課題の練習開始 ──
+function startGradCPT() {
+  // picsInput_75imgs_15nogo_day01.txtを使用（練習用）
+  window.location.href = 'gradcpt/GradCPT_Main.v1.Apr24.html' +
+    '?input=picsInput_75imgs_15nogo_day01.txt&practiceonly=true';
+}
+function startDSM() {
+  // DSM：practiceonly=true（要：DSM HTML修正後に有効化）
+  window.location.href = 'dsm/DSM_Main.v1.Jul24.html?practiceonly=true';
+}
+function startNback() {
+  // 2-back：実装後に有効化
+  window.location.href = 'nback/nback.html?practiceonly=true';
+}
+
+window.addEventListener('DOMContentLoaded', render);
+</script>
+</body>
+</html>
