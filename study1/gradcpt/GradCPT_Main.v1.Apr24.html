@@ -234,7 +234,7 @@
 					  "<label><input class='radioAlign' id='practiceSkip' type='radio' name='practice' value='skip' checked>Skip instructions & practice trials</label><br><br>"+
 					  "<label><input class='radioAlign' id='practiceNoSkip' type='radio' name='practice' value='noSkip'>View instructions & practice trials</label><br>"+
 					  "<br><br>",
-					  "Click here to continue",
+					  "タップして続ける",
 					  function ()
 					  {
 						  practiceChoice = document.getElementById('practiceSkip').checked ? 'skip' : 'noSkip';
@@ -991,14 +991,13 @@
                 else msg = '反応が遅すぎました。<br><br>' +
                            ((chosenInput === 'taps') ?
                             '街の写真をタップしてください！<br><br>' :
-                            '街の写真が出たらスペースキーを押してください<br>' +
-                            'when you see a city picture!<br><br>');
+                            '街の写真が出たらスペースキーを押してください。<br><br>');
             }
 
 			setTimeout(function()
 			{
                 showAlert(msg,
-                      (chosenInput === 'taps' ? (!correct ? "Tap here to retry" : ""): ''),
+                      (chosenInput === 'taps' ? (!correct ? "タップしてやり直す" : ""): ''),
                       function()
                       {
                           showFrame("null");
@@ -1006,7 +1005,7 @@
                       },
                       '20pt',
                       correct ? 1000 : '',
-                      (chosenInput === 'taps' ? null : 'Press the SPACEBAR to retry'),
+                      (chosenInput === 'taps' ? null : 'スペースキーを押してやり直す'),
                       true);
             },200);
         }
@@ -1039,14 +1038,14 @@
             else if (frame.type === "message")
             {
                 showAlert(frame.message,
-                    (chosenInput === 'taps' ? "Tap here to continue" : ''),
+                    (chosenInput === 'taps' ? "タップして続ける" : ''),
                     function ()
                     {
                         nextTrial();
                     },
                     '20pt',
                     null,
-                    (chosenInput === 'taps' ? null : 'Press the SPACEBAR to continue'),
+                    (chosenInput === 'taps' ? null : 'スペースキーを押して続ける'),
                     true);
             }
             // first practice
