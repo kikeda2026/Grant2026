@@ -980,7 +980,7 @@
             correct = (tmbUI.status === "timeout" && type === 'mountain') ||
                        tmbUI.status !== "timeout" && type === 'city' ? 1 : 0;
 
-            if(correct) msg = "Correct!";
+            if(correct) msg = "正解！";
             else
             {
                 // rewind the frame sequence by one frame,
@@ -1038,7 +1038,7 @@
             else if (frame.type === "message")
             {
                 showAlert(frame.message,
-                    (chosenInput === 'taps' ? "タップして続ける" : ''),
+                    (chosenInput === 'taps' ? "タップして続ける" : "クリック / スペースキーで続ける"),
                     function ()
                     {
                         nextTrial();
