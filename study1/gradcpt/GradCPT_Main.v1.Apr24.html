@@ -69,7 +69,41 @@
 
     <script type="text/javascript" src="TestMyBrain.12.18.min.js"></script>
     <script type="text/javascript" src="TestHelper.v1.Oct23.js"></script>
+    <script type="text/javascript">
+    // chooseInput.jsより先に実行：タッチデバイスはタップモードを強制
+    var chosenInput;
+    (function() {
+        var isTouchDevice = ('ontouchstart' in window) ||
+                            (navigator.maxTouchPoints > 0) ||
+                            (navigator.msMaxTouchPoints > 0);
+        var urlParams = new URLSearchParams(window.location.search);
+        var ci = urlParams.get('chooseinput');
+        if (ci === 'taps' || isTouchDevice) {
+            chosenInput = 'taps';
+        } else {
+            chosenInput = 'keys';
+        }
+    })();
+    </script>
     <script type="text/javascript" src="chooseInput.v1.Apr23.js"></script>
+    <script type="text/javascript">
+    // chooseInput.jsが表示したUI要素を非表示にする
+    window.addEventListener('DOMContentLoaded', function() {
+        var isTouchDevice = ('ontouchstart' in window) ||
+                            (navigator.maxTouchPoints > 0) ||
+                            (navigator.msMaxTouchPoints > 0);
+        if (isTouchDevice) {
+            // chooseInput.jsが設定する前に上書き
+            if (typeof chosenInput !== 'undefined') {
+                chosenInput = 'taps';
+            }
+            // chooseInput.jsがUIを表示している場合は非表示にする
+            var chooseDiv = document.getElementById('chooseInputDiv') ||
+                            document.getElementById('inputChoiceDiv');
+            if (chooseDiv) chooseDiv.style.display = 'none';
+        }
+    });
+    </script>
 
 <!-- end of required js libraries ****************************************** -->
 
@@ -1091,15 +1125,19 @@
                 if (practiceonly === 'true')
                 {
                     localStorage.setItem('study1_practice_gradcpt_done', 'true');
+                    // タップで即リダイレクト，タップしなくても3秒後に自動遷移
                     showAlert("GradCPTの練習が完了しました！<br><br>" +
-                              "次の課題の練習へ進みます…<br><br>",
-                              "",
-                              null,
+                              "タップして次の課題へ進んでください。<br><br>",
+                              "次へ進む",
+                              function()
+                              {
+                                  window.location.href = '../practice.html?step=2';
+                              },
                               '20pt');
                     setTimeout(function()
                     {
                         window.location.href = '../practice.html?step=2';
-                    }, 2500);
+                    }, 5000);
                     return;
                 }
 
