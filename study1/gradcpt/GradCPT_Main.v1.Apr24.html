@@ -253,6 +253,7 @@
     var autosave;                   // URL parameter: if they want to save data in a file automatically
     var filename;                   // URL parameter: filename for data
     var nopractice;                 // URL parameter: set to 'true' to skip practice
+    var practiceonly;               // URL parameter: set to 'true' to skip main test after practice
     var usage = "";                 // URL parameter: show usage
     var chosenInput;                // input type (taps or keys)
 	var practiceChoice = null;	// whether the participant chose to complete optional practice trials
@@ -1592,11 +1593,7 @@
         // see if they don't want practice or optional practice
         nopractice = getUrlParameters("nopractice","",true);
         if (!nopractice) nopractice = 'false';
-
-        // practiceonly=true: 練習のみ実施し，本番テストを行わない
-        var practiceonly = getUrlParameters("practiceonly","",true);
-        if (!practiceonly) practiceonly = 'false';
- 		else if (!(nopractice === 'true' || nopractice === 'false' || nopractice === 'optional'))
+        if (!(nopractice === 'true' || nopractice === 'false' || nopractice === 'optional'))
 		{
 			showAlert("Error: URL parameter 'nopractice' must<br>" +
 					  "be set to 'true', 'false', or 'optional'.<br><br>",
@@ -1604,7 +1601,11 @@
 					  null,
 					  '20pt');
 			return;
-		}		
+		}
+
+        // practiceonly=true: 練習のみ実施し，本番テストを行わない
+        practiceonly = getUrlParameters("practiceonly","",true);
+        if (!practiceonly) practiceonly = 'false';
 
         // specify the input file
         inputFile = getUrlParameters("input", "", true);
