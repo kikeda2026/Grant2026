@@ -1123,15 +1123,17 @@
                 if (practiceonly === 'true')
                 {
                     localStorage.setItem('study1_practice_gradcpt_done', 'true');
-                    // タップで即リダイレクト，タップしなくても3秒後に自動遷移
-                    showAlert("GradCPTの練習が完了しました！<br><br>" +
-                              "タップして次の課題へ進んでください。<br><br>",
-                              "次へ進む",
+                    // タップ/スペースキーで即リダイレクト，反応がなくても5秒後に自動遷移
+                    showAlert("GradCPTの練習が完了しました！<br><br>",
+                              (chosenInput === 'taps' ? "タップして次の課題へ進む" : "クリック / スペースキーで次の課題へ進む"),
                               function()
                               {
                                   window.location.href = '../practice.html?step=2';
                               },
-                              '20pt');
+                              '20pt',
+                              null,
+                              (chosenInput === 'taps' ? null : 'スペースキーを押して次へ進む'),
+                              true);
                     setTimeout(function()
                     {
                         window.location.href = '../practice.html?step=2';
