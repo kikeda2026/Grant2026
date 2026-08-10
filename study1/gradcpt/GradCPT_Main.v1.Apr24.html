@@ -76,9 +76,7 @@
         var isTouchDevice = ('ontouchstart' in window) ||
                             (navigator.maxTouchPoints > 0) ||
                             (navigator.msMaxTouchPoints > 0);
-        var urlParams = new URLSearchParams(window.location.search);
-        var ci = urlParams.get('chooseinput');
-        if (ci === 'taps' || isTouchDevice) {
+        if (isTouchDevice) {
             chosenInput = 'taps';
         } else {
             chosenInput = 'keys';
