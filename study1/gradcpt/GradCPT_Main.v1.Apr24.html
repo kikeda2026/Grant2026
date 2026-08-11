@@ -254,6 +254,7 @@
     var filename;                   // URL parameter: filename for data
     var nopractice;                 // URL parameter: set to 'true' to skip practice
     var practiceonly;               // URL parameter: set to 'true' to skip main test after practice
+    var firstrun;                   // URL parameter: set to 'true' to run this as part of practice.html's practice task (practice trials + first 75-trial test, still practice — no GAS submission, continues to next practice step)
     var usage = "";                 // URL parameter: show usage
     var chosenInput;                // input type (taps or keys)
 	var practiceChoice = null;	// whether the participant chose to complete optional practice trials
@@ -1273,22 +1274,42 @@
                 logResults([outcomes],'cum');
             }
 
-            // we either save locally or to the server
-            // ── GASへデータ送信 ──
-            sendResultsToGAS(outcomes, results);
-
-            // ── 完了メッセージを表示し，cognitive.htmlへ戻る ──
-            showAlert("課題が完了しました。<br><br>" +
-                      "ありがとうございました。<br>" +
-                      "自動的に画面が切り替わります…<br><br>",
-                      "",
-                      null,
-                      '20pt');
-
-            setTimeout(function()
+            if (firstrun === 'true')
             {
-                window.location.href = '../cognitive.html';
-            }, 3000);
+                // ── 練習課題ページ内の75試行テスト（初回・あくまで練習）：GAS送信なし，完了フラグのみローカル保存，DSM練習へ遷移 ──
+                localStorage.setItem('study1_practice_gradcpt_done', 'true');
+
+                showAlert("GradCPTの練習課題が完了しました！<br><br>" +
+                          "お疲れさまでした。<br>" +
+                          "続けてDSM（デジットシンボルマッチング）の練習に進みます…<br><br>",
+                          "",
+                          null,
+                          '20pt');
+
+                setTimeout(function()
+                {
+                    window.location.href = '../practice.html?step=2';
+                }, 3000);
+            }
+            else
+            {
+                // we either save locally or to the server
+                // ── GASへデータ送信 ──
+                sendResultsToGAS(outcomes, results);
+
+                // ── 完了メッセージを表示し，cognitive.htmlへ戻る ──
+                showAlert("課題が完了しました。<br><br>" +
+                          "ありがとうございました。<br>" +
+                          "自動的に画面が切り替わります…<br><br>",
+                          "",
+                          null,
+                          '20pt');
+
+                setTimeout(function()
+                {
+                    window.location.href = '../cognitive.html';
+                }, 3000);
+            }
         }
     }
 
@@ -1558,6 +1579,8 @@
                 "<i>ntrials=150</i> -- number of image alternations<br>" +
                 "<i>picseq=shuffle</i> -- method for generating the image sequence [shuffle, randraw]<br>" +
                 "<i>nopractice=true</i> -- omit instructions and practice phase [true, false, optional]<br>" +
+                "<i>practiceonly=true</i> -- run practice trials only, skip the main test<br>" +
+                "<i>firstrun=true</i> -- run as part of the practice task on practice.html (still practice; no GAS submission, continues to next practice step)<br>" +
                 "<i>chooseinput=true</i> -- whether we use chooseInput when touch is detected<br>" +
                 "<i>debug=true</i> -- outputs trial by trial info to the console<br>" +
                 "<i>showresults=true</i> -- allows to save results locally in a file<br>" +
@@ -1606,6 +1629,10 @@
         // practiceonly=true: 練習のみ実施し，本番テストを行わない
         practiceonly = getUrlParameters("practiceonly","",true);
         if (!practiceonly) practiceonly = 'false';
+
+        // firstrun=true: 練習課題ページ内の75試行テスト（初回・あくまで練習）。GAS送信なし，完了後は次の練習ステップへ
+        firstrun = getUrlParameters("firstrun","",true);
+        if (!firstrun) firstrun = 'false';
 
         // specify the input file
         inputFile = getUrlParameters("input", "", true);
