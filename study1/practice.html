@@ -199,7 +199,7 @@ function render() {
         <li>提示された数字に対応するシンボルを<b>できるだけ速く選択</b></li>
         <li>制限時間：90秒</li>
       </ul>
-      <p style="margin-top:0.8rem;">所要時間：練習のみ約2分</p>
+      <p style="margin-top:0.8rem;">所要時間：約2〜2.5分（練習トライアル＋テスト90秒）</p>
       <button class="btn-start" onclick="startDSM()">
         DSMの練習を始める →
       </button>
@@ -233,8 +233,10 @@ function startGradCPT() {
     '?input=picsInput_75imgs_15nogo_practice.txt&firstrun=true&chooseinput=false';
 }
 function startDSM() {
-  // DSM：practiceonly=true（要：DSM HTML修正後に有効化）
-  window.location.href = 'dsm/DSM_Main.v1.Jul24.html?practiceonly=true';
+  // seed=990001：練習専用の固定シード（Day1〜14本番の刺激シードとは別の値を使用）
+  // firstrun=true：練習トライアル＋90秒テスト（すべて練習）を実施し，GAS送信なしで完了後2-back練習へ遷移
+  window.location.href = 'dsm/DSM_Main.v1.Jul24.html' +
+    '?seed=990001&firstrun=true&chooseinput=false';
 }
 function startNback() {
   // 2-back：実装後に有効化
