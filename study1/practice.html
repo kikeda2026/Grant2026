@@ -138,7 +138,7 @@ function render() {
         <p>
           お疲れさまでした。<br>
           これで毎日の認知課題の準備が整いました。<br><br>
-          明日の夕食後から，毎日課題を実施してください。<br>
+          今日の夕食後から，毎日課題を実施してください。<br>
           夕食を始めたら，トップページの「夕食記録」をタップすることをお忘れなく。
         </p>
         <a href="index.html" class="btn-home">← トップページへ戻る</a>
@@ -182,7 +182,7 @@ function render() {
         <li>都市の画像 → <b>できるだけ早くタップ（またはスペースキー）</b></li>
         <li>山の画像 → <b>反応しない</b></li>
       </ul>
-      <p style="margin-top:0.8rem;">所要時間：練習のみ約3〜4分</p>
+      <p style="margin-top:0.8rem;">所要時間：約4〜5分（練習トライアル＋テスト75試行）</p>
       <div class="alert-info">
         ⚠️ 次の画面では英語の操作ガイドが表示される場合があります。「タップ / スペースキー」の選択後，日本語の説明が表示されます。
       </div>
@@ -230,9 +230,10 @@ function render() {
 
 // ── 各課題の練習開始 ──
 function startGradCPT() {
-  // picsInput_75imgs_15nogo_day01.txtを使用（練習用）
+  // picsInput_75imgs_15nogo_practice.txtを使用（Day1本番用day01.txtとは別順序の練習専用ファイル）
+  // firstrun=true：練習トライアル＋75試行テスト（すべて練習）を実施し，GAS送信なしで完了後DSM練習へ遷移
   window.location.href = 'gradcpt/GradCPT_Main.v1.Apr24.html' +
-    '?input=picsInput_75imgs_15nogo_day01.txt&practiceonly=true&chooseinput=false';
+    '?input=picsInput_75imgs_15nogo_practice.txt&firstrun=true&chooseinput=false';
 }
 function startDSM() {
   // DSM：practiceonly=true（要：DSM HTML修正後に有効化）
