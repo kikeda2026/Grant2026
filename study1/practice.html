@@ -216,7 +216,7 @@ function render() {
         <li>現在の文字が<b>2つ前の文字と同じ</b>なら → <b>タップ（またはスペースキー）</b></li>
         <li>違う場合 → <b>反応しない</b></li>
       </ul>
-      <p style="margin-top:0.8rem;">所要時間：練習のみ約3分</p>
+      <p style="margin-top:0.8rem;">所要時間：約2分（練習+テスト38試行）</p>
       <button class="btn-start" onclick="startNback()">
         2-backタスクの練習を始める →
       </button>
@@ -239,8 +239,10 @@ function startDSM() {
     '?seed=990001&firstrun=true&chooseinput=false';
 }
 function startNback() {
-  // 2-back：実装後に有効化
-  window.location.href = 'nback/nback.html?practiceonly=true';
+  // seed=994001：練習専用の固定シード（Day1〜14本番のシードとは別の値を使用，本番シードは未定）
+  // firstrun=true：練習トライアル＋テスト（すべて練習）を実施し，GAS送信なしで完了後「全体終了」画面へ
+  window.location.href = 'nback/NBack_Main.v1.Apr25.html' +
+    '?seed=994001&firstrun=true';
 }
 
 window.addEventListener('DOMContentLoaded', render);
