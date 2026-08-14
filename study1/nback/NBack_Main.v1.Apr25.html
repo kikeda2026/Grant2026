@@ -1,0 +1,3791 @@
+<!DOCTYPE html>
+<!-- saved from url=(0095)https://studies.testmybrain.org/demo/tmb_tests/NBack/NBack.EMA.v1.Apr25/NBack.EMA.v1.Apr25.html -->
+<html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!-- Metadata ************************************************************** -->
+
+    
+    <meta name="description" content="TMB N-Back Memory">
+    <meta name="copyright" content="2025 The Many Brains Project, Inc. and McLean Hospital LGPLv3">
+    <meta name="author" content="Roger Strong">
+    <meta name="keywords" content="cognitive test, brain test, memory test, n-back test">
+
+    <!-- Configs for mobiles -->
+
+    <!-- Set the viewport. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=contain">
+
+    <!-- Allow web app to be run in full-screen mode. -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Make the app title different than the page title. -->
+    <meta name="apple-mobile-web-app-title" content="TMB N-Back">
+
+    <!-- Set the theme color -->
+    <meta name="theme-color" content="white">
+
+<!-- end of metadata ******************************************************* -->
+
+<!-- Links to Icons. ********************************************************-->
+
+    <link rel="apple-touch-icon" sizes="180x180" href="https://studies.testmybrain.org/apple-touch-icon.png">
+    <link rel="shortcut icon" href="https://studies.testmybrain.org/favicon.ico">
+
+<!-- end of icons ********************************************************** -->
+
+<!-- © 2025 The Many Brains Project, Inc. and McLean Hospital.
+
+     This code is made available under a GNU Lesser General Public License 3.0
+     (LGPLv3).
+     https://www.gnu.org/licenses/lgpl-3.0.html.
+
+     For Usage, enter:
+
+      ...html?help
+
+-->
+
+<!-- Title ***************************************************************** -->
+
+    <title>TMB N-Back Memory</title>
+
+<!-- end of Title ********************************************************** -->
+
+<!-- css Style declarations and stylesheets ******************************** -->
+
+    <style type="text/css">
+
+        *
+        {
+            border-radius: 0;
+            box-sizing: border-box;
+        }
+
+        *::after, *::before
+        {
+            box-sizing: border-box;
+        }
+
+        body
+        {
+            width: 100vw;
+            height: 100vh;
+            margin: auto;
+            background: #ffffff;
+            color: #000000;
+            font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+            font-size: 13pt;
+            text-align: center;
+        }
+        
+        #items
+        {
+        	position: absolute;
+            font-family: Arial, sans-serif;
+            font-size: 120pt;
+            line-height: 200px;
+            left: 50vw;
+            top: 50vh;
+            margin-left: -100px;
+            margin-top: -100px;
+            height: 200px;
+            width: 200px;
+            background: red;
+            text-align: center;
+        }
+        
+        #practice_feedback
+        {
+            width: 310px;
+            height: 40px;
+            clear: both;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-top: 150px;
+            margin-left: -155px;
+            text-align:center;
+            font-size: 20pt;
+        }
+
+
+        .image
+        {
+            border: 5px solid transparent;
+            height: 300px;
+        }
+
+
+        .button
+        {
+            border: 2px solid #f1c40f;
+            border-radius: 1em;
+            background: transparent;
+            color: #000000;
+            box-shadow: 0 5px 15px 5px grey
+        }
+
+        .button:active
+        {
+            box-shadow: 0 5px 15px 1px lightgrey
+        }
+
+        .button:focus
+        {
+            outline: none
+        }
+
+    </style>
+
+<!-- end of css Style declarations ***************************************** -->
+
+<!-- required js libraries ************************************************* -->
+
+    <script type="text/javascript" src="TestMyBrain.12.18.min.js"></script>
+
+<!-- end of required js libraries ****************************************** -->
+
+<!-- js script ************************************************************* -->
+
+    <script type="text/javascript">
+
+    // ── GAS Integration (池田研究室 研究1) ──────────────────────────
+    var GAS_URL = 'https://script.google.com/macros/s/AKfycby5FYl7ruaqdoQvbxhCrUxUG8IMpxYHY6cUFwASDWxwplmTA49eOV6-24hgDD0grCSV/exec';
+
+    function sendResultsToGAS(outcomes, results) {
+        var pid = localStorage.getItem('study1_participant_id') || '';
+        var now_str = new Date().toLocaleString('ja-JP');
+
+        // テスト試行のみ抽出（練習試行を除く，isHitが確定している試行のみ）
+        var testTrials = (results || []).filter(function(t) {
+            return t.type === 'test' && t.isHit !== null;
+        }).map(function(t) {
+            return {
+                item:     t.item     !== undefined ? t.item     : '',
+                isHit:    t.isHit    !== null       ? t.isHit    : '',
+                nBack:    t.nBack    !== undefined ? t.nBack    : '',
+                pressed:  t.pressed  !== undefined ? t.pressed  : '',
+                correct:  t.correct  !== null       ? t.correct  : '',
+                rt:       t.rt       !== null       ? t.rt       : '',
+                state:    t.state    || ''
+            };
+        });
+
+        // ── 集計データ送信 ──
+        var summaryPayload = {
+            'タイプ':            '2-back集計',
+            '参加者ID':          pid,
+            '実施日時':          now_str,
+            'dprime':           outcomes.dprime      !== undefined ? outcomes.dprime      : '',
+            'crit':             outcomes.crit        !== undefined ? outcomes.crit        : '',
+            'hitRate':          outcomes.OEprop      !== undefined ? (1 - outcomes.OEprop) : '',
+            'falseAlarmRate':   outcomes.CEprop      !== undefined ? outcomes.CEprop      : '',
+            'meanRTc':          outcomes.meanRTc     !== undefined ? outcomes.meanRTc     : '',
+            'medianRTc':        outcomes.medianRTc   !== undefined ? outcomes.medianRTc   : '',
+            'sdRTc':            outcomes.sdRTc       !== undefined ? outcomes.sdRTc       : '',
+            'cvRTc':            outcomes.cvRTc       !== undefined ? outcomes.cvRTc       : '',
+            'accuracy':         outcomes.accuracy    !== undefined ? outcomes.accuracy    : '',
+            'score':            outcomes.score       !== undefined ? outcomes.score       : '',
+            'responseDevice':   outcomes.responseDevice !== undefined ? outcomes.responseDevice : '',
+            'testVersion':      outcomes.testVersion !== undefined ? outcomes.testVersion : ''
+        };
+        postToGAS(summaryPayload);
+
+        // ── 詳細データ送信（試行レベル JSON） ──
+        if (testTrials.length > 0) {
+            var detailPayload = {
+                'タイプ':    '2-back詳細',
+                '参加者ID': pid,
+                '実施日時': now_str,
+                'trials':   JSON.stringify(testTrials)
+            };
+            postToGAS(detailPayload);
+        }
+    }
+
+    // 隠しiframeへのPOST送信（CORS回避）
+    function postToGAS(payload) {
+        var form = document.createElement('form');
+        form.action  = GAS_URL;
+        form.method  = 'POST';
+        form.target  = 'gasIframe';
+        form.style.display = 'none';
+        Object.keys(payload).forEach(function(key) {
+            var inp = document.createElement('input');
+            inp.type  = 'hidden';
+            inp.name  = key;
+            inp.value = payload[key];
+            form.appendChild(inp);
+        });
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+    }
+
+    var item_options
+     = ['A', 'B', 'C', 'D', 'E', 'F'];  // list of n-back item options
+    var ch;                 			// timeouts chain
+    var results = [];       			// array to store trials details and responses
+    var outcomes = {};      			// object containing outcome variables
+    var frameSequence = []; 			// object containing the sequence of frames and their properties
+    var resetSequenceState = [];		// variable for resetting frame sequence after practice errors
+    var frame;              			// single frame object
+    var testVersion;        			// version identifier for this test
+    var presentationTime;		 		// URL parameter: time (in ms) that each item is displayed for, default = 1000
+    var ISI;		          			// URL parameter: inter-stimulus interval (in  ms), default = 500
+    var numItems;	        			// URL parameter: number of items per sequence, default = 40
+    var hitProp;    					// URL parameter: percentage of n-back occurrences, default = .25
+    var numGoItemsTest;					// number of go items per sequence (test)
+    var numNoGoItemsTest;				// number of no-go items per sequence (test)
+    var numGoItemsPractice;				// number of go items per sequence (practice)
+    var numNoGoItemsPractice;			// number of no-go items per sequence (practice)
+    var nBack;							// URL parameter: n-back sequences to run
+    var seed;              				// URL parameter: random generator seed
+    var feedback;         				// URL parameter: whether or not to show feedback
+    var practiceItems = 6;				// how many letters in practice sequence
+    var totalPracticeAttempts = 0;		// how many practice attempts have been completed
+    var maxPracticeAttempts = 3;		// maximum number of practice attempts before advancing
+    var feedbackDuration = 150;			// duration of feedback in ms (when feedback is present)
+    var debug;         					// URL parameter: output to console
+    var showresults;   					// URL parameter: if they want to show results in a popup window
+    var autosave;      					// URL parameter: if they want to save data in a file automatically
+    var filename;      					// URL parameter: filename for data
+    var usage = "";    					// URL parameter: show usage
+    var nopractice;						// URL parameter: should we skip the practice trials?
+    var trialStart;						// variable for keeping track of times when trials start
+    var trialCount = -1;				// variable to keep track of trial number
+    var exampleSequences = [];			// example sequences for instructions
+    var msg1;							// string specific to input device
+    var just_saw_warning = false;		// variable to keep track of practice warning message state
+    var last_event = now();				// variable used for debouncing
+    var practice_feedback;				// feedback div during practice
+    var firstrun;						// URL parameter: set to 'true' to run as part of practice.html's practice task (still practice — no GAS submission, continues to next practice step) — 池田研究室 研究1で追加
+    var lastPracticeSequence = null;	// 直前の練習試行の文字列・ヒット位置（やり直し画面の説明表示用）— 池田研究室 研究1で追加
+    
+    function sample(lo, hi, n, replacement){
+		// store output
+		var res = [];
+		
+		// make vector of numbers we are sampling from
+		var num_opts = [];
+		for (var i = lo; i <= hi; i++)
+		{
+			num_opts.push(i);
+		}
+		
+		//start sampling randomly
+		for (var c = 0; c < n; c++)
+		{
+			var pos = sampleInt(0, num_opts.length - 1);
+			var pick = num_opts[pos];
+			res.push(pick);
+			
+			//cut selection from list if not replacement
+			if (!replacement)
+			{
+				num_opts.splice(pos, 1);
+			}
+		}
+		return(res);
+	}
+	
+	function sampleInt(lo, hi)
+	{
+		var res = Math.floor(Math.random() * (hi - lo + 1)) + lo;
+		return(res);
+	}
+	
+	function showDemoSequence(sequence, count)
+	{
+		// show stimuli
+		ch = chainTimeouts(
+		function()
+		{
+			//show item
+			getID("items").style.background = 'white';
+			getID("items").innerHTML = sequence[count];
+			showFrame("items");
+			
+		},
+		presentationTime,
+		function()
+		{
+			 getID("items").innerHTML = "";
+		},
+		ISI,
+		function()
+		{
+			if (count == 5)
+			{
+				nextTrial();
+			}
+			else
+			{
+				showDemoSequence(sequence, count+1);
+			}
+		});
+	}
+	
+	function ltqnorm (p)
+    {
+        /* Lower tail quantile for standard normal distribution function.
+
+         This function returns an approximation of the inverse cumulative
+         standard normal distribution function.  I.e., given P, it returns
+         an approximation to the X satisfying P = Pr{Z <= X} where Z is a
+         random variable from the standard normal distribution.
+
+         The algorithm uses a minimax approximation by rational functions
+         and the result has a relative error whose absolute value is less
+         than 1.15e-9.
+
+         Author:      Peter John Acklam
+
+         http://home.online.no/~pjacklam/notes/invnorm/
+         */
+
+        /* Coefficients in rational approximations. */
+        var a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02,
+            1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+
+        var b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02,
+            6.680131188771972e+01, -1.328068155288572e+01];
+
+        var c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00,
+            -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+
+        var d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00,
+            3.754408661907416e+00];
+
+        var LOW = 0.02425;
+        var HIGH = 0.97575;
+
+        var q, r;
+
+        // errno = 0;
+
+        if (p < 0 || p > 1)
+        {
+            // errno = EDOM;
+            return 0.0;
+        }
+        else if (p === 0)
+        {
+            // errno = ERANGE;
+            return Number.NEGATIVE_INFINITY; /* minus "infinity" */
+        }
+        else if (p === 1)
+        {
+            // errno = ERANGE;
+            return Number.POSITIVE_INFINITY; /* "infinity" */
+        }
+        else if (p < LOW)
+        {
+            /* Rational approximation for lower region */
+            q = Math.sqrt(-2*Math.log(p));
+            return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) /
+                ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+        }
+        else if (p > HIGH)
+        {
+            /* Rational approximation for upper region */
+            q  = Math.sqrt(-2*Math.log(1-p));
+            return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) /
+                ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+        }
+        else
+        {
+            /* Rational approximation for central region */
+            q = p - 0.5;
+            r = q*q;
+            return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q /
+                (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+        }
+    }
+	
+	function report(e)
+    {
+		if (e.repeat)
+		{ 
+			return;
+		}
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // if a second response comes in too quickly after a previous one,
+		// ignore it (debounce with 50ms delay)
+		// (this can happen when both touchstart and pointerdown are emitted
+		// for the same response)
+		var this_event = now();
+		if (this_event - last_event < 50)
+		{
+			return;
+		}
+        last_event = this_event;
+        
+        
+        // handle the response
+        var whichTrial;
+
+        if(e.type === "touchstart" ||
+           e.type === "pointerdown" ||
+           e.type === "keydown")
+        {
+            
+            // log rt
+            var responseTimeStamp = now();
+            var responseTime = (responseTimeStamp - trialStart).round(2);
+            
+            if (responseTime <= 200)
+            {
+            	if (results[trialCount-1].pressed === 0) // assign to prior trial if no response to prior trial
+            	{
+            		whichTrial = trialCount - 1;
+            		responseTime = (responseTimeStamp - results[whichTrial].stim_onset).round(2);
+            	}
+            	else if (results[trialCount].pressed === 0) // assign to current trial if already response to prior trial but not current
+            	{
+            		whichTrial = trialCount;
+            	}
+            	else // ignore response if response already assigned to both trials
+            	{
+            		return;
+            	}
+            }
+            else
+            {
+            	if (results[trialCount].pressed === 0)
+            	{
+            		whichTrial = trialCount;
+            	} 
+            	else // ignore response if already assigned to this trial
+            	{
+            		return; 
+            	}
+            }
+            
+            results[whichTrial].rt = responseTime.round();
+            results[whichTrial].pressed = 1;
+			if(e.type === 'pointerdown') results[whichTrial].state = e.type + ('-'+e.pointerType);
+			else results[whichTrial].state = e.type;
+			results[whichTrial].response_timestamp = responseTimeStamp.round();
+            
+            //log accuracy and give feedback
+            if (results[whichTrial].isHit === 1)
+            {
+            	// if practice, set up feedback
+            	if (frame.type === "practice")
+            	{
+					practice_feedback.innerHTML = 'Correct!';
+					setTimeout(function(){practice_feedback.innerHTML = ''},500);
+                }
+                
+            	results[whichTrial].correct = 1;
+            	if (feedback)
+            	{
+					getID("items").style.background = 'green';
+					setTimeout(function(){getID("items").style.background = 'white';}, feedbackDuration);
+            	}
+            } 
+            else 
+            {
+            	results[whichTrial].correct = 0;
+            	results[whichTrial].rt = responseTime;
+            	if (feedback)
+            	{
+					getID("items").style.background = 'red';
+					setTimeout(function(){getID("items").style.background = 'white';}, feedbackDuration);
+            	}
+            }
+        }
+
+    }
+    
+    // ── 文字系列をヒット位置を緑色でハイライトして表示するHTML生成（欠落画像の代替）池田研究室 研究1で追加 ──
+    function renderAnnotatedSequence(seq)
+    {
+    	if (!seq) return '';
+    	var html = "<div style='font-size:22pt; letter-spacing:0.3em; margin:0.5em 0;'>";
+    	for (var i = 0; i < seq.items.length; i++)
+    	{
+    		var color = (seq.hits[i] === 1) ? '#2EAA6E' : '#000000';
+    		var weight = (seq.hits[i] === 1) ? 'bold' : 'normal';
+    		html += "<span style='color:" + color + "; font-weight:" + weight + ";'>" + seq.items[i] + "</span>";
+    	}
+    	html += "</div>";
+    	return html;
+    }
+
+    function showPracticeErrorMessage(h)
+    {
+    
+    	var buttonText;
+    	
+    	totalPracticeAttempts++;
+    	
+    	if (h === 0) // miss
+    	{
+    		var msg = "おしい！<br>" +
+    					(hasTouch ? "タップ" : "スペースキーを押す") +
+    					"べきでした。<br>" +
+    					"2つ前の文字と同じ文字が出たら，毎回<br>" +
+    					(hasTouch ? "タップ" : "スペースキーを押す") +
+    					"してください。<br><br>" +
+    					"この系列では，緑色の文字のときに<br>反応するのが正解です。<br><br>" +
+                        renderAnnotatedSequence(lastPracticeSequence);
+    	}
+    	else if (h === 1) // false alarm
+    	{
+    		var msg = "おしい！<br>" +
+    					"2つ前の文字と同じ文字が出たときだけ<br>" +
+    					(hasTouch ? "タップ" : "スペースキーを押す") +
+    					"してください。<br><br>" +
+    					"この系列では，緑色の文字のときに<br>反応するのが正解です。<br><br>" +
+                        renderAnnotatedSequence(lastPracticeSequence);
+    	
+    	}
+    	
+    	// log that we just saw the warning to permit test to advance
+    	just_saw_warning = true;
+    	
+    	if (totalPracticeAttempts < maxPracticeAttempts)
+    	{
+    		// reset frame sequence back to start of practice trials
+    		frameSequence = resetSequenceState[nBack.indexOf(results[trialCount].nBack)].slice(0);
+    		
+    		buttonText =  (hasTouch ? "タップしてもう一度" : "スペースキーを押してもう一度");
+    	}
+    	else 
+    	{
+    		// remove any remaining practice frames
+    		while (frameSequence[0].type === 'practice')
+    		{
+    			frameSequence.shift();
+    		}
+    		
+    		buttonText =  (hasTouch ? "タップして続ける" : "スペースキーを押して続ける");
+    	}
+    	
+    	showAlert(msg,
+				 buttonText,
+				 function ()
+				 {
+					 showFrame("null");
+					 nextTrial();
+				 },
+				 '20pt');
+    }
+
+    // iterate through the frameSequence object
+    // implementing stimulus presentation,
+    // response collection and data management
+    function nextTrial()
+    {
+    
+    	// remove event listener (in case no response last test trial or incorrect practice)
+		if(hasTouch)
+		{
+			if("ontouchend" in window)
+				window.removeEventListener('touchstart',report,true);
+			if(window.PointerEvent)
+				window.removeEventListener('pointerdown',report,true);
+		}
+		else 
+		{
+			window.removeEventListener('keydown',report,true);
+		}
+		
+    	// if practice and they got the last trial wrong, escape and show message
+    	if (!just_saw_warning && results.length > 0 && results[trialCount].type == "practice" && totalPracticeAttempts < maxPracticeAttempts)
+    	{
+    		if ((results[trialCount].pressed === 1 && results[trialCount].isHit !== 1) ||
+    			(results[trialCount].pressed === 0 && results[trialCount].isHit === 1))
+    		{
+    			showPracticeErrorMessage(results[trialCount].pressed);
+    			return;
+    		}
+    	} 
+    	else 
+    	{
+    		just_saw_warning = false;
+    	}
+    		
+        // read the frame sequence one frame at a time
+        frame = frameSequence.shift();
+        if (frame)
+        {
+            // check if it's the startup frame
+            if (frame.type === "begin") showAlert(frame.message,
+                                                  (hasTouch ? "タップして説明を見る" : "スペースキーを押して説明を見る"),
+                                                  function ()
+                                                  {
+                                                      showFrame("null");
+                                                      nextTrial();
+                                                  },
+                                                  '20pt');
+
+            // else if it's a message frame, show it
+            else if (frame.type === "message")
+			{  							
+				showAlert(frame.message,
+				 (hasTouch ? "タップして続ける" : "スペースキーを押して続ける"),
+				 function ()
+				 {
+					 showFrame("null");
+					 nextTrial();
+				 },
+				 '20pt');
+            }
+            // else if it's a message_start frame, show it
+            else if (frame.type === "message_start")
+			{  							
+				showAlert(frame.message,
+				 (hasTouch ? "タップしてテストを始める" : "スペースキーを押してテストを始める"),
+				 function ()
+				 {
+					 showFrame("null");
+					 nextTrial();
+				 },
+				 '20pt');
+            }
+            // else if it's a message_practice frame, show it
+            else if (frame.type === "message_practice")
+			{  							
+				showAlert(frame.message,
+				 (hasTouch ? "タップして練習を始める" : "スペースキーを押して練習を始める"),
+				 function ()
+				 {
+					 showFrame("null");
+					 nextTrial();
+				 },
+				 '20pt');
+            }
+            // handle sequence examples
+            else if (frame.type === "example") 
+            {
+				
+				// make sure item background is white
+            	getID("items").style.background = 'white';
+            	
+            	// set the demo sequence
+            	var this_demo_sequence = exampleSequences[frame.nBack - 1];
+            	
+            	// show the demo sequence
+                showDemoSequence(this_demo_sequence, 0);
+            }
+            // deal with practice and test frames
+            else
+            {
+           		//increase trial count
+           		trialCount++;
+           		 
+            	// add to results object
+            	results.push({
+					type: frame.type, // one of practice or test
+					trial: frame.trial_id,
+					item: frame.item,
+					isHit: frame.isHit,
+					nBack: frame.nBack,
+					rt: null,
+					pressed: 0,
+					state: '',
+					correct: null
+                });
+                
+                //set up initial accuracy value in case no response is made
+                if (results[trialCount].isHit === 1)
+                {
+                	results[trialCount].correct = 0;
+                } 
+                else if (results[trialCount].isHit === 0)
+                {
+                	results[trialCount].correct = 1;
+                }
+                
+                // show stimuli
+                ch = chainTimeouts(
+                function()
+                {
+                	//show item
+                	getID("items").style.background = 'white';
+                    getID("items").innerHTML = frame.item;
+                    
+                    // include practice feedback div if practice trial
+                    if (frame.type === "practice")
+                    {
+                    	feedback.innerHTML = '';
+                    	showFrame("items", "practice_feedback");
+                    }
+                    else
+                    {
+                    	showFrame("items");
+                    }
+                    
+                    trialStart = now();
+                    results[trialCount].stim_onset = trialStart.round();
+                    results[trialCount].response_timestamp = null;
+                    //add event listener
+                    if(hasTouch)
+					{
+						if("ontouchend" in window)
+							window.addEventListener('touchstart',report,true);
+
+						// to accomodate for pen input we need to listen to 'pointerdown';
+						// on hybrid windows devices and edge browser
+						// pen is reported as pointerdown.pen
+						if(window.PointerEvent)
+							window.addEventListener('pointerdown',report,true);
+					}
+					else
+					{
+						window.addEventListener('keydown',report,true);
+					}
+                },
+                presentationTime,
+                function()
+                {
+                     getID("items").innerHTML = "";
+                },
+                ISI,
+                function()
+                {
+                    nextTrial();
+                });
+            }
+        }
+        // else the sequence is empty, we are done!
+        else
+        {
+            //compute outcomes
+             var tmp1, tmp2, tmp3, tmp4;
+             
+            //total go and nogo trials across the entire test (numItems * number of n-back conditions)
+            var nGoTotal = numGoItemsTest * nBack.length;
+            var nNoGoTotal = numNoGoItemsTest * nBack.length;
+
+            // all test trials (excluding practice and first N trials)
+            tmp1 = results.filter(function( obj )
+            {
+                return obj.type === 'test' &&
+                       obj.isHit !== null;
+            });
+            
+            // correct trials
+            tmp2 = tmp1.filter(function( obj ) {return obj.correct === 1;});
+            
+            // correct go trials (i.e., hits or true positives)
+            tmp3 = tmp2.filter(function( obj ) {return obj.isHit === 1;});
+
+            // compute commission errors (go response to no-go trial)
+            // and omission errors (no-go response to go trial)
+            var tmp_incorrect = tmp1.filter(function( obj ) {return obj.correct === 0;});
+            var CE = tmp_incorrect.filter(function( obj ) {return obj.isHit === 0;});
+            var OE = tmp_incorrect.filter(function( obj ) {return obj.isHit === 1;});
+            var CEprop = CE.length / nNoGoTotal;
+            var OEprop = OE.length / nGoTotal;
+
+            // compute d' and bias
+            // (avoid infinity by adding or subtracting 0.5 error when
+            //  pHit and/or pFA are 0 or 1)
+            // pHit = 1 - OEprop
+            // pFA =ZCEprop
+            // d' = norminv(pHit) - norminv(pFA)
+            // crit = (-1 * (norminv(pHit) + norminv(pFA)) / 2
+            var pFA = (CE.length === 0) ? (0.5 / nNoGoTotal):
+                       (CE.length === nNoGoTotal) ?  (1 - (0.5 / nNoGoTotal)):
+                       CEprop;
+            var pHit = (OE.length === nGoTotal) ? (0.5 / nGoTotal):
+                      (OE.length === 0) ? (1 - (0.5 / nGoTotal)):
+                      1 - OEprop;
+            var zHit = ltqnorm(pHit);
+            var zFA = ltqnorm(pFA);
+
+            // get response device from trials where a response was made
+           	tmp4 = results.filter(function( obj )
+            {
+                return obj.type === 'test' &&
+                       obj.pressed === 1;
+            });
+            tmp4 = tmp4.length ? tmp4[0].state : 'none';
+            tmp4 = /key/i.test(tmp4) ? 'keyboard' :
+                   /touch/i.test(tmp4) ? 'touch' :
+                   /mouse/i.test(tmp4) ? 'mouse' :
+                   /pen/i.test(tmp4) ? 'pen' :
+                   'unknown';
+
+            outcomes.accuracy = (tmp2.length / tmp1.length).round(4);
+            outcomes.meanRTc = tmp3.length ? tmp3.pluck('rt').average().round(4) : null;
+            outcomes.medianRTc = tmp3.length ? tmp3.pluck('rt').median().round(4) : null;
+            outcomes.sdRTc = tmp3.length > 1 ? tmp3.pluck('rt').sd().round(4) : null;
+            outcomes.cvRTc = tmp3.length > 1 ? outcomes.sdRTc / outcomes.meanRTc : null;
+			if (outcomes.cvRTc !== null)       
+			{
+				outcomes.cvRTc = outcomes.cvRTc.round(4);
+			}    
+            outcomes.CEprop = CEprop.round(4);
+            outcomes.OEprop = OEprop.round(4);
+            outcomes.dprime = (zHit - zFA).round(4);
+            outcomes.crit = ((-1 * (zHit + zFA)) / 2).round(4);
+            outcomes.score = (100*Math.sqrt((1-CEprop)*(1-OEprop))).round(4);
+            outcomes.responseDevice = tmp4;
+            outcomes.testVersion = testVersion;
+    
+			
+            // if debugging, output to console
+            if(debug === "true") logResults([outcomes], 'cum');
+
+            // we either save locally or to the server
+            if(showresults === "true" || autosave === 'true' || filename)
+            {
+                // append outcomes to results
+                outcomes.type = 'summaryScores';
+                results.push(outcomes);
+
+                showAlert("Your score is " + outcomes.score + ".<br>" +
+                          "<br>The test is over.<br>" +
+                          "Thank you for participating!<br><br>",
+                          "",
+                          null,
+                          '20pt');
+
+                setTimeout(function()
+                {
+                    if(filename === false) filename = "NBackResults.csv";
+                    tmbSubmitToFile(results,filename,autosave);
+                },2000);
+            }
+            else if (firstrun === 'true')
+            {
+                // ── 練習課題ページ内のテスト（あくまで練習）：GAS送信なし，完了フラグのみローカル保存 ── 池田研究室 研究1で追加
+                localStorage.setItem('study1_practice_nback_done', 'true');
+
+                showAlert("2-backの練習課題が完了しました！<br><br>" +
+                          "お疲れさまでした。<br>" +
+                          "これで3つの課題の練習がすべて終わりました。<br><br>",
+                          "",
+                          null,
+                          '20pt');
+
+                setTimeout(function()
+                {
+                    window.location.href = '../practice.html?step=4';
+                }, 3000);
+            }
+            else
+            {
+                // ── GASへデータ送信 ── 池田研究室 研究1で改修（元はtmbSubmitToServerでTestMyBrain側へ送信していた）
+                sendResultsToGAS(outcomes, results);
+
+                showAlert("課題が完了しました。<br><br>" +
+                          "ありがとうございました。<br>" +
+                          "自動的に画面が切り替わります…<br><br>",
+                          "",
+                          null,
+                          '20pt');
+
+                setTimeout(function()
+                {
+                    window.location.href = '../cognitive.html';
+                }, 3000);
+            }
+        }
+    }
+
+    // generate the frameSequence object,
+    // where each object's element codes the parameters
+    // for a single trial/frame
+    //"For example, you might see the<br>following sequence of letters:<br><br>" + 
+     //                         "C...A...B...B...D...C<br><br>"), 
+    function setFrameSequence()
+    {
+        var testMessage, i;
+        
+        msg1 = ((hasTouch) ?
+                           'tap the screen' :
+                           'press and release the spacebar');
+        msg1_cap = ((hasTouch) ?
+                           'Tap the screen' :
+                           'Press and release the spacebar');
+        
+        
+        // nback-specific instructions
+        if (nBack.length === 1)
+        {
+			var instuct_n1a = "<h2>説明：</h2>";
+			var instuct_n2a = "<h2>説明：</h2>";
+			var instruct_n2b = "";
+        }
+        else if (nBack.length === 2 && Math.min.apply(Math, nBack) === 1)
+        {
+        	var instuct_n1a = "<h2>1/2<br>説明：</h2>";
+			var instuct_n2a = "<h2>2/2<br>説明：</h2>もう一度，";
+			var instruct_n2b = "今度は，";
+        }
+        
+        
+        var instructions = [];
+        //1-back instructions
+        instructions[0] = [(instuct_n1a +
+                              "You will see letters appear one at a time.<br><br>" +
+                              "Click below to see an example.<br><br>"),
+                              //new instruction page//
+                              ("EXAMPLE"),
+                              //new instruction page//
+                              ("<h2>Instructions:<br></h2>" +
+                              "Your goal is to " + msg1 + "<br>when the letter on the screen is " + 
+                              "the same<br>as the letter that appeared <b>immediately before it.</b><br><br>"),
+                               //new instruction page//
+                              ("<h2>Instructions:</h2>" +
+                              "The letters you just saw are listed below.<br><br>" + 
+                              "With this letter sequence,d<br>" + msg1 + " when<br>" +
+                              "the letter B appears the second time,<br>" + 
+                              "because a B also appeared <br>1 letter before.<br><br>" + 
+                              "<img src='images/back1_example1.png' alt='Example'><br><br>"),
+                              //new instruction page//
+                              ("<h2>Instructions:</h2>" +
+                              "Below is another example sequence.<br><br>" +  
+                              msg1_cap + "<br>for all the letters in green below.<br><br>" + 
+                              "For each green letter, the same letter<br>"  + 
+                              "also appeared 1 letter before.<br><br>" +
+                              "<img src='images/back1_example2.png' alt='Example'><br><br>")];
+        //2-back instructions（池田研究室 研究1で日本語化。欠落画像は実際のデモ系列から生成したHTMLに置き換え）
+        instructions[1] = [(instuct_n2a +
+                              "文字が1つずつ<br>表示されます。<br><br>" +
+                              "下のボタンで例を見てみましょう。<br><br>"),
+                               //new instruction page//
+                              ("EXAMPLE"),
+                               //new instruction page//
+                              ("<h2>説明：</h2>" +
+                              instruct_n2b + "画面に表示された文字が，<br>" +
+                              "<b>2つ前に表示された文字と同じ</b>ときに<br>" +
+                              (hasTouch ? "タップ" : "スペースキーを押す") + "してください。<br><br>"),
+                               //new instruction page//
+                              ("<h2>説明：</h2>" +
+                              "先ほどの文字列は，以下の通りです。<br><br>" + 
+                              "この系列では，2番目のAが出たときに<br>" +
+                              (hasTouch ? "タップ" : "スペースキーを押す") + "してください。<br>" +
+                              "2つ前にもAが表示されているためです。<br><br>" +
+                              "<div style='font-size:26pt; letter-spacing:0.4em; margin:0.5em 0;'>" +
+                              "<span>C</span><span>A</span><span>B</span>" +
+                              "<span style='color:#2EAA6E; font-weight:bold;'>A</span>" +
+                              "<span>D</span><span>C</span></div><br>"),
+                              //new instruction page//
+                              ("<h2>説明：</h2>" +
+                              "別の例を見てみましょう。<br><br>" +
+                              "下の緑色の文字のときに<br>すべて" +
+                              (hasTouch ? "タップ" : "スペースキーを押す") + "してください。<br><br>" +
+                              "緑色の文字はどれも，<br>2つ前に同じ文字が表示されています。<br><br>" +
+                              "<div style='font-size:26pt; letter-spacing:0.4em; margin:0.5em 0;'>" +
+                              "<span>C</span><span>A</span><span>B</span>" +
+                              "<span style='color:#2EAA6E; font-weight:bold;'>A</span>" +
+                              "<span>D</span><span>C</span></div><br>")];
+        
+        // messages（池田研究室 研究1で日本語化）
+        testMessage =
+        {
+            "begin": ("<h2>2-backタスク</h2>" +
+                      "<img src='images/nback.gif'><br><br>")
+        };
+
+        
+        // opening frame 
+        frameSequence.push(
+			{
+				type: "begin",
+				message: testMessage.begin,
+				item: "",
+				isHit: "",
+				nBack: "",
+				trial_id: ""
+			}
+		);
+        
+        // set up n-back stim
+		var new_item;
+		var pre_item;
+		var isHit;
+		
+		for (var n = 0; n < nBack.length; n++)
+		{
+			
+			//this n-back value
+			var nCond = nBack[n];
+			
+			
+			if (!nopractice)
+			{
+				//add instructions to the frames chain
+				for (i = 0; i < instructions[nCond-1].length; i++)
+				{
+					if (instructions[nCond-1][i].indexOf('EXAMPLE') != -1)
+					{
+						var this_type = 'example';
+					} 
+					else 
+					{
+						var this_type = 'message';
+					}
+				
+					frameSequence.push(
+						{
+							type: this_type,
+							message: instructions[nCond-1][i],
+							item: "",
+							isHit: "",
+							nBack: nCond,
+							trial_id: ""
+						});
+				}
+			}
+			
+			//loop for practice and test trials
+			if (nopractice)
+			{
+				p0 = 1;
+			} 
+			else 
+			{
+				p0 = 0;
+			}
+			
+			for (var pt = p0; pt <= 1; pt++)
+			{
+				if (pt === 1) // test
+				{
+					var sequence_items = numItems;
+					var numGoItems = numGoItemsTest;
+					var msg = "よくできました！続けてテストを行います。<br><br>ここからは文字の系列が長くなり，" +
+					 			"正誤のフィードバックは表示されません。<br><br>";
+					var this_type = 'test';
+					var this_message_type = 'message_start';
+				} 
+				else // practice
+				{
+					var sequence_items = practiceItems;
+					var numGoItems = numGoItemsTestPractice;
+					var msg = "練習してみましょう！<br><br>";
+					var this_type = 'practice';
+					var this_message_type = 'message_practice';
+				}
+			
+			
+				// set the RNG based on seed and this nCond value
+				// this results in sequence always being the same for each seed + n-back value,
+				// regardless of other n-back sequences being completed by the participant
+				// (e.g., 3-back sequence will be the same when presented alone and when 
+				// presented with 2-back condition)
+				
+				if (pt === 0) // practice
+				{
+					var this_seed = seed + '_N' + nCond + '_' + pt; //make unique seed for practice
+				}
+				else // test
+				{
+					var this_seed = seed + '_N' + nCond; //make unique seed for practice
+				}
+				Math.seedrandom(this_seed);
+			
+				// empty lists for items and hit locations (1/0)
+				var item_list = [];
+				var hit_list = [];
+							
+				// randomly select locations of hit items
+				var hit_locations = sample(nCond, sequence_items + nCond - 1, numGoItems, false);
+			
+				for (var i = 0; i < sequence_items + nCond; i++)
+				{
+					var trial_opts = item_options.slice(0);
+					if (i === 0) //first item
+					{
+						new_item = trial_opts[sampleInt(0, trial_opts.length - 1)];
+						isHit = null;
+					} 
+					else if (i < nCond) //items that occur before an n-back hit is possible
+					{
+						//remove previous item as an option
+						trial_opts.splice(trial_opts.indexOf(prev_item),1);
+						new_item = trial_opts[sampleInt(0, trial_opts.length - 1)];
+						isHit = null;
+					} 
+					else //items can now be n-back hits
+					{ 
+						var nback_item = item_list[i - nCond];
+						if (hit_locations.indexOf(i) === -1) //not an n-back hit location
+						{
+							var trial_opts = item_options.slice(0);
+							//remove n-back item as an option
+							trial_opts.splice(trial_opts.indexOf(nback_item),1);
+							//remove previous item as an option
+							trial_opts.splice(trial_opts.indexOf(prev_item),1);
+							//if next item is a hit location and nCond > 1, don't let that item occur now
+							if (hit_locations.indexOf(i + 1) !== -1 && nCond > 1)
+							{
+								var next_n_back = item_list[i + 1 - nCond];
+								trial_opts.splice(trial_opts.indexOf(next_n_back),1);
+							}
+							//select new item
+							new_item = trial_opts[sampleInt(0, trial_opts.length - 1)];
+							isHit = 0;
+					
+						}
+						else //an n-back hit location
+						{
+							new_item = nback_item;
+							isHit = 1;
+						}
+					}
+					hit_list.push(isHit);
+					item_list.push(new_item);
+					prev_item = new_item;
+				}
+				
+				// ── 練習ブロックの系列を保存（やり直し画面での表示用）池田研究室 研究1で追加 ──
+				if (pt === 0)
+				{
+					lastPracticeSequence = { items: item_list.slice(0), hits: hit_list.slice(0) };
+				}
+				
+				
+				//add instruction message frames
+				if (nCond === 1)
+				{ 
+					var txt = '直前に';
+				} else {
+					var txt = nCond + '文字前に';
+				}
+			
+				var msg2 = ((hasTouch) ?
+						   '画面をタップして' :
+						   'スペースキーを押して');
+				
+				if (!nopractice)
+				{
+					frameSequence.push(
+							{
+								type: this_message_type,
+								message:    msg + txt + "表示された文字と<br>" +
+											"<b>同じ文字</b>が表示されたら，<br>毎回" + msg2 + "答えてください。<br><br>" +
+											"それ以外のときは<br>" + (hasTouch ? "タップしないで" : "何も押さないで") + "ください。<br><br>",
+								item: '',
+								isHit: '',
+								nBack: nCond,
+								trial_id: ""
+							});
+						
+					var msg_verb = ((hasTouch) ?
+							   'タップする' :
+							   'キーを押す');
+						   
+					if (feedback)
+					{
+						frameSequence.push(
+							{
+								type: "message",
+								message:    '正しく' + msg_verb + 'と，<br>緑色の四角が表示されます。<br><br>' + 
+											"<div style='width:120px; height:120px; background:#2EAA6E; margin:1em auto;'></div><br><br>",
+								item: '',
+								isHit: '',
+								nBack: nCond,
+								trial_id: ""
+							});
+						frameSequence.push(
+							{
+								type: this_message_type,
+								message:    '誤って' + msg_verb + 'と，<br>赤色の四角が表示されます。<br><br>' + 
+											"<div style='width:120px; height:120px; background:#D9534F; margin:1em auto;'></div><br><br>",
+								item: '',
+								isHit: '',
+								nBack: nCond,
+								trial_id: ""
+							});
+					 
+					}
+            	} 
+            	else // single instruction frame when practice is skipped
+            	{
+					frameSequence.push(
+							{
+								type: "message_start",
+								message:    txt + "表示された文字と<br>" +
+											"<b>同じ文字</b>が表示されたら，<br>毎回" + msg2 + "答えてください。<br><br>" +
+											"それ以外のときは<br>" + (hasTouch ? "タップしないで" : "何も押さないで") + "ください。<br><br>",
+								item: '',
+								isHit: '',
+								nBack: nCond,
+								trial_id: ""
+							});
+            	} 
+					
+				//add n-back sequence frames
+				for (var i = 0; i < sequence_items + nCond; i++)
+				{
+					frameSequence.push(
+							{
+								type: this_type,
+								message: '',
+								item: item_list[i],
+								isHit: hit_list[i],
+								nBack: nCond,
+								trial_id: this_type + (i+1)
+							});
+				}
+			}
+        }
+        
+        //set up frame reset sequences for missed practice trials
+        if (!nopractice)
+		{
+			var practice_frame_start = [];
+			for (r = 0; r < frameSequence.length; r++)
+			{
+				if(frameSequence[r].message.indexOf('practice!') !== -1)
+				{
+					practice_frame_start.push(r+1);
+				}
+			}
+			for (r = 0; r < practice_frame_start.length; r++)
+			{
+				resetSequenceState.push(frameSequence.slice(practice_frame_start[r]));
+			}
+        }
+        
+        // start the trial sequence
+        nextTrial();
+    }
+
+    // on page load completion, set up initial parameters,
+    // call the frameSequence generator
+    // and start the trials sequence
+    window.onload = function()
+    {
+        var copyright = "Copyright " +
+                        document.querySelector('meta[name="copyright"]').content;
+        var scriptName = window.location.pathname.split('/').pop();
+        
+        // see if they are just asking for help
+        if ((usage = getUrlParameters("help", "", true)))
+        {
+            showAlert("<p style='text-align: left'>" +
+                "<b>"+ document.title + "</b><br>" +
+                "<i>" + copyright + "</i><br><br>" +
+                "<b>Usage:</b>" +
+                "<br>" + scriptName + "?urlParam1=1&urlParam2=0<br><br>" +
+                "<b>URL Parameters</b>:<br>" +
+                "<i>input=testInput.txt</i> -- image pairs input file<br>" +
+                "<i>debug=true</i> -- outputs trial by trial info to the console<br>" +
+                "<i>showresults=true</i> -- allows to save results locally in a file<br>" +
+                "<i>autosave=true</i> -- will attempt to save results automatically to file<br>" +
+                "<i>filename=subject1.csv</i> -- the filename to save results to<br>" +
+                "<i>presentationTime=1000</i> -- time (in ms) that each item is displayed for<br>" +
+                "<i>ISI=500</i> -- inter-stimulus interval (in  ms)<br>" +
+                "<i>numItems=32</i> -- number of items per sequence<br>" +
+                "<i>hitProp=.25</i> -- percentage of items that are n-back occurrences<br>" +
+                "<i>nBack=[2]</i> -- n-back sequences to run (default = [1,2])<br>" +
+                "<i>feedback=false</i> -- whether to show feedback after responses (default = false)<br>" +
+                "<i>nopractice=false</i> -- whether to skip instructions and practice trials (default = false)<br>" +
+                "<i>seed=1</i> -- seed for generating random sequences<br>" +
+                "<i>help</i> -- print this message");
+            return;
+        }
+
+        // check if this is a debug session
+        debug = getUrlParameters("debug", "", true);
+
+        // check if they want to load results in a new page when the test is over,
+        // if data is to be saved automatically to a file and the filename
+        showresults = getUrlParameters("showresults", "", true);
+        autosave = getUrlParameters("autosave", "", true);
+        filename = getUrlParameters("filename", "", true);
+
+        // firstrun=true: 練習課題ページ内のテスト（あくまで練習）。GAS送信なし，完了後は次の練習ステップへ 池田研究室 研究1で追加
+        firstrun = getUrlParameters("firstrun","",true);
+        if (!firstrun) firstrun = 'false';
+        
+        // get the nback conditions
+        nBack = getUrlParameters("nback","",true);
+        try
+        {	
+        	if (!nBack)
+        	{
+        		nBack = [2];
+        	} else {
+        		nBack = JSON.parse(nBack);
+        	}
+        }
+        catch
+        {
+			showAlert("Invalid nback URL parameter:<br><br>"+
+					  "N-Back conditions must be separated by commas <br>" +
+					  "and contained within brackets. For example:<br><br>" + 
+					  "&nback=[2,3]",
+					  "",
+					  null,
+					  '20pt');
+			return;
+        }
+        
+        // set the random seed
+        seed = getUrlParameters("seed","",true);
+        if(!(seed = parseInt(seed))) seed = 1;
+        
+        // get presentationTime url parameter
+        presentationTime = getUrlParameters("presentationTime","",true);
+        if(!(presentationTime = parseInt(presentationTime))) presentationTime = 1000;
+        
+        // get ISI url parameter
+        ISI = getUrlParameters("ISI","",true);
+        if(!(ISI = parseInt(ISI))) ISI = 500;
+        
+        // get numItems url parameter
+        numItems = getUrlParameters("numItems","",true);
+        if(!(numItems = parseInt(numItems))) numItems = 32;
+        
+        // get hitProp url parameter
+        hitProp = getUrlParameters("hitProp","",true);
+        if(!(hitProp = parseFloat(hitProp))) hitProp = .25;
+        
+        // get feedback url parameter
+        feedback = getUrlParameters("feedback","",true);
+        if(feedback === 'true')
+        {
+        	feedback = true;
+        } 
+        else if (!feedback || feedback === 'false')
+        {
+        	feedback = false;
+        } 
+        else 
+        {
+        	showAlert("Error: Invalid value for url parameter 'feedback'<br><br>" +
+                      "Must be 'true' or 'false'<br><br>",
+                       "",
+                       null,
+                       '20pt');
+            return;
+        }
+        
+        // practice feedback div
+        practice_feedback = getID('practice_feedback');
+        
+        // get nopractice url parameter
+        nopractice = getUrlParameters("nopractice","",true);
+        if(nopractice === 'true')
+        {
+        	nopractice = true;
+        } 
+        else if (!nopractice || nopractice === 'false')
+        {
+        	nopractice = false;
+        } 
+        else 
+        {
+        	showAlert("Error: Invalid value for url parameter 'nopractice'<br><br>" +
+                      "Must be 'true' or 'false'<br><br>",
+                       "",
+                       null,
+                       '20pt');
+            return;
+        }
+        
+        
+        // determine number of go and no-go items per sequence based on URL input
+        numGoItemsTest = Math.round(hitProp*numItems);	//number of go items per test sequence
+    	numNoGoItemsTest = numItems -  numGoItemsTest;	//number of no-go items per test sequence
+    	numGoItemsTestPractice = Math.round(hitProp*practiceItems);	//number of go items per test sequence
+    	numNoGoItemsTestPractice = practiceItems -  numGoItemsTestPractice;	//number of no-go items per test sequence
+    	
+    	// set up example sequences
+    	exampleSequences[0] = ['C','A','B','B','D','C'];
+    	exampleSequences[1] = ['C','A','B','A','D','C'];
+        
+        // set the test version
+        testVersion = scriptName.replace(/\.[^/.]+$/, "");
+
+        // disable spurious user interaction
+        disableSelect();
+        disableRightClick();
+        disableDrag();
+        disableDoubleTapZoom();
+
+        // add appropriate meta viewport for scaling
+        setMobileViewportScale(600,600);
+        
+        // preload images and set frame sequence
+        // 池田研究室 研究1：欠落画像7点はHTML/CSSによる動的表示に置き換えたため，プリロード対象から除外
+        imagePreLoad(["images/nback.gif"],
+                     {pipeline: false, callBack: setFrameSequence});
+        
+    }
+
+    </script>
+
+<!-- end of js script ****************************************************** -->
+
+<style>@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 200;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZYokSdh18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 200;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZYokSdo18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 200;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZYokSdg18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 200;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZYokSdv18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 200;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZYokSdj18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 200;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZYokSdi18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 200;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZYokSds18S0xR41.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZMkidh18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZMkido18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZMkidg18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZMkidv18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZMkidj18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZMkidi18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZMkids18S0xR41.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7qsDJB9cme_xc.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7jsDJB9cme_xc.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7rsDJB9cme_xc.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7ksDJB9cme_xc.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7osDJB9cme_xc.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7psDJB9cme_xc.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7nsDJB9cme.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZY4lCdh18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZY4lCdo18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZY4lCdg18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZY4lCdv18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZY4lCdj18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZY4lCdi18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZY4lCds18S0xR41.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZclSdh18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZclSdo18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZclSdg18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZclSdv18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZclSdj18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZclSdi18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZclSds18S0xR41.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZklydh18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZklydo18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZklydg18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZklydv18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZklydj18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZklydi18S0xR41YDw.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZklyds18S0xR41.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i94_wmhdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i94_wkxdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i94_wmxdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i94_wlBdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i94_wmBdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i94_wmRdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i94_wlxdu3cOWxw.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwmhdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwkxdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwmxdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwlBdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwmBdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwmRdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwlxdu3cOWxw.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qNa7lujVj9_mf.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qPK7lujVj9_mf.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qNK7lujVj9_mf.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qO67lujVj9_mf.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qN67lujVj9_mf.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qNq7lujVj9_mf.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qOK7lujVj9w.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwmhdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwkxdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwmxdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwlBdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwmBdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwmRdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwlxdu3cOWxw.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwmhdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwkxdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwmxdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwlBdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwmBdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwmRdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwlxdu3cOWxw.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3iu4nwmhdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3iu4nwkxdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3iu4nwmxdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3iu4nwlBdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3iu4nwmBdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3iu4nwmRdu3cOWxy40.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3iu4nwlxdu3cOWxw.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+.ZD1LzV_5hhnbdBzBCTeC {
+z-index: 65536;
+}
+
+.BBAoAg1q8YTH2NGsa7Ui {
+font-family: 'Source Sans Pro'
+}
+
+@keyframes aqjkdtZawN5lryW5flKx {
+  from {
+    transform:rotate(0deg)
+  }
+  to {
+    transform:rotate(360deg)
+  }
+}
+
+.qEYyC4J5veWyiLaz9gNP {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  transition: none;
+  position: relative;
+  overflow: hidden;
+  transform: translate3d(0, 0, 0);
+  vertical-align: baseline;
+  margin-bottom: 5.58px;
+  padding: 3px 18px;
+  font-family: "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  background-image: none;
+  border-radius: 4px;
+  border: 1px solid #646363;
+  background-color: #fff;
+  box-shadow: 0 0 0 1px transparent;
+  color: #000;
+  transition: box-shadow ease-in-out .1s,background-color ease-in-out .1s;
+}
+
+.qEYyC4J5veWyiLaz9gNP svg {
+  width:1em;
+  height:1em;
+  vertical-align:middle
+}
+
+.qEYyC4J5veWyiLaz9gNP svg path:not(.ntvBF21SnsKwNa29Rg8A) {
+  transition:fill .2s ease-out;
+  fill:#666
+}
+
+
+.qEYyC4J5veWyiLaz9gNP svg circle.iy0BC5jhx6jMyzcvrLwf,
+.qEYyC4J5veWyiLaz9gNP svg path.iy0BC5jhx6jMyzcvrLwf{
+  fill:transparent;
+  stroke:#666
+}
+
+.qEYyC4J5veWyiLaz9gNP:last-child {
+  margin-right:0
+}
+
+.qEYyC4J5veWyiLaz9gNP svg {
+  min-width:1em;
+  margin-left:.2rem;
+  margin-right:.2rem
+}
+
+.qEYyC4J5veWyiLaz9gNP:hover,
+.qEYyC4J5veWyiLaz9gNP:focus,
+.qEYyC4J5veWyiLaz9gNP:focus-within,
+.qEYyC4J5veWyiLaz9gNP:active {
+  outline:none;
+  text-decoration:none;
+  color:#000;
+  background-color:#f7f7f7;
+  box-shadow:0 0 0 1px #5e34be;
+  text-decoration:none
+}
+
+.qEYyC4J5veWyiLaz9gNP:hover svg,
+.qEYyC4J5veWyiLaz9gNP:focus svg,
+.qEYyC4J5veWyiLaz9gNP:focus-within svg,
+.qEYyC4J5veWyiLaz9gNP:active svg {
+  width:1em;
+  height:1em;
+  vertical-align:middle
+}
+
+.qEYyC4J5veWyiLaz9gNP:hover svg path:not(.ntvBF21SnsKwNa29Rg8A),
+.qEYyC4J5veWyiLaz9gNP:focus svg path:not(.ntvBF21SnsKwNa29Rg8A),
+.qEYyC4J5veWyiLaz9gNP:focus-within svg path:not(.ntvBF21SnsKwNa29Rg8A),
+.qEYyC4J5veWyiLaz9gNP:active svg path:not(.ntvBF21SnsKwNa29Rg8A) {
+  transition:fill .2s ease-out;
+  fill:#000
+}
+
+.qEYyC4J5veWyiLaz9gNP:hover svg circle.iy0BC5jhx6jMyzcvrLwf,
+.qEYyC4J5veWyiLaz9gNP:hover svg path.iy0BC5jhx6jMyzcvrLwf,
+.qEYyC4J5veWyiLaz9gNP:focus svg circle.iy0BC5jhx6jMyzcvrLwf,
+.qEYyC4J5veWyiLaz9gNP:focus svg path.iy0BC5jhx6jMyzcvrLwf,
+.qEYyC4J5veWyiLaz9gNP:focus-within svg circle.iy0BC5jhx6jMyzcvrLwf,
+.qEYyC4J5veWyiLaz9gNP:focus-within svg path.iy0BC5jhx6jMyzcvrLwf,
+.qEYyC4J5veWyiLaz9gNP:active svg circle.iy0BC5jhx6jMyzcvrLwf,
+.qEYyC4J5veWyiLaz9gNP:active svg path.iy0BC5jhx6jMyzcvrLwf {
+  fill:transparent;
+  stroke:#000
+}
+
+.qEYyC4J5veWyiLaz9gNP:disabled {
+  cursor:not-allowed;
+  opacity:.8;
+  background-color:#fff;
+  box-shadow:0 0 0 1px transparent
+}
+
+.qEYyC4J5veWyiLaz9gNP+button,
+.qEYyC4J5veWyiLaz9gNP+.qEYyC4J5veWyiLaz9gNP {
+  margin-left:5.58px
+}
+.htXPkXdMWWcmr0_dul7A {
+  padding:0;
+  background-color:transparent;
+  border:0;
+  box-shadow:none;
+  color:#000
+}
+.htXPkXdMWWcmr0_dul7A:hover,
+.htXPkXdMWWcmr0_dul7A:focus,
+.htXPkXdMWWcmr0_dul7A:focus-within,
+.htXPkXdMWWcmr0_dul7A:active {
+  background-color:transparent;
+  border:0;
+  box-shadow:none;
+  color:#000;
+  text-decoration:underline
+}
+.htXPkXdMWWcmr0_dul7A:disabled {
+  text-decoration:none
+}
+.MvZ5MuRzqsBeDt5z0X1e svg {
+  margin-top: -5px;
+  margin-right:.75rem;
+  animation-name:aqjkdtZawN5lryW5flKx;
+  animation-duration:3s;
+  animation-iteration-count:infinite;
+  animation-timing-function:linear;
+  transform-origin:50% 50%
+}
+.MvZ5MuRzqsBeDt5z0X1e.Tz2rVjh6IjVdduJP08Qm svg use {
+  stroke:#fff
+}
+.ZChY5ShGlfvLluUVYdtA {
+  padding:9px 36px;
+  font-size:21.6px;
+  font-size:1.2rem
+}
+.L7kF1ZLpIeOYvvHdD7Dg {
+  padding:3.5px 7px;
+  font-size:14.4px;
+  font-size:.8rem
+}
+.c8FhE1WPTbl4j6Blh_Cw {
+  width:100%;
+  margin-left:0 !important
+}
+.Tz2rVjh6IjVdduJP08Qm {
+  border:0;
+  font-weight:300;
+  background-color:#5E33BF;
+  border:1px solid #5e34be;
+  box-shadow:0 0 0 1px transparent;
+  color:#fff
+}
+.Tz2rVjh6IjVdduJP08Qm svg {
+  width:1em;
+  height:1em;
+  vertical-align:middle
+}
+.Tz2rVjh6IjVdduJP08Qm svg path:not(.ntvBF21SnsKwNa29Rg8A) {
+  transition:fill .2s ease-out;
+  fill:#fff
+}
+.Tz2rVjh6IjVdduJP08Qm svg circle.iy0BC5jhx6jMyzcvrLwf,
+.Tz2rVjh6IjVdduJP08Qm svg path.iy0BC5jhx6jMyzcvrLwf {
+  fill:transparent;
+  stroke:#fff
+}
+.Tz2rVjh6IjVdduJP08Qm:hover,
+.Tz2rVjh6IjVdduJP08Qm:focus,
+.Tz2rVjh6IjVdduJP08Qm:focus-within,
+.Tz2rVjh6IjVdduJP08Qm:active {
+  color:#fff;
+  background-color:#6b40cc;
+  box-shadow:0 0 0 1px #5e34be
+}
+.Tz2rVjh6IjVdduJP08Qm:hover svg,
+.Tz2rVjh6IjVdduJP08Qm:focus svg,
+.Tz2rVjh6IjVdduJP08Qm:focus-within svg,
+.Tz2rVjh6IjVdduJP08Qm:active svg {
+  width:1em;
+  height:1em;
+  vertical-align:middle
+}
+.Tz2rVjh6IjVdduJP08Qm:hover svg path:not(.ntvBF21SnsKwNa29Rg8A),
+.Tz2rVjh6IjVdduJP08Qm:focus svg path:not(.ntvBF21SnsKwNa29Rg8A),
+.Tz2rVjh6IjVdduJP08Qm:focus-within svg path:not(.ntvBF21SnsKwNa29Rg8A),
+.Tz2rVjh6IjVdduJP08Qm:active svg path:not(.ntvBF21SnsKwNa29Rg8A) {
+  transition:fill .2s ease-out;
+  fill:#fff
+}
+.Tz2rVjh6IjVdduJP08Qm:hover svg circle.iy0BC5jhx6jMyzcvrLwf,
+.Tz2rVjh6IjVdduJP08Qm:hover svg path.iy0BC5jhx6jMyzcvrLwf,
+.Tz2rVjh6IjVdduJP08Qm:focus svg circle.iy0BC5jhx6jMyzcvrLwf,
+.Tz2rVjh6IjVdduJP08Qm:focus svg path.iy0BC5jhx6jMyzcvrLwf,
+.Tz2rVjh6IjVdduJP08Qm:focus-within svg circle.iy0BC5jhx6jMyzcvrLwf,
+.Tz2rVjh6IjVdduJP08Qm:focus-within svg path.iy0BC5jhx6jMyzcvrLwf,
+.Tz2rVjh6IjVdduJP08Qm:active svg circle.iy0BC5jhx6jMyzcvrLwf,
+.Tz2rVjh6IjVdduJP08Qm:active svg path.iy0BC5jhx6jMyzcvrLwf {
+  fill:transparent;
+  stroke:#fff
+}
+.Tz2rVjh6IjVdduJP08Qm:disabled {
+  background-color:#5E33BF;
+  box-shadow:0 0 0 1px transparent;
+  color:#fff
+}
+.K29Do4qZAslPSEk0asSZ {
+  min-height:auto;
+  width:1.75em;
+  height:1.75em;
+  margin:0 .5rem 0 0;
+  padding:0;
+  border:1px solid transparent;
+  border-radius:50%;
+  background-color:transparent;
+  box-shadow:none
+}
+.K29Do4qZAslPSEk0asSZ svg {
+  width:1em;
+  height:1em;
+  vertical-align:middle
+}
+.K29Do4qZAslPSEk0asSZ svg path:not(.ntvBF21SnsKwNa29Rg8A) {
+  transition:fill .2s ease-out;
+  fill:#666
+}
+.K29Do4qZAslPSEk0asSZ svg circle.iy0BC5jhx6jMyzcvrLwf,
+.K29Do4qZAslPSEk0asSZ svg path.iy0BC5jhx6jMyzcvrLwf {
+  fill:transparent;
+  stroke:#666
+}
+.K29Do4qZAslPSEk0asSZ:hover svg,
+.K29Do4qZAslPSEk0asSZ:focus svg,
+.K29Do4qZAslPSEk0asSZ:focus-within svg,
+.K29Do4qZAslPSEk0asSZ:active svg {
+  width:1em;
+  height:1em;
+  vertical-align:middle
+}
+.K29Do4qZAslPSEk0asSZ:hover svg path:not(.ntvBF21SnsKwNa29Rg8A),
+.K29Do4qZAslPSEk0asSZ:focus svg path:not(.ntvBF21SnsKwNa29Rg8A),
+.K29Do4qZAslPSEk0asSZ:focus-within svg path:not(.ntvBF21SnsKwNa29Rg8A),
+.K29Do4qZAslPSEk0asSZ:active svg path:not(.ntvBF21SnsKwNa29Rg8A) {
+  transition:fill .2s ease-out;
+  fill:#5e34be
+}
+.K29Do4qZAslPSEk0asSZ:hover svg circle.iy0BC5jhx6jMyzcvrLwf,
+.K29Do4qZAslPSEk0asSZ:hover svg path.iy0BC5jhx6jMyzcvrLwf,
+.K29Do4qZAslPSEk0asSZ:focus svg circle.iy0BC5jhx6jMyzcvrLwf,
+.K29Do4qZAslPSEk0asSZ:focus svg path.iy0BC5jhx6jMyzcvrLwf,
+.K29Do4qZAslPSEk0asSZ:focus-within svg circle.iy0BC5jhx6jMyzcvrLwf,
+.K29Do4qZAslPSEk0asSZ:focus-within svg path.iy0BC5jhx6jMyzcvrLwf,
+.K29Do4qZAslPSEk0asSZ:active svg circle.iy0BC5jhx6jMyzcvrLwf,
+.K29Do4qZAslPSEk0asSZ:active svg path.iy0BC5jhx6jMyzcvrLwf {
+  fill:transparent;
+  stroke:#5e34be
+}
+.K29Do4qZAslPSEk0asSZ:disabled {
+  opacity:1;
+  background-color:#fff;
+  box-shadow:none
+}
+.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm {
+  background-color:#5E33BF;
+  border:1px solid #e9eaed;
+  box-shadow:0 0 0 1px transparent;
+  color:#fff
+}
+.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm svg {
+  width:1em;
+  height:1em;
+  vertical-align:middle
+}
+.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm svg path:not(.ntvBF21SnsKwNa29Rg8A) {
+  transition:fill .2s ease-out;
+  fill:#fff
+}
+.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm svg circle.iy0BC5jhx6jMyzcvrLwf,
+.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm svg path.iy0BC5jhx6jMyzcvrLwf {
+  fill:transparent;
+  stroke:#fff
+}
+.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm:hover,
+.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm:focus,
+.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm:focus-within,
+.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm:active {
+  background-color:#6b40cc;
+  box-shadow:0 0 0 1px #e9eaed
+}
+
+@keyframes KG9mWh693CBdLSEsKEEw {
+  0% {
+    transform: rotateZ(0deg);
+  }
+  100% {
+    transform: rotateZ(360deg);
+  }
+}
+
+@keyframes aqjkdtZawN5lryW5flKx {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ZD1LzV_5hhnbdBzBCTeC {
+  z-index: 65536;
+}</style><style>.Yhs0neJe89LIyfkAJoxK {
+  overflow: visible;
+}
+
+.Yhs0neJe89LIyfkAJoxK:hover .ZhAn9j0umnIEipjxXmaw {
+  display: block;
+}
+
+.Ivj7JdNm5WGw6xA2l9yt {
+}
+
+.RA6W6tHqfGIgyq6FvHto {
+  background-color: #5e33bf !important;
+  color: #fff !important;
+  transform: translate3d(0, 0, 0) !important;
+  transition: background-color 0.2s ease-in !important;
+  cursor: pointer;
+}
+
+.RA6W6tHqfGIgyq6FvHto .df8AcRGrLBTeGlrI8Kpt svg {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+}
+
+.RA6W6tHqfGIgyq6FvHto .df8AcRGrLBTeGlrI8Kpt svg path:not(.MW1rWF7KNYwKqk4M7BZX) {
+  transition: fill 0.2s ease-out;
+  fill: #fff;
+}
+
+.RA6W6tHqfGIgyq6FvHto .df8AcRGrLBTeGlrI8Kpt svg circle.zgYLZOdQFmvl1k7yJoFd,
+.RA6W6tHqfGIgyq6FvHto .df8AcRGrLBTeGlrI8Kpt svg path.zgYLZOdQFmvl1k7yJoFd {
+  fill: transparent;
+  stroke: #fff;
+}
+
+.RA6W6tHqfGIgyq6FvHto:hover,
+.RA6W6tHqfGIgyq6FvHto:focus,
+.RA6W6tHqfGIgyq6FvHto:focus-within,
+.RA6W6tHqfGIgyq6FvHto:active {
+  background-color: #fff !important;
+  color: #5e33bf !important;
+  border: 1px solid #5e33bf !important;
+}
+
+.RA6W6tHqfGIgyq6FvHto:hover .df8AcRGrLBTeGlrI8Kpt svg,
+.RA6W6tHqfGIgyq6FvHto:focus .df8AcRGrLBTeGlrI8Kpt svg,
+.RA6W6tHqfGIgyq6FvHto:focus-within .df8AcRGrLBTeGlrI8Kpt svg,
+.RA6W6tHqfGIgyq6FvHto:active .df8AcRGrLBTeGlrI8Kpt svg {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+}
+
+.RA6W6tHqfGIgyq6FvHto:hover .df8AcRGrLBTeGlrI8Kpt svg path:not(.MW1rWF7KNYwKqk4M7BZX),
+.RA6W6tHqfGIgyq6FvHto:focus .df8AcRGrLBTeGlrI8Kpt svg path:not(.MW1rWF7KNYwKqk4M7BZX),
+.RA6W6tHqfGIgyq6FvHto:focus-within .df8AcRGrLBTeGlrI8Kpt svg path:not(.MW1rWF7KNYwKqk4M7BZX),
+.RA6W6tHqfGIgyq6FvHto:active .df8AcRGrLBTeGlrI8Kpt svg path:not(.MW1rWF7KNYwKqk4M7BZX) {
+  transition: fill 0.2s ease-out;
+  fill: #fff;
+}
+
+.RA6W6tHqfGIgyq6FvHto:hover .df8AcRGrLBTeGlrI8Kpt svg circle.zgYLZOdQFmvl1k7yJoFd,
+.RA6W6tHqfGIgyq6FvHto:hover .df8AcRGrLBTeGlrI8Kpt svg path.zgYLZOdQFmvl1k7yJoFd,
+.RA6W6tHqfGIgyq6FvHto:focus .df8AcRGrLBTeGlrI8Kpt svg circle.zgYLZOdQFmvl1k7yJoFd,
+.RA6W6tHqfGIgyq6FvHto:focus .df8AcRGrLBTeGlrI8Kpt svg path.zgYLZOdQFmvl1k7yJoFd,
+.RA6W6tHqfGIgyq6FvHto:focus-within .df8AcRGrLBTeGlrI8Kpt svg circle.zgYLZOdQFmvl1k7yJoFd,
+.RA6W6tHqfGIgyq6FvHto:focus-within .df8AcRGrLBTeGlrI8Kpt svg path.zgYLZOdQFmvl1k7yJoFd,
+.RA6W6tHqfGIgyq6FvHto:active .df8AcRGrLBTeGlrI8Kpt svg circle.zgYLZOdQFmvl1k7yJoFd,
+.RA6W6tHqfGIgyq6FvHto:active .df8AcRGrLBTeGlrI8Kpt svg path.zgYLZOdQFmvl1k7yJoFd {
+  fill: transparent;
+  stroke: #fff;
+}
+
+.c8ymIgiX1_X1KsA3H1tV {
+  background-color: #646363 !important;
+  color: #fff !important;
+  transform: translate3d(0, 0, 0) !important;
+  transition: background-color 0.2s ease-in !important;
+  cursor: pointer;
+}
+
+.c8ymIgiX1_X1KsA3H1tV .QzECqWHsQ0RPsvPBQcPg {
+  background-color: #9d9d9c !important;
+}
+
+.c8ymIgiX1_X1KsA3H1tV .QzECqWHsQ0RPsvPBQcPg svg {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+}
+
+.c8ymIgiX1_X1KsA3H1tV .QzECqWHsQ0RPsvPBQcPg svg path:not(.MW1rWF7KNYwKqk4M7BZX) {
+  transition: fill 0.2s ease-out;
+  fill: #fff;
+}
+
+.c8ymIgiX1_X1KsA3H1tV .QzECqWHsQ0RPsvPBQcPg svg circle.zgYLZOdQFmvl1k7yJoFd,
+.c8ymIgiX1_X1KsA3H1tV .QzECqWHsQ0RPsvPBQcPg svg path.zgYLZOdQFmvl1k7yJoFd {
+  fill: transparent;
+  stroke: #fff;
+}
+
+.c8ymIgiX1_X1KsA3H1tV:hover,
+.c8ymIgiX1_X1KsA3H1tV:focus,
+.c8ymIgiX1_X1KsA3H1tV:focus-within,
+.c8ymIgiX1_X1KsA3H1tV:active {
+  background-color: #9d9d9c !important;
+  color: #000 !important;
+}
+
+.c8ymIgiX1_X1KsA3H1tV:hover .QzECqWHsQ0RPsvPBQcPg svg,
+.c8ymIgiX1_X1KsA3H1tV:focus .QzECqWHsQ0RPsvPBQcPg svg,
+.c8ymIgiX1_X1KsA3H1tV:focus-within .QzECqWHsQ0RPsvPBQcPg svg,
+.c8ymIgiX1_X1KsA3H1tV:active .QzECqWHsQ0RPsvPBQcPg svg {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+}
+
+.c8ymIgiX1_X1KsA3H1tV:hover .QzECqWHsQ0RPsvPBQcPg svg path:not(.MW1rWF7KNYwKqk4M7BZX),
+.c8ymIgiX1_X1KsA3H1tV:focus .QzECqWHsQ0RPsvPBQcPg svg path:not(.MW1rWF7KNYwKqk4M7BZX),
+.c8ymIgiX1_X1KsA3H1tV:focus-within .QzECqWHsQ0RPsvPBQcPg svg path:not(.MW1rWF7KNYwKqk4M7BZX),
+.c8ymIgiX1_X1KsA3H1tV:active .QzECqWHsQ0RPsvPBQcPg svg path:not(.MW1rWF7KNYwKqk4M7BZX) {
+  transition: fill 0.2s ease-out;
+  fill: #fff;
+}
+
+.c8ymIgiX1_X1KsA3H1tV:hover .QzECqWHsQ0RPsvPBQcPg svg circle.zgYLZOdQFmvl1k7yJoFd,
+.c8ymIgiX1_X1KsA3H1tV:hover .QzECqWHsQ0RPsvPBQcPg svg path.zgYLZOdQFmvl1k7yJoFd,
+.c8ymIgiX1_X1KsA3H1tV:focus .QzECqWHsQ0RPsvPBQcPg svg circle.zgYLZOdQFmvl1k7yJoFd,
+.c8ymIgiX1_X1KsA3H1tV:focus .QzECqWHsQ0RPsvPBQcPg svg path.zgYLZOdQFmvl1k7yJoFd,
+.c8ymIgiX1_X1KsA3H1tV:focus-within .QzECqWHsQ0RPsvPBQcPg svg circle.zgYLZOdQFmvl1k7yJoFd,
+.c8ymIgiX1_X1KsA3H1tV:focus-within .QzECqWHsQ0RPsvPBQcPg svg path.zgYLZOdQFmvl1k7yJoFd,
+.c8ymIgiX1_X1KsA3H1tV:active .QzECqWHsQ0RPsvPBQcPg svg circle.zgYLZOdQFmvl1k7yJoFd,
+.c8ymIgiX1_X1KsA3H1tV:active .QzECqWHsQ0RPsvPBQcPg svg path.zgYLZOdQFmvl1k7yJoFd {
+  fill: transparent;
+  stroke: #fff;
+}</style><style>.zQ2oI6HGyJr41sAaSN6A {  
+  width: 195px !important;  
+}
+
+.CBjZQOrWgjhwajg6cNdt {
+  width: 210px !important;
+  margin-left:10px !important;
+}
+
+.yN40z2aRoGZzOKE8ARN3 {
+  position: absolute !important;
+  z-index: 9999999 !important;
+  height: 126px;
+  padding: 10px !important;
+  color: #111 !important;
+  background-color: #f0f0eb !important;
+  border-radius: 4px !important;  
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 1.3 !important;
+  -webkit-font-smoothing: antialiased;
+}
+.yN40z2aRoGZzOKE8ARN3 * {
+  font-family: inherit;
+}
+
+.zQ2oI6HGyJr41sAaSN6A:after {
+  content: "";
+  display: block !important;
+  position: absolute !important;
+  bottom: -5px !important;
+  left: 25% !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin-left: -3px !important;
+  border-top: 6px solid #f0f0eb !important;
+  border-left: 6px solid transparent !important;
+  border-right: 6px solid transparent !important;
+}
+
+.CBjZQOrWgjhwajg6cNdt:after {
+  content: "";
+  display: block !important;
+  position: absolute !important;
+  bottom: -10px !important;
+  left: 50% !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin-left: -3px !important;
+  border-top: 10px solid #f0f0eb !important;
+  border-left: 10px solid transparent !important;
+  border-right: 10px solid transparent !important;
+}
+
+.c22rusyRofQicH3i73oO {
+  margin: 0 0 5px;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  color: #111;
+}
+
+.MAtUQwoIbEYN6I2IW3iU {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #111;
+}
+.Dzpte9yA2frq_VJhi6CC {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.vCn6PTxk9sBIkF37FZ4Q {
+  display: flex !important;
+  align-items: center !important;
+  color: #111 !important;
+  margin-bottom: 0 !important;
+  line-height: 1.6 !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+}
+
+.qHjXL9KCgUmignnlCgjt {
+  margin-right: 0.5rem !important;
+  margin-top: -3px !important;
+}
+
+.qHjXL9KCgUmignnlCgjt svg {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+
+.qHjXL9KCgUmignnlCgjt svg path:not(.zFF4AleNIF_4DQ6TA9Ze) {
+  transition: fill 0.2s ease-out;
+  fill: #646363;
+}
+
+.qHjXL9KCgUmignnlCgjt svg circle.Dh3ou9W2aVNVDeowSDkG,
+.qHjXL9KCgUmignnlCgjt svg path.Dh3ou9W2aVNVDeowSDkG {
+  fill: transparent;
+  stroke: #646363;
+}
+
+.c5TyDaoqniVfBZ_t4fl6 {
+  color: #111 !important;
+  font-weight: 700 !important;
+}
+
+.vD1sKbEy4K_sdAhPfoZX {
+  font-weight: 700 !important;
+}
+
+.c5TyDaoqniVfBZ_t4fl6 .qHjXL9KCgUmignnlCgjt svg {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+
+.c5TyDaoqniVfBZ_t4fl6
+  .qHjXL9KCgUmignnlCgjt
+  svg
+  path:not(.zFF4AleNIF_4DQ6TA9Ze) {
+  transition: fill 0.2s ease-out;
+  fill: #111;
+}
+
+.vD1sKbEy4K_sdAhPfoZX
+  .qHjXL9KCgUmignnlCgjt
+  svg
+  path:not(.zFF4AleNIF_4DQ6TA9Ze) {
+  transition: fill 0.2s ease-out;
+  fill: #fff;
+}
+
+.c5TyDaoqniVfBZ_t4fl6 .qHjXL9KCgUmignnlCgjt svg circle.Dh3ou9W2aVNVDeowSDkG,
+.c5TyDaoqniVfBZ_t4fl6 .qHjXL9KCgUmignnlCgjt svg path.Dh3ou9W2aVNVDeowSDkG {
+  fill: transparent;
+  stroke: #fff;
+}
+
+.kW147OB4sedNGu2d6rGT {
+}
+
+.kW147OB4sedNGu2d6rGT .qHjXL9KCgUmignnlCgjt circle {
+  animation: 1.4s ease-in-out infinite both Buowibv1_rtZ58hAVORO;
+  display: block;
+  fill: transparent;
+  stroke: #111;
+  stroke-linecap: round;
+  stroke-dasharray: 283;
+  stroke-dashoffset: 280;
+  stroke-width: 10px;
+  transform-origin: 50% 50%;
+}
+
+
+</style><style>@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:200;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZYokSdh18S0xR41YDw.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:200;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZYokSdo18S0xR41YDw.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:200;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZYokSdg18S0xR41YDw.woff2) format("woff2");unicode-range:U+1F00-1FFF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:200;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZYokSdv18S0xR41YDw.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:200;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZYokSdj18S0xR41YDw.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:200;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZYokSdi18S0xR41YDw.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:200;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZYokSds18S0xR41.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZMkidh18S0xR41YDw.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZMkido18S0xR41YDw.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZMkidg18S0xR41YDw.woff2) format("woff2");unicode-range:U+1F00-1FFF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZMkidv18S0xR41YDw.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZMkidj18S0xR41YDw.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZMkidi18S0xR41YDw.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZMkids18S0xR41.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7qsDJB9cme_xc.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7jsDJB9cme_xc.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7rsDJB9cme_xc.woff2) format("woff2");unicode-range:U+1F00-1FFF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7ksDJB9cme_xc.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7osDJB9cme_xc.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7psDJB9cme_xc.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7nsDJB9cme.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZY4lCdh18S0xR41YDw.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZY4lCdo18S0xR41YDw.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZY4lCdg18S0xR41YDw.woff2) format("woff2");unicode-range:U+1F00-1FFF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZY4lCdv18S0xR41YDw.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZY4lCdj18S0xR41YDw.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZY4lCdi18S0xR41YDw.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZY4lCds18S0xR41.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZclSdh18S0xR41YDw.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZclSdo18S0xR41YDw.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZclSdg18S0xR41YDw.woff2) format("woff2");unicode-range:U+1F00-1FFF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZclSdv18S0xR41YDw.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZclSdj18S0xR41YDw.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZclSdi18S0xR41YDw.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZclSds18S0xR41.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZklydh18S0xR41YDw.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZklydo18S0xR41YDw.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZklydg18S0xR41YDw.woff2) format("woff2");unicode-range:U+1F00-1FFF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZklydv18S0xR41YDw.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZklydj18S0xR41YDw.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZklydi18S0xR41YDw.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:"Source Sans Pro";font-style:italic;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZklyds18S0xR41.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:200;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i94_wmhdu3cOWxy40.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:200;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i94_wkxdu3cOWxy40.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:200;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i94_wmxdu3cOWxy40.woff2) format("woff2");unicode-range:U+1F00-1FFF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:200;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i94_wlBdu3cOWxy40.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:200;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i94_wmBdu3cOWxy40.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:200;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i94_wmRdu3cOWxy40.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:200;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i94_wlxdu3cOWxw.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwmhdu3cOWxy40.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwkxdu3cOWxy40.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwmxdu3cOWxy40.woff2) format("woff2");unicode-range:U+1F00-1FFF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwlBdu3cOWxy40.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwmBdu3cOWxy40.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwmRdu3cOWxy40.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:300;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwlxdu3cOWxw.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qNa7lujVj9_mf.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qPK7lujVj9_mf.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qNK7lujVj9_mf.woff2) format("woff2");unicode-range:U+1F00-1FFF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qO67lujVj9_mf.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qN67lujVj9_mf.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qNq7lujVj9_mf.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:400;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xK3dSBYKcSV-LCoeQqfX1RYOo3qOK7lujVj9w.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwmhdu3cOWxy40.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwkxdu3cOWxy40.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwmxdu3cOWxy40.woff2) format("woff2");unicode-range:U+1F00-1FFF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwlBdu3cOWxy40.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwmBdu3cOWxy40.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwmRdu3cOWxy40.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:600;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3i54rwlxdu3cOWxw.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwmhdu3cOWxy40.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwkxdu3cOWxy40.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwmxdu3cOWxy40.woff2) format("woff2");unicode-range:U+1F00-1FFF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwlBdu3cOWxy40.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwmBdu3cOWxy40.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwmRdu3cOWxy40.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:700;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwlxdu3cOWxw.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3iu4nwmhdu3cOWxy40.woff2) format("woff2");unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3iu4nwkxdu3cOWxy40.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3iu4nwmxdu3cOWxy40.woff2) format("woff2");unicode-range:U+1F00-1FFF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3iu4nwlBdu3cOWxy40.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3iu4nwmBdu3cOWxy40.woff2) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3iu4nwmRdu3cOWxy40.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}@font-face{font-family:"Source Sans Pro";font-style:normal;font-weight:900;font-display:swap;src:url(https://fonts.gstatic.com/s/sourcesanspro/v22/6xKydSBYKcSV-LCoeQqfX1RYOo3iu4nwlxdu3cOWxw.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}.ZD1LzV_5hhnbdBzBCTeC{z-index:65536}.BBAoAg1q8YTH2NGsa7Ui{font-family:"Source Sans Pro"}@keyframes aqjkdtZawN5lryW5flKx{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}.qEYyC4J5veWyiLaz9gNP{display:inline-flex;flex-wrap:nowrap;align-items:center;justify-content:center;transition:none;position:relative;overflow:hidden;transform:translate3d(0, 0, 0);vertical-align:baseline;margin-bottom:5.58px;padding:3px 18px;font-family:"Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:400;line-height:1.5;text-align:center;cursor:pointer;letter-spacing:.01em;text-decoration:none;background-image:none;border-radius:4px;border:1px solid #646363;background-color:#fff;box-shadow:0 0 0 1px rgba(0,0,0,0);color:#000;transition:box-shadow ease-in-out .1s,background-color ease-in-out .1s}.qEYyC4J5veWyiLaz9gNP svg{width:1em;height:1em;vertical-align:middle}.qEYyC4J5veWyiLaz9gNP svg path:not(.ntvBF21SnsKwNa29Rg8A){transition:fill .2s ease-out;fill:#666}.qEYyC4J5veWyiLaz9gNP svg circle.iy0BC5jhx6jMyzcvrLwf,.qEYyC4J5veWyiLaz9gNP svg path.iy0BC5jhx6jMyzcvrLwf{fill:rgba(0,0,0,0);stroke:#666}.qEYyC4J5veWyiLaz9gNP:last-child{margin-right:0}.qEYyC4J5veWyiLaz9gNP svg{min-width:1em;margin-left:.2rem;margin-right:.2rem}.qEYyC4J5veWyiLaz9gNP:hover,.qEYyC4J5veWyiLaz9gNP:focus,.qEYyC4J5veWyiLaz9gNP:focus-within,.qEYyC4J5veWyiLaz9gNP:active{outline:none;text-decoration:none;color:#000;background-color:#f7f7f7;box-shadow:0 0 0 1px #5e34be;text-decoration:none}.qEYyC4J5veWyiLaz9gNP:hover svg,.qEYyC4J5veWyiLaz9gNP:focus svg,.qEYyC4J5veWyiLaz9gNP:focus-within svg,.qEYyC4J5veWyiLaz9gNP:active svg{width:1em;height:1em;vertical-align:middle}.qEYyC4J5veWyiLaz9gNP:hover svg path:not(.ntvBF21SnsKwNa29Rg8A),.qEYyC4J5veWyiLaz9gNP:focus svg path:not(.ntvBF21SnsKwNa29Rg8A),.qEYyC4J5veWyiLaz9gNP:focus-within svg path:not(.ntvBF21SnsKwNa29Rg8A),.qEYyC4J5veWyiLaz9gNP:active svg path:not(.ntvBF21SnsKwNa29Rg8A){transition:fill .2s ease-out;fill:#000}.qEYyC4J5veWyiLaz9gNP:hover svg circle.iy0BC5jhx6jMyzcvrLwf,.qEYyC4J5veWyiLaz9gNP:hover svg path.iy0BC5jhx6jMyzcvrLwf,.qEYyC4J5veWyiLaz9gNP:focus svg circle.iy0BC5jhx6jMyzcvrLwf,.qEYyC4J5veWyiLaz9gNP:focus svg path.iy0BC5jhx6jMyzcvrLwf,.qEYyC4J5veWyiLaz9gNP:focus-within svg circle.iy0BC5jhx6jMyzcvrLwf,.qEYyC4J5veWyiLaz9gNP:focus-within svg path.iy0BC5jhx6jMyzcvrLwf,.qEYyC4J5veWyiLaz9gNP:active svg circle.iy0BC5jhx6jMyzcvrLwf,.qEYyC4J5veWyiLaz9gNP:active svg path.iy0BC5jhx6jMyzcvrLwf{fill:rgba(0,0,0,0);stroke:#000}.qEYyC4J5veWyiLaz9gNP:disabled{cursor:not-allowed;opacity:.8;background-color:#fff;box-shadow:0 0 0 1px rgba(0,0,0,0)}.qEYyC4J5veWyiLaz9gNP+button,.qEYyC4J5veWyiLaz9gNP+.qEYyC4J5veWyiLaz9gNP{margin-left:5.58px}.htXPkXdMWWcmr0_dul7A{padding:0;background-color:rgba(0,0,0,0);border:0;box-shadow:none;color:#000}.htXPkXdMWWcmr0_dul7A:hover,.htXPkXdMWWcmr0_dul7A:focus,.htXPkXdMWWcmr0_dul7A:focus-within,.htXPkXdMWWcmr0_dul7A:active{background-color:rgba(0,0,0,0);border:0;box-shadow:none;color:#000;text-decoration:underline}.htXPkXdMWWcmr0_dul7A:disabled{text-decoration:none}.MvZ5MuRzqsBeDt5z0X1e svg{margin-top:-5px;margin-right:.75rem;animation-name:aqjkdtZawN5lryW5flKx;animation-duration:3s;animation-iteration-count:infinite;animation-timing-function:linear;transform-origin:50% 50%}.MvZ5MuRzqsBeDt5z0X1e.Tz2rVjh6IjVdduJP08Qm svg use{stroke:#fff}.ZChY5ShGlfvLluUVYdtA{padding:9px 36px;font-size:21.6px;font-size:1.2rem}.L7kF1ZLpIeOYvvHdD7Dg{padding:3.5px 7px;font-size:14.4px;font-size:.8rem}.c8FhE1WPTbl4j6Blh_Cw{width:100%;margin-left:0 !important}.Tz2rVjh6IjVdduJP08Qm{border:0;font-weight:300;background-color:#5e33bf;border:1px solid #5e34be;box-shadow:0 0 0 1px rgba(0,0,0,0);color:#fff}.Tz2rVjh6IjVdduJP08Qm svg{width:1em;height:1em;vertical-align:middle}.Tz2rVjh6IjVdduJP08Qm svg path:not(.ntvBF21SnsKwNa29Rg8A){transition:fill .2s ease-out;fill:#fff}.Tz2rVjh6IjVdduJP08Qm svg circle.iy0BC5jhx6jMyzcvrLwf,.Tz2rVjh6IjVdduJP08Qm svg path.iy0BC5jhx6jMyzcvrLwf{fill:rgba(0,0,0,0);stroke:#fff}.Tz2rVjh6IjVdduJP08Qm:hover,.Tz2rVjh6IjVdduJP08Qm:focus,.Tz2rVjh6IjVdduJP08Qm:focus-within,.Tz2rVjh6IjVdduJP08Qm:active{color:#fff;background-color:#6b40cc;box-shadow:0 0 0 1px #5e34be}.Tz2rVjh6IjVdduJP08Qm:hover svg,.Tz2rVjh6IjVdduJP08Qm:focus svg,.Tz2rVjh6IjVdduJP08Qm:focus-within svg,.Tz2rVjh6IjVdduJP08Qm:active svg{width:1em;height:1em;vertical-align:middle}.Tz2rVjh6IjVdduJP08Qm:hover svg path:not(.ntvBF21SnsKwNa29Rg8A),.Tz2rVjh6IjVdduJP08Qm:focus svg path:not(.ntvBF21SnsKwNa29Rg8A),.Tz2rVjh6IjVdduJP08Qm:focus-within svg path:not(.ntvBF21SnsKwNa29Rg8A),.Tz2rVjh6IjVdduJP08Qm:active svg path:not(.ntvBF21SnsKwNa29Rg8A){transition:fill .2s ease-out;fill:#fff}.Tz2rVjh6IjVdduJP08Qm:hover svg circle.iy0BC5jhx6jMyzcvrLwf,.Tz2rVjh6IjVdduJP08Qm:hover svg path.iy0BC5jhx6jMyzcvrLwf,.Tz2rVjh6IjVdduJP08Qm:focus svg circle.iy0BC5jhx6jMyzcvrLwf,.Tz2rVjh6IjVdduJP08Qm:focus svg path.iy0BC5jhx6jMyzcvrLwf,.Tz2rVjh6IjVdduJP08Qm:focus-within svg circle.iy0BC5jhx6jMyzcvrLwf,.Tz2rVjh6IjVdduJP08Qm:focus-within svg path.iy0BC5jhx6jMyzcvrLwf,.Tz2rVjh6IjVdduJP08Qm:active svg circle.iy0BC5jhx6jMyzcvrLwf,.Tz2rVjh6IjVdduJP08Qm:active svg path.iy0BC5jhx6jMyzcvrLwf{fill:rgba(0,0,0,0);stroke:#fff}.Tz2rVjh6IjVdduJP08Qm:disabled{background-color:#5e33bf;box-shadow:0 0 0 1px rgba(0,0,0,0);color:#fff}.K29Do4qZAslPSEk0asSZ{min-height:auto;width:1.75em;height:1.75em;margin:0 .5rem 0 0;padding:0;border:1px solid rgba(0,0,0,0);border-radius:50%;background-color:rgba(0,0,0,0);box-shadow:none}.K29Do4qZAslPSEk0asSZ svg{width:1em;height:1em;vertical-align:middle}.K29Do4qZAslPSEk0asSZ svg path:not(.ntvBF21SnsKwNa29Rg8A){transition:fill .2s ease-out;fill:#666}.K29Do4qZAslPSEk0asSZ svg circle.iy0BC5jhx6jMyzcvrLwf,.K29Do4qZAslPSEk0asSZ svg path.iy0BC5jhx6jMyzcvrLwf{fill:rgba(0,0,0,0);stroke:#666}.K29Do4qZAslPSEk0asSZ:hover svg,.K29Do4qZAslPSEk0asSZ:focus svg,.K29Do4qZAslPSEk0asSZ:focus-within svg,.K29Do4qZAslPSEk0asSZ:active svg{width:1em;height:1em;vertical-align:middle}.K29Do4qZAslPSEk0asSZ:hover svg path:not(.ntvBF21SnsKwNa29Rg8A),.K29Do4qZAslPSEk0asSZ:focus svg path:not(.ntvBF21SnsKwNa29Rg8A),.K29Do4qZAslPSEk0asSZ:focus-within svg path:not(.ntvBF21SnsKwNa29Rg8A),.K29Do4qZAslPSEk0asSZ:active svg path:not(.ntvBF21SnsKwNa29Rg8A){transition:fill .2s ease-out;fill:#5e34be}.K29Do4qZAslPSEk0asSZ:hover svg circle.iy0BC5jhx6jMyzcvrLwf,.K29Do4qZAslPSEk0asSZ:hover svg path.iy0BC5jhx6jMyzcvrLwf,.K29Do4qZAslPSEk0asSZ:focus svg circle.iy0BC5jhx6jMyzcvrLwf,.K29Do4qZAslPSEk0asSZ:focus svg path.iy0BC5jhx6jMyzcvrLwf,.K29Do4qZAslPSEk0asSZ:focus-within svg circle.iy0BC5jhx6jMyzcvrLwf,.K29Do4qZAslPSEk0asSZ:focus-within svg path.iy0BC5jhx6jMyzcvrLwf,.K29Do4qZAslPSEk0asSZ:active svg circle.iy0BC5jhx6jMyzcvrLwf,.K29Do4qZAslPSEk0asSZ:active svg path.iy0BC5jhx6jMyzcvrLwf{fill:rgba(0,0,0,0);stroke:#5e34be}.K29Do4qZAslPSEk0asSZ:disabled{opacity:1;background-color:#fff;box-shadow:none}.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm{background-color:#5e33bf;border:1px solid #e9eaed;box-shadow:0 0 0 1px rgba(0,0,0,0);color:#fff}.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm svg{width:1em;height:1em;vertical-align:middle}.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm svg path:not(.ntvBF21SnsKwNa29Rg8A){transition:fill .2s ease-out;fill:#fff}.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm svg circle.iy0BC5jhx6jMyzcvrLwf,.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm svg path.iy0BC5jhx6jMyzcvrLwf{fill:rgba(0,0,0,0);stroke:#fff}.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm:hover,.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm:focus,.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm:focus-within,.K29Do4qZAslPSEk0asSZ.Tz2rVjh6IjVdduJP08Qm:active{background-color:#6b40cc;box-shadow:0 0 0 1px #e9eaed}@keyframes KG9mWh693CBdLSEsKEEw{0%{transform:rotateZ(0deg)}100%{transform:rotateZ(360deg)}}@keyframes aqjkdtZawN5lryW5flKx{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}.ZD1LzV_5hhnbdBzBCTeC{z-index:65536}</style><style>.O2kKYom4PJdnrcnGyfli{z-index:65536}.vqLLjXCvIZqFf6By7FsC{margin:0px !important;padding:0px !important}.D14sb1esRO00iZ1nebmr{position:fixed;padding:0px;margin:0px;width:250px;height:100px;box-shadow:none;margin:0;padding:0;display:flex;flex-direction:column;bottom:30px;left:0;z-index:9999999999999}.D14sb1esRO00iZ1nebmr.jmxllJPgW9QEseF_vRoS{bottom:90px}.ussejiMsgWzhgro3ajrg{bottom:80px !important;left:20px !important}.LiGTdyntXC8pa1XtEx0l{border-top-left-radius:30px !important;border-bottom-left-radius:30px !important}.SNO5yrb7NobAstipiMDb{height:100px;width:250px;left:0px;bottom:0px;box-shadow:none;margin:0px;border:0px;background-color:rgba(0,0,0,0) !important;overflow:hidden}.aDFGVZWO3T4Y2VPKu1IJ{display:block;margin-left:-8px}.hCym1FzCCgnchmEHLh2m{bottom:0px;left:0px;width:245px;height:80px;z-index:2000;margin:0;background-color:rgba(0,0,0,0);box-shadow:none;transform:translateX(-155px)}.YyRq9ewDY2IoRu54yZUi{display:flex;align-items:center;justify-content:flex-end;position:fixed;left:0px;width:220px;height:60px;padding-left:15px;background-color:#646363;color:#fff;border-top-right-radius:30px;border-bottom-right-radius:30px;transition:all .2s ease-in;cursor:pointer}.suMsnHlxitgjuMG9mk9c{}.RF3Ft4wMCSGJSNMh4BQf{flex-grow:1;padding-right:20px;line-height:1.1;text-align:center;transition:opacity .2s ease-in;color:#fff;opacity:1}.TRRuEGZkYLlovFGRV4Bg{height:60px;margin-right:5px;margin-top:7px;border-radius:50%}.nmH3eZaEDNZYzltAf3I9{height:60px;margin-right:5px;margin-top:7px;border-radius:50%}.WLHFcMAIg7lJLH6HZFnr{width:60px;height:60px;margin-right:5px;margin-top:15px;border-radius:50%}._9rvR6bGxpo9OdTnXTR1{transition:transform .2s ease-in;transform:translateX(-155px)}._rPZrbFgvMZOpS5lclxw{transition:transform .2s ease-in;transform:translateX(0)}.L75gelpYh4_q7uSDTb2x{transition:transform .5s ease-out;transform:translateX(-260px)}.mlJ8rgJkvB_9abQfz6BZ{border:2px solid rgba(0,0,0,0);border-left:0;background-color:#5e33bf;border-left:0;font-size:22px}.mlJ8rgJkvB_9abQfz6BZ:hover{background-color:#5e33bf}.mlJ8rgJkvB_9abQfz6BZ .RF3Ft4wMCSGJSNMh4BQf{opacity:1}.lWkUu_3zoMartWQEOtNJ .RF3Ft4wMCSGJSNMh4BQf{opacity:0}.TLjRZPoo5DaC8kofv5i8 .RF3Ft4wMCSGJSNMh4BQf{opacity:1}.ZbdpEJU6Zi9G8AWLuw2d{transition:transform .2s ease-in;transform:translateX(-162.5px)}.B48hMquTcZ958Ijv64UB{opacity:.8;box-shadow:none;font-size:18px}.TLjRZPoo5DaC8kofv5i8{opacity:1;box-shadow:0 2px 4px 0 rgba(0,0,0,.5);background:#646363;font-size:18px}.PutPRtxMCwBXTIlJ1ERX{transition:transform .2s ease-in;transform:translateX(0)}.MZZI6CipqCZYqNKOU41z{display:none;position:absolute;width:20px;height:20px !important;color:#111;background-color:#f0f0eb;border:1px solid #111;border-radius:20px;line-height:20px;font-size:16px;top:0;right:0;z-index:4000;cursor:pointer}.MZZI6CipqCZYqNKOU41z:hover{display:block}.BYG4Q2WQqiz9_B9pi8bI{position:relative;left:-1px;top:-2px}</style><style>.g2yPL5PuP5YcxDAm6OHT {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 19999;
+}
+.TKXFYjyTT7BRVXk2l6uF a {
+    color: #5e33bf;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+  .TKXFYjyTT7BRVXk2l6uF a svg {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+  }
+  .TKXFYjyTT7BRVXk2l6uF a svg path:not(.UEpjZcO6H4w0RvC9Kcye) {
+    -webkit-transition: fill 0.2s ease-out;
+    transition: fill 0.2s ease-out;
+    fill: #5e33bf;
+  }
+  .TKXFYjyTT7BRVXk2l6uF a svg circle.gZCekxKuewhQhlBZDuJQ,
+  .TKXFYjyTT7BRVXk2l6uF a svg path.gZCekxKuewhQhlBZDuJQ {
+    fill: transparent;
+    stroke: #5e33bf;
+  }
+  .TKXFYjyTT7BRVXk2l6uF a:hover,
+  .TKXFYjyTT7BRVXk2l6uF a:focus,
+  .TKXFYjyTT7BRVXk2l6uF a:focus-within,
+  .TKXFYjyTT7BRVXk2l6uF a:active {
+    color: #5e33bf;
+  }
+  .TKXFYjyTT7BRVXk2l6uF a:hover svg,
+  .TKXFYjyTT7BRVXk2l6uF a:focus svg,
+  .TKXFYjyTT7BRVXk2l6uF a:focus-within svg,
+  .TKXFYjyTT7BRVXk2l6uF a:active svg {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+  }
+  .TKXFYjyTT7BRVXk2l6uF a:hover svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .TKXFYjyTT7BRVXk2l6uF a:focus svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .TKXFYjyTT7BRVXk2l6uF a:focus-within svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .TKXFYjyTT7BRVXk2l6uF a:active svg path:not(.UEpjZcO6H4w0RvC9Kcye) {
+    -webkit-transition: fill 0.2s ease-out;
+    transition: fill 0.2s ease-out;
+    fill: #06512c;
+  }
+  .TKXFYjyTT7BRVXk2l6uF a:hover svg circle.gZCekxKuewhQhlBZDuJQ,
+  .TKXFYjyTT7BRVXk2l6uF a:hover svg path.gZCekxKuewhQhlBZDuJQ,
+  .TKXFYjyTT7BRVXk2l6uF a:focus svg circle.gZCekxKuewhQhlBZDuJQ,
+  .TKXFYjyTT7BRVXk2l6uF a:focus svg path.gZCekxKuewhQhlBZDuJQ,
+  .TKXFYjyTT7BRVXk2l6uF a:focus-within svg circle.gZCekxKuewhQhlBZDuJQ,
+  .TKXFYjyTT7BRVXk2l6uF a:focus-within svg path.gZCekxKuewhQhlBZDuJQ,
+  .TKXFYjyTT7BRVXk2l6uF a:active svg circle.gZCekxKuewhQhlBZDuJQ,
+  .TKXFYjyTT7BRVXk2l6uF a:active svg path.gZCekxKuewhQhlBZDuJQ {
+    fill: transparent;
+    stroke: #fff;
+  }
+  .TKXFYjyTT7BRVXk2l6uF a:not([href]) {
+    opacity: 0.8;
+    cursor: not-allowed;
+    color: #fff !important;
+  }
+  .TKXFYjyTT7BRVXk2l6uF a.o53g2xMKPHItiQ_Pa50z {
+    color: #fff !important;
+  }
+  
+  .TKXFYjyTT7BRVXk2l6uF > :first-child {
+    margin-top: 0;
+  }
+  .TKXFYjyTT7BRVXk2l6uF > :last-child {
+    margin-bottom: 0;
+  }
+  
+  .N8JKKJ9GMp6XB25A3VK8 {
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-mask-image: radial-gradient(150px at bottom 60px left 290px, transparent 99%, black 100%);
+    mask-image: radial-gradient(150px at bottom 60px left 290px, transparent 99%, black 100%);
+  }
+  
+  .WKlsVvzGQcaszJKQigkg {
+    background-color: rgba(255, 255, 255, 0.8);
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  
+  .NFIyN4kDgBJX4_hCTjAo {
+    -webkit-mask-image: radial-gradient(350px at bottom 60px left 40px, transparent 99%, black 100%);
+    mask-image: radial-gradient(350px at bottom 60px left 40px, transparent 99%, black 100%);
+  }
+  
+  .xsQ_pBk79MDxlAtWKQ1i {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+  
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V {
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    min-height: 2.5em;
+    -webkit-transition: none;
+    transition: none;
+    position: relative;
+    overflow: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    vertical-align: middle;
+    padding: 6px 18px;
+    font-family: "Clarivate", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.5;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: none;
+    background-image: none;
+    border-radius: 4px;
+    border: 1px solid #f3f9f6;
+    background-color: #f3f9f6;
+    color: #4a494a;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V svg,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V svg {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V svg path:not(.UEpjZcO6H4w0RvC9Kcye) {
+    -webkit-transition: fill 0.2s ease-out;
+    transition: fill 0.2s ease-out;
+    fill: #b0afb0;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V svg circle.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V svg path.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V svg circle.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V svg path.gZCekxKuewhQhlBZDuJQ {
+    fill: transparent;
+    stroke: #b0afb0;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:hover,
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:focus,
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:focus-within,
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:active,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:hover,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:focus,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:focus-within,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:active {
+    outline: none;
+    text-decoration: none;
+    color: #4a494a;
+    background-color: #e9f4ee;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:hover svg,
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:focus svg,
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:focus-within svg,
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:active svg,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:hover svg,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:focus svg,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:focus-within svg,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:active svg {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:hover svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:focus svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:focus-within svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:active svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:hover svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:focus svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:focus-within svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:active svg path:not(.UEpjZcO6H4w0RvC9Kcye) {
+    -webkit-transition: fill 0.2s ease-out;
+    transition: fill 0.2s ease-out;
+    fill: #4a494a;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:hover svg circle.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:hover svg path.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:focus svg circle.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:focus svg path.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:focus-within svg circle.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:focus-within svg path.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:active svg circle.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:active svg path.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:hover svg circle.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:hover svg path.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:focus svg circle.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:focus svg path.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:focus-within svg circle.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:focus-within svg path.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:active svg circle.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:active svg path.gZCekxKuewhQhlBZDuJQ {
+    fill: transparent;
+    stroke: #5e33bf;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V:disabled,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .pOV6BFePmeRb9zzOJ09V svg,
+  .YqtWBHxfSeuDDI4tBtJq .pOV6BFePmeRb9zzOJ09V svg {
+    margin-right: 0.75rem;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .ZFFejwogdbRltBtqgc3n svg,
+  .YqtWBHxfSeuDDI4tBtJq .ZFFejwogdbRltBtqgc3n svg {
+    margin-right: 0;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb {
+    min-height: auto;
+    width: 1.75em;
+    height: 1.75em;
+    margin: 0 0.5rem 0 0;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background-color: transparent;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:hover,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:focus,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:focus-within,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:active,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:hover,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:focus,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:focus-within,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:active {
+    border: 1px solid #f3f9f6;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .SlU_AzpYh4lpS86_AlqH,
+  .YqtWBHxfSeuDDI4tBtJq .SlU_AzpYh4lpS86_AlqH {
+    width: 100%;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .o53g2xMKPHItiQ_Pa50z,
+  .YqtWBHxfSeuDDI4tBtJq .o53g2xMKPHItiQ_Pa50z {
+    border: 0;
+    background-color: #f3f9f6;
+    color: #fff;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .o53g2xMKPHItiQ_Pa50z svg,
+  .YqtWBHxfSeuDDI4tBtJq .o53g2xMKPHItiQ_Pa50z svg {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .o53g2xMKPHItiQ_Pa50z svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .YqtWBHxfSeuDDI4tBtJq .o53g2xMKPHItiQ_Pa50z svg path:not(.UEpjZcO6H4w0RvC9Kcye) {
+    -webkit-transition: fill 0.2s ease-out;
+    transition: fill 0.2s ease-out;
+    fill: #fff;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .o53g2xMKPHItiQ_Pa50z svg circle.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .o53g2xMKPHItiQ_Pa50z svg path.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .o53g2xMKPHItiQ_Pa50z svg circle.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .o53g2xMKPHItiQ_Pa50z svg path.gZCekxKuewhQhlBZDuJQ {
+    fill: transparent;
+    stroke: #fff;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .o53g2xMKPHItiQ_Pa50z:hover,
+  #fj4Y2VBM_jUdoqg8vxxE .o53g2xMKPHItiQ_Pa50z:focus,
+  .YqtWBHxfSeuDDI4tBtJq .o53g2xMKPHItiQ_Pa50z:hover,
+  .YqtWBHxfSeuDDI4tBtJq .o53g2xMKPHItiQ_Pa50z:focus {
+    color: #fff;
+    background-color: #5e33bf;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .o53g2xMKPHItiQ_Pa50z:hover svg,
+  #fj4Y2VBM_jUdoqg8vxxE .o53g2xMKPHItiQ_Pa50z:focus svg,
+  .YqtWBHxfSeuDDI4tBtJq .o53g2xMKPHItiQ_Pa50z:hover svg,
+  .YqtWBHxfSeuDDI4tBtJq .o53g2xMKPHItiQ_Pa50z:focus svg {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .o53g2xMKPHItiQ_Pa50z:hover svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  #fj4Y2VBM_jUdoqg8vxxE .o53g2xMKPHItiQ_Pa50z:focus svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .YqtWBHxfSeuDDI4tBtJq .o53g2xMKPHItiQ_Pa50z:hover svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .YqtWBHxfSeuDDI4tBtJq .o53g2xMKPHItiQ_Pa50z:focus svg path:not(.UEpjZcO6H4w0RvC9Kcye) {
+    -webkit-transition: fill 0.2s ease-out;
+    transition: fill 0.2s ease-out;
+    fill: #fff;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .o53g2xMKPHItiQ_Pa50z:hover svg circle.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .o53g2xMKPHItiQ_Pa50z:hover svg path.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .o53g2xMKPHItiQ_Pa50z:focus svg circle.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .o53g2xMKPHItiQ_Pa50z:focus svg path.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .o53g2xMKPHItiQ_Pa50z:hover svg circle.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .o53g2xMKPHItiQ_Pa50z:hover svg path.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .o53g2xMKPHItiQ_Pa50z:focus svg circle.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .o53g2xMKPHItiQ_Pa50z:focus svg path.gZCekxKuewhQhlBZDuJQ {
+    fill: transparent;
+    stroke: #fff;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .jrqth2DBy5Tfn6bolRG3,
+  .YqtWBHxfSeuDDI4tBtJq .jrqth2DBy5Tfn6bolRG3 {
+    padding: 9px 36px;
+    font-size: 21.6px;
+    font-size: 1.2rem;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb {
+    min-height: auto;
+    width: 2.5em;
+    height: 2.5em;
+    margin: 0 0.5rem 0 0;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background-color: transparent;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb svg,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb svg {
+    width: 1.25em;
+    height: 1.25em;
+    vertical-align: middle;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb svg path:not(.UEpjZcO6H4w0RvC9Kcye) {
+    -webkit-transition: fill 0.2s ease-out;
+    transition: fill 0.2s ease-out;
+    fill: #5e33bf;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb svg circle.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb svg path.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb svg circle.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb svg path.gZCekxKuewhQhlBZDuJQ {
+    fill: transparent;
+    stroke: #5e33bf;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:hover,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:focus,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:focus-within,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:active,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:hover,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:focus,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:focus-within,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:active {
+    border: 1px solid #5e33bf;
+    background-color: #e9f4ee;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:hover svg,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:focus svg,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:focus-within svg,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:active svg,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:hover svg,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:focus svg,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:focus-within svg,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:active svg {
+    width: 1.25em;
+    height: 1.25em;
+    vertical-align: middle;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:hover svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:focus svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:focus-within svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:active svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:hover svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:focus svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:focus-within svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:active svg path:not(.UEpjZcO6H4w0RvC9Kcye) {
+    -webkit-transition: fill 0.2s ease-out;
+    transition: fill 0.2s ease-out;
+    fill: #5e33bf;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:hover svg circle.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:hover svg path.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:focus svg circle.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:focus svg path.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:focus-within svg circle.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:focus-within svg path.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:active svg circle.gZCekxKuewhQhlBZDuJQ,
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:active svg path.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:hover svg circle.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:hover svg path.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:focus svg circle.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:focus svg path.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:focus-within svg circle.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:focus-within svg path.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:active svg circle.gZCekxKuewhQhlBZDuJQ,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:active svg path.gZCekxKuewhQhlBZDuJQ {
+    fill: transparent;
+    stroke: #5e33bf;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb:last-child,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb:last-child {
+    margin-right: 0;
+  }
+  #fj4Y2VBM_jUdoqg8vxxE .x_CwlUpfr3F8cJGqU9wb svg,
+  .YqtWBHxfSeuDDI4tBtJq .x_CwlUpfr3F8cJGqU9wb svg {
+    margin-right: 0;
+  }
+  
+  .WKlsVvzGQcaszJKQigkg {
+    background-color: rgba(255, 255, 255, 0.8);
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .YqtWBHxfSeuDDI4tBtJq,
+  .y2eGkYbULQmLiDmmsaE_,
+  .G7McxXXrgjal0gygY7go,
+  .cA8Idbs6OA0BSmKw9Tam {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    font-size: 16px;
+    font-family: "Clarivate", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  .YqtWBHxfSeuDDI4tBtJq *:before,
+  .y2eGkYbULQmLiDmmsaE_ *:before,
+  .G7McxXXrgjal0gygY7go *:before,
+  .cA8Idbs6OA0BSmKw9Tam *:before,
+  .YqtWBHxfSeuDDI4tBtJq *:after,
+  .y2eGkYbULQmLiDmmsaE_ *:after,
+  .G7McxXXrgjal0gygY7go *:after,
+  .cA8Idbs6OA0BSmKw9Tam *:after {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  
+  .eHXvC2pkWtoHh3fOdygK {
+    overflow: hidden !important;
+  }
+  
+  .N7GBO0t9WTd0OozV15Vh {
+    z-index: 70000000 !important;
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    height: 100vh;
+    width: 100vw;
+    background-color: #dadada;
+    opacity: 0.8;
+  }
+  
+  .xNhUX6MpP3eU4apTCdOF {
+    position: relative;
+    z-index: 80000000 !important;
+  }
+  
+  .YqtWBHxfSeuDDI4tBtJq {
+    position: fixed;
+    bottom: 30px;
+    left: 320px;
+    width: 350px;
+    z-index: 80000000;
+    padding: 15px;
+    background-color: #5e33bf;
+    border: 3px solid #5e33bf;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 10px 15px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 15px 0 rgba(0, 0, 0, 0.3);
+  }
+  .YqtWBHxfSeuDDI4tBtJq:before,
+  .YqtWBHxfSeuDDI4tBtJq:after {
+    content: "";
+    position: absolute;
+  }
+  
+  .wP_d6sVNjv41TuoIOqgu {
+    top: 20vh;
+    left: 50vw;
+    margin-left: -175px;
+  }
+  
+  .y2eGkYbULQmLiDmmsaE_ {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    position: fixed;
+    min-width: 350px;
+    min-height: 350px;
+    z-index: 80000000;
+    padding: 15px;
+    background-color: #fff;
+    border: 10px dashed #696969;
+    border-radius: 4px;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    text-align: center;
+  }
+  .y2eGkYbULQmLiDmmsaE_ .MU1OWZXYSl7cGLHsourz {
+    padding-right: 0;
+  }
+  
+  .P8xmsluQbsK9kCB8J4TB:before {
+    top: 50%;
+    right: -50px;
+    width: 50px;
+    margin-top: -5px;
+    border-top: 5px solid #5e33bf;
+    border-bottom: 5px solid #5e33bf;
+  }
+  .P8xmsluQbsK9kCB8J4TB:after {
+    top: 50%;
+    right: -80px;
+    height: 0;
+    width: 0;
+    margin-top: -20px;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-left: 30px solid #5e33bf;
+  }
+  
+  .G6JUSg1GIC3pcwn4LtwJ:before {
+    top: 25px;
+    right: -50px;
+    width: 50px;
+    border-top: 5px solid #5e33bf;
+    border-bottom: 5px solid #5e33bf;
+  }
+  .G6JUSg1GIC3pcwn4LtwJ:after {
+    top: 10px;
+    right: -80px;
+    height: 0;
+    width: 0;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-left: 30px solid #5e33bf;
+  }
+  
+  .TSVTVmbeKDsx1uaA3jwg:before {
+    bottom: 25px;
+    right: -50px;
+    width: 50px;
+    border-top: 5px solid #5e33bf;
+    border-bottom: 5px solid #5e33bf;
+  }
+  .TSVTVmbeKDsx1uaA3jwg:after {
+    bottom: 10px;
+    right: -80px;
+    height: 0;
+    width: 0;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-left: 30px solid #5e33bf;
+  }
+  
+  .lXK6keKCXOgkCYRWTuuw:before {
+    top: 50%;
+    left: -50px;
+    width: 50px;
+    margin-top: -5px;
+    border-top: 5px solid #5e33bf;
+    border-bottom: 5px solid #5e33bf;
+  }
+  .lXK6keKCXOgkCYRWTuuw:after {
+    top: 50%;
+    left: -80px;
+    height: 0;
+    width: 0;
+    margin-top: -20px;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-right: 30px solid #5e33bf;
+  }
+  
+  .ziKSzAZaZuS7hitu2X8Z:before {
+    top: 25px;
+    left: -50px;
+    width: 50px;
+    border-top: 5px solid #5e33bf;
+    border-bottom: 5px solid #5e33bf;
+  }
+  .ziKSzAZaZuS7hitu2X8Z:after {
+    top: 10px;
+    left: -80px;
+    height: 0;
+    width: 0;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-right: 30px solid #5e33bf;
+  }
+  
+  .quK2DZCe63wsbgp9iUm4:before {
+    bottom: 25px;
+    left: -50px;
+    width: 50px;
+    border-top: 5px solid #5e33bf;
+    border-bottom: 5px solid #5e33bf;
+  }
+  .quK2DZCe63wsbgp9iUm4:after {
+    bottom: 10px;
+    left: -80px;
+    height: 0;
+    width: 0;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-right: 30px solid #5e33bf;
+  }
+  
+  .GrMWkdgGakDmpReMdXtx:before {
+    top: -50px;
+    left: 50%;
+    height: 50px;
+    margin-left: -5px;
+    border-left: 5px solid #5e33bf;
+    border-right: 5px solid #5e33bf;
+  }
+  .GrMWkdgGakDmpReMdXtx:after {
+    left: 50%;
+    top: -80px;
+    height: 0;
+    width: 0;
+    margin-left: -20px;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 30px solid #5e33bf;
+  }
+  
+  .YksVyuEMbXSg025JadDh:before {
+    left: 25px;
+    top: -50px;
+    height: 50px;
+    border-left: 5px solid #5e33bf;
+    border-right: 5px solid #5e33bf;
+  }
+  .YksVyuEMbXSg025JadDh:after {
+    left: 10px;
+    top: -80px;
+    height: 0;
+    width: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 30px solid #5e33bf;
+  }
+  
+  .CTXY9eKXSOcPsREchYI2:before {
+    right: 25px;
+    top: -50px;
+    height: 50px;
+    border-left: 5px solid #5e33bf;
+    border-right: 5px solid #5e33bf;
+  }
+  .CTXY9eKXSOcPsREchYI2:after {
+    right: 10px;
+    top: -80px;
+    height: 0;
+    width: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 30px solid #5e33bf;
+  }
+  
+  .mV5XjFYui13hlKYiF9fz:before {
+    bottom: -50px;
+    left: 50%;
+    height: 50px;
+    margin-left: -5px;
+    border-left: 5px solid #5e33bf;
+    border-right: 5px solid #5e33bf;
+  }
+  .mV5XjFYui13hlKYiF9fz:after {
+    left: 50%;
+    bottom: -80px;
+    height: 0;
+    width: 0;
+    margin-left: -20px;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 30px solid #5e33bf;
+  }
+  
+  .jlXUNrOMfrz8QPtWwi9D:before {
+    bottom: -50px;
+    left: 25px;
+    height: 50px;
+    border-left: 5px solid #5e33bf;
+    border-right: 5px solid #5e33bf;
+  }
+  .jlXUNrOMfrz8QPtWwi9D:after {
+    left: 10px;
+    bottom: -80px;
+    height: 0;
+    width: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 30px solid #5e33bf;
+  }
+  
+  .JeoJI1NdjwsQC_qBgQws:before {
+    bottom: -50px;
+    right: 25px;
+    height: 50px;
+    border-left: 5px solid #5e33bf;
+    border-right: 5px solid #5e33bf;
+  }
+  .JeoJI1NdjwsQC_qBgQws:after {
+    right: 10px;
+    bottom: -80px;
+    height: 0;
+    width: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 30px solid #5e33bf;
+  }
+  
+  .MU1OWZXYSl7cGLHsourz {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: start;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding-right: 85px;
+    font-size: 26px;
+    line-height: 1.25;
+  }
+  
+  .G7McxXXrgjal0gygY7go {
+    min-width: 30px;
+    height: 40px;
+    margin-right: 0.75rem;
+  }
+  .G7McxXXrgjal0gygY7go svg {
+    max-height: 40px;
+    height: auto;
+    width: auto;
+  }
+  
+  .mRKSYTEhLTxmKLYCNnX9 {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    min-height: 40px;
+  }
+  
+  .cA8Idbs6OA0BSmKw9Tam {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    -ms-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    margin: 0;
+    padding: 1rem;
+    outline: none;
+    background-color: transparent;
+    color: #fff;
+    font-weight: 400;
+    text-decoration: none;
+    border: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    cursor: pointer;
+  }
+  .cA8Idbs6OA0BSmKw9Tam svg {
+    width: 10px;
+    height: 10px;
+    margin-left: 5px;
+    vertical-align: middle;
+  }
+  .cA8Idbs6OA0BSmKw9Tam svg path:not(.UEpjZcO6H4w0RvC9Kcye) {
+    -webkit-transition: fill 0.2s ease-out;
+    transition: fill 0.2s ease-out;
+    fill: #fff;
+  }
+  .cA8Idbs6OA0BSmKw9Tam svg circle.gZCekxKuewhQhlBZDuJQ,
+  .cA8Idbs6OA0BSmKw9Tam svg path.gZCekxKuewhQhlBZDuJQ {
+    fill: transparent;
+    stroke: #696969;
+  }
+  .cA8Idbs6OA0BSmKw9Tam:hover,
+  .cA8Idbs6OA0BSmKw9Tam:focus,
+  .cA8Idbs6OA0BSmKw9Tam:focus-within,
+  .cA8Idbs6OA0BSmKw9Tam:active {
+    color: #dadada;
+    background-color: transparent;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+  .cA8Idbs6OA0BSmKw9Tam:hover svg,
+  .cA8Idbs6OA0BSmKw9Tam:focus svg,
+  .cA8Idbs6OA0BSmKw9Tam:focus-within svg,
+  .cA8Idbs6OA0BSmKw9Tam:active svg {
+    width: 10px;
+    height: 10px;
+    margin-left: 5px;
+    vertical-align: middle;
+  }
+  .cA8Idbs6OA0BSmKw9Tam:hover svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .cA8Idbs6OA0BSmKw9Tam:focus svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .cA8Idbs6OA0BSmKw9Tam:focus-within svg path:not(.UEpjZcO6H4w0RvC9Kcye),
+  .cA8Idbs6OA0BSmKw9Tam:active svg path:not(.UEpjZcO6H4w0RvC9Kcye) {
+    -webkit-transition: fill 0.2s ease-out;
+    transition: fill 0.2s ease-out;
+    fill: #dadada;
+  }
+  .cA8Idbs6OA0BSmKw9Tam:hover svg circle.gZCekxKuewhQhlBZDuJQ,
+  .cA8Idbs6OA0BSmKw9Tam:hover svg path.gZCekxKuewhQhlBZDuJQ,
+  .cA8Idbs6OA0BSmKw9Tam:focus svg circle.gZCekxKuewhQhlBZDuJQ,
+  .cA8Idbs6OA0BSmKw9Tam:focus svg path.gZCekxKuewhQhlBZDuJQ,
+  .cA8Idbs6OA0BSmKw9Tam:focus-within svg circle.gZCekxKuewhQhlBZDuJQ,
+  .cA8Idbs6OA0BSmKw9Tam:focus-within svg path.gZCekxKuewhQhlBZDuJQ,
+  .cA8Idbs6OA0BSmKw9Tam:active svg circle.gZCekxKuewhQhlBZDuJQ,
+  .cA8Idbs6OA0BSmKw9Tam:active svg path.gZCekxKuewhQhlBZDuJQ {
+    fill: transparent;
+    stroke: #5e33bf;
+  }
+  
+  .TKXFYjyTT7BRVXk2l6uF {
+    margin: 15px 0;
+    line-height: 1.25;
+    background: #5e33bf;
+    color: #fff;
+  }
+  .TKXFYjyTT7BRVXk2l6uF:first-of-type,
+  .TKXFYjyTT7BRVXk2l6uF:first-child {
+    margin-top: 0;
+  }
+  .TKXFYjyTT7BRVXk2l6uF:last-child {
+    margin-bottom: 0;
+  }
+  
+  .NnI3UXnyndFcINeMIp0o {
+    font-size: 18px;
+    font-weight: 700;
+  }
+  
+  .FV8g2jL10G1UB_eAf9BA {
+    text-align: right;
+  }
+  .FV8g2jL10G1UB_eAf9BA a{
+   color: white;
+   text-decoration: underline;
+  }
+  .FV8g2jL10G1UB_eAf9BA a:hover{
+    color: white;
+    text-decoration: none;
+   }
+  
+  .wwyWCr_3HEEc_JqAydbV {
+    text-align: center;
+  }
+  .z4zawF9GdEBCaptUBX5p {
+    cursor: pointer;
+  }
+  .JcejyBv9JYPL8TJLsJFI {
+    cursor: pointer;
+  }
+  .Mo7gxI5NC9YwGrb2VuBI {
+    position: absolute;
+    width: 273px;
+    bottom: 120px;
+    left: 155px;
+    padding: 15px;
+    border-radius: 2px;
+    background-color: rgba(48, 55, 61, 1);
+    z-index: 500000000;
+  }
+  
+  .h5vXAMG8g9yvOW1B6wro {
+    left: 15px;
+    bottom: 100px;
+  }
+  
+  .h5vXAMG8g9yvOW1B6wro::after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: -15px;
+    left: 15px;
+    height: 0;
+    border-top: 15px solid #30373d;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+  }
+  
+  .IAiRh1I0k5egyOBwu5xu {
+    bottom: 111px;
+    left: 283px;
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+    background-color: rgba(48, 55, 61, 1);
+  }
+  
+  .SH95mwXWE4rR88NI9kdw {
+    font-family: "Clarivate";
+    text-align: left;
+    color: #fff;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  
+  /* Content visibility */
+  .JDTc_LYE4hywcP2UrMj1 {
+    display: none;
+    height: 100%;
+    -webkit-animation-duration: 500ms;
+    animation-duration: 500ms;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+  }
+  
+  .JDTc_LYE4hywcP2UrMj1.xt3prUvhYpXaDTATSaqi {
+    display: block;
+    -webkit-animation-name: cyDGHsYvrKbP8e_GTG2d;
+    animation-name: cyDGHsYvrKbP8e_GTG2d;
+  }
+  
+  @keyframes cyDGHsYvrKbP8e_GTG2d {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  
+  #p23dTdp5Vjnb1kKXw0Pm {
+    color: #fff;
+  }
+  
+  #p23dTdp5Vjnb1kKXw0Pm:hover {
+    color: #dadada;
+    text-decoration: none;
+  }
+  </style></head>
+
+<!-- HTML content ********************************************************** -->
+
+<body style="user-select: none; touch-action: manipulation; cursor: auto;">
+
+	<!-- this DIV shows the n-back sequence items -->
+    <div id="items" style="display: none;"></div>
+    
+    <!-- this DIV shows feedback during practice -->
+    <div id="practice_feedback" style="display: none;"></div>
+    
+    <!-- if Javascript is disabled, we instruct the user to enable it------->
+    <noscript>
+    For full functionality of this site it is necessary to enable JavaScript.<br>
+    Here are the <a href="https://www.enable-javascript.com/" target="_blank" rel="noopener noreferrer">
+    instructions</a> how to enable JavaScript in your web browser.
+    </noscript>
+
+    <!-- GAS送信用の隠しiframe（CORS回避）池田研究室 研究1で追加 -->
+    <iframe id="gasIframe" name="gasIframe" style="display:none;"></iframe>
+
+</body></html>
