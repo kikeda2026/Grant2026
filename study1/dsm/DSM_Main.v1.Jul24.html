@@ -249,12 +249,20 @@
         }
     }
 
-    // 隠しiframeへのPOST送信（CORS回避）
+    // 送信ごとに専用の使い捨てiframeを生成してPOST送信（CORS回避／複数送信の競合防止）
+    // 池田研究室 研究1で改修：以前は共通のgasIframeを使い回しており，集計・詳細を連続送信すると
+    // 一方の通信がキャンセルされることがあったため，送信のたびに新規iframeを作る方式に変更
     function postToGAS(payload) {
+        var iframeName = 'gasIframe_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+        var iframe = document.createElement('iframe');
+        iframe.name = iframeName;
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+
         var form = document.createElement('form');
         form.action  = GAS_URL;
         form.method  = 'POST';
-        form.target  = 'gasIframe';
+        form.target  = iframeName;
         form.style.display = 'none';
         Object.keys(payload).forEach(function(key) {
             var inp = document.createElement('input');
@@ -266,6 +274,11 @@
         document.body.appendChild(form);
         form.submit();
         document.body.removeChild(form);
+
+        // 送信完了を待ってからiframeを片付ける（早すぎる削除は通信を妨げるため）
+        setTimeout(function() {
+            if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+        }, 10000);
     }
 
     var testVersion;                // version identifier for this test
@@ -798,6 +811,10 @@
         autosave = getUrlParameters("autosave", "", true);
         filename = getUrlParameters("filename", "", true);
 
+        // firstrun=true: 練習課題ページ内のテスト（あくまで練習）。GAS送信なし，完了後は次の練習ステップへ 池田研究室 研究1で追加
+        firstrun = getUrlParameters("firstrun", "", true);
+        if (!firstrun) firstrun = 'false';
+
         // see if they don't want practice or optional practice
         nopractice = getUrlParameters("nopractice", "", true);
         if (!nopractice) nopractice = 'false';
@@ -914,9 +931,6 @@
         Here are the <a href="https://www.enable-javascript.com/" target="_blank" rel="noopener noreferrer">
         instructions</a> how to enable JavaScript in your web browser.
     </noscript>
-
-    <!-- GAS送信用の隠しiframe（CORS回避） -->
-    <iframe id="gasIframe" name="gasIframe" style="display:none;"></iframe>
 
 </body>
 
