@@ -553,17 +553,19 @@
     }
     
     // ── 文字系列をヒット位置を緑色でハイライトして表示するHTML生成（欠落画像の代替）池田研究室 研究1で追加 ──
+    // 池田研究室 研究1で修正：<div>はライブラリのshowFrame()により自動的に非表示化されるため，
+    // <span>とbrのみで構成するよう変更（divを一切使わない）
     function renderAnnotatedSequence(seq)
     {
     	if (!seq) return '';
-    	var html = "<div style='font-size:22pt; letter-spacing:0.3em; margin:0.5em 0;'>";
+    	var html = "<br><span style='font-size:22pt; letter-spacing:0.3em;'>";
     	for (var i = 0; i < seq.items.length; i++)
     	{
     		var color = (seq.hits[i] === 1) ? '#2EAA6E' : '#000000';
     		var weight = (seq.hits[i] === 1) ? 'bold' : 'normal';
     		html += "<span style='color:" + color + "; font-weight:" + weight + ";'>" + seq.items[i] + "</span>";
     	}
-    	html += "</div>";
+    	html += "</span><br>";
     	return html;
     }
 
@@ -1013,20 +1015,20 @@
                                //new instruction page//
                               ("<h2>説明：</h2>" +
                               "先ほどの文字列は，以下の通りです。<br>" + 
-                              "<div style='font-size:20pt; letter-spacing:0.3em; margin:0.4em 0;'>" +
+                              "<br><span style='font-size:20pt; letter-spacing:0.3em;'>" +
                               "<span>C</span><span>A</span><span>B</span>" +
                               "<span style='color:#2EAA6E; font-weight:bold;'>A</span>" +
-                              "<span>D</span><span>C</span></div>" +
+                              "<span>D</span><span>C</span></span><br>" +
                               "2番目のAが出たときに<br>" +
                               (hasTouch ? "タップして" : "スペースキーを押して") + "ください。<br>" +
-                              "2つ前にもAが表示されているためです。<br><br>"),
+                              "2つ前の文字も同じAだったからです。<br><br>"),
                               //new instruction page//
                               ("<h2>説明：</h2>" +
                               "別の例を見てみましょう。<br>" +
-                              "<div style='font-size:20pt; letter-spacing:0.3em; margin:0.4em 0;'>" +
+                              "<br><span style='font-size:20pt; letter-spacing:0.3em;'>" +
                               "<span>C</span><span>A</span><span>B</span>" +
                               "<span style='color:#2EAA6E; font-weight:bold;'>A</span>" +
-                              "<span>D</span><span>C</span></div>" +
+                              "<span>D</span><span>C</span></span><br>" +
                               "下の緑色の文字のときに，<br>すべて" +
                               (hasTouch ? "タップして" : "スペースキーを押して") + "ください。<br>" +
                               "緑色の文字はどれも，2つ前に<br>同じ文字が表示されています。<br><br>")];
@@ -1233,7 +1235,7 @@
 							{
 								type: "message",
 								message:    '正しく' + msg_verb + 'と，<br>緑色の四角が表示されます。<br><br>' + 
-											"<div style='width:120px; height:120px; background:#2EAA6E; margin:1em auto;'></div><br><br>",
+											"<span style='display:inline-block; width:120px; height:120px; background:#2EAA6E;'></span><br><br>",
 								item: '',
 								isHit: '',
 								nBack: nCond,
@@ -1243,7 +1245,7 @@
 							{
 								type: this_message_type,
 								message:    '誤って' + msg_verb + 'と，<br>赤色の四角が表示されます。<br><br>' + 
-											"<div style='width:120px; height:120px; background:#D9534F; margin:1em auto;'></div><br><br>",
+											"<span style='display:inline-block; width:120px; height:120px; background:#D9534F;'></span><br><br>",
 								item: '',
 								isHit: '',
 								nBack: nCond,
