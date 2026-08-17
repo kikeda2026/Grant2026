@@ -136,6 +136,13 @@
             outline: none
         }
 
+        /* 池田研究室 研究1で追加：説明文が長くなった場合に画面外へ隠れないようスクロールを許可 */
+        #alertBox
+        {
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
     </style>
 
 <!-- end of css Style declarations ***************************************** -->
@@ -201,6 +208,29 @@
                 'trials':   JSON.stringify(testTrials)
             };
             postToGAS(detailPayload);
+        }
+    }
+
+    // showAlertにスペースキー対応を追加するラッパー 池田研究室 研究1で追加
+    // このバージョンのTestMyBrain.jsのshowAlert()はボタンのクリック（onclick）にしか反応せず，
+    // キーボードでの続行に対応していないため，別途キーボードリスナーを追加する
+    var _showAlertKeyHandler = null;
+    function showAlertKB(message, buttonText, callback, fontSize) {
+        if (_showAlertKeyHandler) {
+            document.removeEventListener('keydown', _showAlertKeyHandler);
+            _showAlertKeyHandler = null;
+        }
+        showAlert(message, buttonText, callback, fontSize);
+        if (!hasTouch) {
+            _showAlertKeyHandler = function(e) {
+                if (e.code === 'Space' || e.key === ' ' || e.keyCode === 32) {
+                    e.preventDefault();
+                    document.removeEventListener('keydown', _showAlertKeyHandler);
+                    _showAlertKeyHandler = null;
+                    callback();
+                }
+            };
+            document.addEventListener('keydown', _showAlertKeyHandler);
         }
     }
 
@@ -490,7 +520,7 @@
             	// if practice, set up feedback
             	if (frame.type === "practice")
             	{
-					practice_feedback.innerHTML = 'Correct!';
+					practice_feedback.innerHTML = '正解！';
 					setTimeout(function(){practice_feedback.innerHTML = ''},500);
                 }
                 
@@ -503,6 +533,13 @@
             } 
             else 
             {
+            	// if practice, set up feedback（池田研究室 研究1で追加：元は不正解時のテキスト表示がなかった）
+            	if (frame.type === "practice")
+            	{
+					practice_feedback.innerHTML = '不正解';
+					setTimeout(function(){practice_feedback.innerHTML = ''},500);
+                }
+
             	results[whichTrial].correct = 0;
             	results[whichTrial].rt = responseTime;
             	if (feedback)
@@ -540,11 +577,11 @@
     	if (h === 0) // miss
     	{
     		var msg = "おしい！<br>" +
-    					(hasTouch ? "タップ" : "スペースキーを押す") +
+    					(hasTouch ? "タップす" : "スペースキーを押す") +
     					"べきでした。<br>" +
     					"2つ前の文字と同じ文字が出たら，毎回<br>" +
-    					(hasTouch ? "タップ" : "スペースキーを押す") +
-    					"してください。<br><br>" +
+    					(hasTouch ? "タップして" : "スペースキーを押して") +
+    					"ください。<br><br>" +
     					"この系列では，緑色の文字のときに<br>反応するのが正解です。<br><br>" +
                         renderAnnotatedSequence(lastPracticeSequence);
     	}
@@ -552,8 +589,8 @@
     	{
     		var msg = "おしい！<br>" +
     					"2つ前の文字と同じ文字が出たときだけ<br>" +
-    					(hasTouch ? "タップ" : "スペースキーを押す") +
-    					"してください。<br><br>" +
+    					(hasTouch ? "タップして" : "スペースキーを押して") +
+    					"ください。<br><br>" +
     					"この系列では，緑色の文字のときに<br>反応するのが正解です。<br><br>" +
                         renderAnnotatedSequence(lastPracticeSequence);
     	
@@ -580,7 +617,7 @@
     		buttonText =  (hasTouch ? "タップして続ける" : "スペースキーを押して続ける");
     	}
     	
-    	showAlert(msg,
+    	showAlertKB(msg,
 				 buttonText,
 				 function ()
 				 {
@@ -629,7 +666,7 @@
         if (frame)
         {
             // check if it's the startup frame
-            if (frame.type === "begin") showAlert(frame.message,
+            if (frame.type === "begin") showAlertKB(frame.message,
                                                   (hasTouch ? "タップして説明を見る" : "スペースキーを押して説明を見る"),
                                                   function ()
                                                   {
@@ -641,7 +678,7 @@
             // else if it's a message frame, show it
             else if (frame.type === "message")
 			{  							
-				showAlert(frame.message,
+				showAlertKB(frame.message,
 				 (hasTouch ? "タップして続ける" : "スペースキーを押して続ける"),
 				 function ()
 				 {
@@ -653,7 +690,7 @@
             // else if it's a message_start frame, show it
             else if (frame.type === "message_start")
 			{  							
-				showAlert(frame.message,
+				showAlertKB(frame.message,
 				 (hasTouch ? "タップしてテストを始める" : "スペースキーを押してテストを始める"),
 				 function ()
 				 {
@@ -665,7 +702,7 @@
             // else if it's a message_practice frame, show it
             else if (frame.type === "message_practice")
 			{  							
-				showAlert(frame.message,
+				showAlertKB(frame.message,
 				 (hasTouch ? "タップして練習を始める" : "スペースキーを押して練習を始める"),
 				 function ()
 				 {
@@ -972,27 +1009,27 @@
                               ("<h2>説明：</h2>" +
                               instruct_n2b + "画面に表示された文字が，<br>" +
                               "<b>2つ前に表示された文字と同じ</b>ときに<br>" +
-                              (hasTouch ? "タップ" : "スペースキーを押す") + "してください。<br><br>"),
+                              (hasTouch ? "タップして" : "スペースキーを押して") + "ください。<br><br>"),
                                //new instruction page//
                               ("<h2>説明：</h2>" +
-                              "先ほどの文字列は，以下の通りです。<br><br>" + 
-                              "この系列では，2番目のAが出たときに<br>" +
-                              (hasTouch ? "タップ" : "スペースキーを押す") + "してください。<br>" +
-                              "2つ前にもAが表示されているためです。<br><br>" +
-                              "<div style='font-size:26pt; letter-spacing:0.4em; margin:0.5em 0;'>" +
+                              "先ほどの文字列は，以下の通りです。<br>" + 
+                              "<div style='font-size:20pt; letter-spacing:0.3em; margin:0.4em 0;'>" +
                               "<span>C</span><span>A</span><span>B</span>" +
                               "<span style='color:#2EAA6E; font-weight:bold;'>A</span>" +
-                              "<span>D</span><span>C</span></div><br>"),
+                              "<span>D</span><span>C</span></div>" +
+                              "2番目のAが出たときに<br>" +
+                              (hasTouch ? "タップして" : "スペースキーを押して") + "ください。<br>" +
+                              "2つ前にもAが表示されているためです。<br><br>"),
                               //new instruction page//
                               ("<h2>説明：</h2>" +
-                              "別の例を見てみましょう。<br><br>" +
-                              "下の緑色の文字のときに<br>すべて" +
-                              (hasTouch ? "タップ" : "スペースキーを押す") + "してください。<br><br>" +
-                              "緑色の文字はどれも，<br>2つ前に同じ文字が表示されています。<br><br>" +
-                              "<div style='font-size:26pt; letter-spacing:0.4em; margin:0.5em 0;'>" +
+                              "別の例を見てみましょう。<br>" +
+                              "<div style='font-size:20pt; letter-spacing:0.3em; margin:0.4em 0;'>" +
                               "<span>C</span><span>A</span><span>B</span>" +
                               "<span style='color:#2EAA6E; font-weight:bold;'>A</span>" +
-                              "<span>D</span><span>C</span></div><br>")];
+                              "<span>D</span><span>C</span></div>" +
+                              "下の緑色の文字のときに，<br>すべて" +
+                              (hasTouch ? "タップして" : "スペースキーを押して") + "ください。<br>" +
+                              "緑色の文字はどれも，2つ前に<br>同じ文字が表示されています。<br><br>")];
         
         // messages（池田研究室 研究1で日本語化）
         testMessage =
@@ -1247,12 +1284,14 @@
         }
         
         //set up frame reset sequences for missed practice trials
+        // 池田研究室 研究1で修正：元は message.indexOf('practice!') で英語文言を検索していたが，
+        // 日本語化により該当文字列が消え，練習リセットが機能しなくなっていたため，type判定に変更
         if (!nopractice)
 		{
 			var practice_frame_start = [];
 			for (r = 0; r < frameSequence.length; r++)
 			{
-				if(frameSequence[r].message.indexOf('practice!') !== -1)
+				if(frameSequence[r].type === 'message_practice')
 				{
 					practice_frame_start.push(r+1);
 				}
