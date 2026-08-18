@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今日の認知課題 | 研究1</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:       #1A2340;
+    --green:      #2EAA6E;
+    --green-light:#EBF7F2;
+    --green-dim:  #1E7A4E;
+    --amber:      #E8973A;
+    --amber-light:#FFF8EC;
+    --gray:       #8A94A6;
+    --gray-light: #F4F6FA;
+    --border:     #E2E8F0;
+    --white:      #FFFFFF;
+    --mono:       'DM Mono', monospace;
+  }
+  body { font-family: 'Noto Sans JP', sans-serif; color: var(--navy); background: var(--gray-light); min-height: 100vh; line-height: 1.8; }
+
+  nav { background: var(--navy); display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 56px; }
+  .nav-logo { color: var(--white); font-family: 'Noto Serif JP', serif; font-size: 0.85rem; text-decoration: none; }
+  .nav-back  { color: rgba(255,255,255,0.7); font-size: 0.82rem; text-decoration: none; }
+
+  .page-header { background: var(--navy); padding: 32px 5% 28px; }
+  .header-eyebrow { font-family: var(--mono); font-size: 0.7rem; color: var(--green); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .header-title { font-family: 'Noto Serif JP', serif; font-size: clamp(1.2rem, 3vw, 1.6rem); color: var(--white); }
+  .header-day { font-family: var(--mono); font-size: 0.95rem; color: rgba(255,255,255,0.75); margin-top: 0.4rem; }
+
+  main { max-width: 640px; margin: 0 auto; padding: 28px 5% 80px; }
+
+  .card { background: var(--white); border: 1.5px solid var(--border); border-radius: 4px; padding: 1.8rem; margin-bottom: 1.2rem; }
+  .card h2 { font-family: 'Noto Serif JP', serif; font-size: 1.1rem; margin-bottom: 0.8rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--green-light); }
+  .card p { font-size: 0.88rem; color: #4A5568; line-height: 1.9; margin-bottom: 0.6rem; }
+
+  .task-badge { display: inline-block; font-family: var(--mono); font-size: 0.7rem; background: var(--navy); color: var(--white); padding: 0.2rem 0.6rem; border-radius: 2px; margin-bottom: 0.8rem; letter-spacing: 0.1em; }
+
+  .btn-start { width: 100%; padding: 1.1rem 1rem; font-size: 1rem; font-family: 'Noto Sans JP', sans-serif; font-weight: 700; background: var(--green); color: var(--white); border: none; border-radius: 4px; cursor: pointer; letter-spacing: 0.06em; margin-top: 1rem; transition: background .2s; -webkit-tap-highlight-color: transparent; }
+  .btn-start:hover { background: var(--green-dim); }
+  .btn-start:disabled { background: var(--gray); cursor: not-allowed; }
+
+  .done-panel { background: var(--green-light); border: 2px solid var(--green); border-radius: 4px; padding: 1.2rem 1.4rem; display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem; }
+  .done-panel .icon { font-size: 1.5rem; flex-shrink: 0; }
+  .done-panel p { font-size: 0.88rem; color: var(--green-dim); font-weight: 700; margin: 0; }
+
+  .todo-panel { background: var(--gray-light); border: 1.5px solid var(--border); border-radius: 4px; padding: 1rem 1.4rem; font-size: 0.85rem; color: var(--gray); margin-bottom: 1.2rem; }
+
+  .complete-panel { text-align: center; padding: 2.5rem 1.5rem; background: var(--white); border: 1.5px solid var(--border); border-radius: 4px; }
+  .complete-panel .icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+  .complete-panel h2 { font-family: 'Noto Serif JP', serif; font-size: 1.3rem; color: var(--green); margin-bottom: 0.8rem; }
+  .complete-panel p { font-size: 0.88rem; color: #4A5568; line-height: 1.9; }
+  .btn-home { display: inline-block; margin-top: 1.4rem; padding: 0.8rem 2rem; background: var(--navy); color: var(--white); text-decoration: none; border-radius: 3px; font-size: 0.88rem; font-weight: 700; }
+
+  .lock-panel { text-align: center; padding: 2.5rem 1.5rem; }
+  .lock-panel .icon { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
+  .lock-panel h2 { font-family: 'Noto Serif JP', serif; font-size: 1.1rem; margin-bottom: 0.6rem; color: var(--amber); }
+  .back-link { display: inline-block; margin-top: 1.2rem; color: var(--green); font-size: 0.85rem; text-decoration: none; font-weight: 700; }
+
+  /* VAS（気分尺度） */
+  .vas-wrap { margin: 1.6rem 0 1.2rem; }
+  .vas-slider { width: 100%; height: 8px; border-radius: 4px; background: linear-gradient(to right, var(--gray) 0%, var(--green) 100%); outline: none; -webkit-appearance: none; appearance: none; }
+  .vas-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; border-radius: 50%; background: var(--white); border: 3px solid var(--navy); cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+  .vas-slider::-moz-range-thumb { width: 28px; height: 28px; border-radius: 50%; background: var(--white); border: 3px solid var(--navy); cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+  .vas-labels { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--gray); margin-top: 0.6rem; line-height: 1.5; }
+  .vas-labels span:first-child { text-align: left; max-width: 40%; }
+  .vas-labels span:last-child { text-align: right; max-width: 40%; }
+
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(26,35,64,0.5); z-index: 200; align-items: center; justify-content: center; }
+  .overlay.show { display: flex; }
+  .overlay-box { background: var(--white); padding: 1.8rem 2.2rem; text-align: center; border-radius: 4px; }
+  .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 0.8rem; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  footer { background: #111827; padding: 1.2rem 5%; text-align: center; }
+  footer p { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-box">
+    <div class="spinner"></div>
+    <p style="font-size:0.88rem;color:#4A5568;">送信中です…</p>
+  </div>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">研究1 参加者ページ</a>
+  <a href="index.html" class="nav-back">← トップへ戻る</a>
+</nav>
+
+<div class="page-header">
+  <p class="header-eyebrow">Cognitive Tasks / 毎日実施</p>
+  <h1 class="header-title">今日の認知課題</h1>
+  <p class="header-day" id="headerDay"></p>
+</div>
+
+<main id="mainContent"></main>
+
+<footer>
+  <p>© 2026 池田研究室 ― 尚絅学院大学 心理部門　|　倫理審査承認番号：2026-002</p>
+</footer>
+
+<script>
+// ══════════════════════════════════════════════════════
+// 池田研究室 研究1 ― 本番用認知課題統合ページ
+// ══════════════════════════════════════════════════════
+const GAS_URL = 'https://script.google.com/macros/s/AKfycby5FYl7ruaqdoQvbxhCrUxUG8IMpxYHY6cUFwASDWxwplmTA49eOV6-24hgDD0grCSV/exec';
+const ID_KEY  = 'study1_participant_id';
+const STUDY_DAYS = 14;
+
+// ── 送信ごとに専用の使い捨てiframeを生成してPOST送信（GradCPT/DSM/2-backと同じ方式） ──
+function postToGAS(payload) {
+    return new Promise(function(resolve) {
+        var iframeName = 'gasIframe_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+        var iframe = document.createElement('iframe');
+        iframe.name = iframeName;
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+
+        var settled = false;
+        function finish() {
+            if (settled) return;
+            settled = true;
+            resolve();
+            setTimeout(function() {
+                if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+            }, 1000);
+        }
+        iframe.addEventListener('load', finish);
+        setTimeout(finish, 8000);
+
+        var form = document.createElement('form');
+        form.action = GAS_URL;
+        form.method = 'POST';
+        form.target = iframeName;
+        form.style.display = 'none';
+        Object.keys(payload).forEach(function(key) {
+            var inp = document.createElement('input');
+            inp.type  = 'hidden';
+            inp.name  = key;
+            inp.value = payload[key];
+            form.appendChild(inp);
+        });
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+    });
+}
+
+// ── 「何日目か」の判定：dinner.htmlが保存する日別キー（dinner_recorded_{ID}_{日付}）を
+//     すべて走査し，最も古い日付を1日目として，暦日ベースの差分で計算する ──
+function getFirstDinnerDate(pid) {
+    var prefix = 'dinner_recorded_' + pid + '_';
+    var earliest = null;
+    for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (key && key.indexOf(prefix) === 0) {
+            var dateStr = key.substring(prefix.length); // 例: "Tue Aug 18 2026"
+            var d = new Date(dateStr);
+            if (!isNaN(d) && (earliest === null || d < earliest)) {
+                earliest = d;
+            }
+        }
+    }
+    return earliest;
+}
+
+function getCurrentDay(pid) {
+    var firstDate = getFirstDinnerDate(pid);
+    if (!firstDate) return null;
+    var today = new Date();
+    var todayMid = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    var firstMid = new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate());
+    var diffDays = Math.round((todayMid - firstMid) / 86400000);
+    return diffDays + 1; // 初回夕食記録日を1日目とする
+}
+
+// ── 日別のlocalStorageキー ──
+function dayKey(day, suffix) {
+    return 'study1_day' + day + '_' + suffix;
+}
+
+// ── その日の3課題の提示順序（ページを開くたびにランダムに決め直す。リロード中は保持） ──
+function getTaskOrder(day) {
+    var key = dayKey(day, 'task_order');
+    var saved = sessionStorage.getItem(key);
+    if (saved) {
+        try { return JSON.parse(saved); } catch (e) {}
+    }
+    var tasks = ['gradcpt', 'dsm', 'nback'];
+    for (var i = tasks.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = tasks[i]; tasks[i] = tasks[j]; tasks[j] = tmp;
+    }
+    sessionStorage.setItem(key, JSON.stringify(tasks));
+    return tasks;
+}
+
+// ── その日の3課題の提示順序：保存せず，画面を表示するたびに毎回シャッフルし直す
+//     （すでに完了した課題は，完了フラグにより順序に関わらず「完了済み」表示になる） ──
+function getTaskOrder() {
+    var tasks = ['gradcpt', 'dsm', 'nback'];
+    for (var i = tasks.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = tasks[i]; tasks[i] = tasks[j]; tasks[j] = tmp;
+    }
+    return tasks;
+}
+
+var TASK_INFO = {
+    gradcpt: {
+        label: 'GradCPT（集中力課題）',
+        desc:  '都市または山の画像が次々と表示されます。都市の画像が出たらできるだけ早くタップ（またはスペースキー），山の画像には反応しないでください。',
+        time:  '約1分'
+    },
+    dsm: {
+        label: 'DSM（処理速度課題）',
+        desc:  '画面上部の対応表を見ながら，提示されたシンボルに対応する数字をできるだけ速く選択してください。',
+        time:  '約1.5分'
+    },
+    nback: {
+        label: '2-backタスク（ワーキングメモリ課題）',
+        desc:  '文字が1つずつ表示されます。現在の文字が2つ前の文字と同じならタップ（またはスペースキー），違う場合は反応しないでください。',
+        time:  '約1分'
+    }
+};
+
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+function startTask(task, day) {
+    if (task === 'gradcpt') {
+        window.location.href = 'gradcpt/GradCPT_Main.v1.Apr24.html' +
+            '?input=picsInput_75imgs_15nogo_day' + pad2(day) + '.txt' +
+            '&nopractice=true&chooseinput=false&day=' + day;
+    } else if (task === 'dsm') {
+        window.location.href = 'dsm/DSM_Main.v1.Jul24.html' +
+            '?seed=' + (100000 + day) +
+            '&nopractice=true&chooseinput=false&day=' + day;
+    } else if (task === 'nback') {
+        window.location.href = 'nback/NBack_Main.v1.Apr25.html' +
+            '?seed=' + (200000 + day) +
+            '&nopractice=true&day=' + day;
+    }
+}
+
+// ══════════════════════════════════════════════════════
+// 描画
+// ══════════════════════════════════════════════════════
+function render() {
+    var pid  = localStorage.getItem(ID_KEY);
+    var main = document.getElementById('mainContent');
+    document.getElementById('headerDay').textContent = '';
+
+    if (!pid) {
+        main.innerHTML =
+            '<div class="card"><div class="lock-panel">' +
+            '<span class="icon">🔒</span>' +
+            '<h2>参加者IDが未設定です</h2>' +
+            '<p style="font-size:0.85rem;color:#4A5568;">トップページで参加者IDを入力してから戻ってきてください。</p>' +
+            '<a href="index.html" class="back-link">← トップページへ</a>' +
+            '</div></div>';
+        return;
+    }
+
+    var day = getCurrentDay(pid);
+
+    if (day === null) {
+        main.innerHTML =
+            '<div class="card"><div class="lock-panel">' +
+            '<span class="icon">🍽️</span>' +
+            '<h2>夕食記録がまだありません</h2>' +
+            '<p style="font-size:0.85rem;color:#4A5568;">認知課題を始める前に，トップページの「夕食記録」から夕食開始を記録してください。</p>' +
+            '<a href="index.html" class="back-link">← トップページへ</a>' +
+            '</div></div>';
+        return;
+    }
+
+    if (day > STUDY_DAYS) {
+        main.innerHTML =
+            '<div class="card"><div class="lock-panel">' +
+            '<span class="icon">🎉</span>' +
+            '<h2>研究期間は終了しました</h2>' +
+            '<p style="font-size:0.85rem;color:#4A5568;">14日間の認知課題は，これですべて終了です。ご協力いただき，誠にありがとうございました。<br>今後の手続きについては，研究担当者からのご案内をお待ちください。</p>' +
+            '<a href="index.html" class="back-link">← トップページへ</a>' +
+            '</div></div>';
+        return;
+    }
+
+    document.getElementById('headerDay').textContent = 'Day ' + day + ' / ' + STUDY_DAYS;
+
+    var moodDone   = !!localStorage.getItem(dayKey(day, 'mood_done'));
+    var taskDone   = {
+        gradcpt: !!localStorage.getItem(dayKey(day, 'gradcpt_done')),
+        dsm:     !!localStorage.getItem(dayKey(day, 'dsm_done')),
+        nback:   !!localStorage.getItem(dayKey(day, 'nback_done'))
+    };
+    var allDone = moodDone && taskDone.gradcpt && taskDone.dsm && taskDone.nback;
+
+    if (allDone) {
+        main.innerHTML =
+            '<div class="complete-panel">' +
+            '<span class="icon">🎉</span>' +
+            '<h2>本日の課題はすべて終了しました！</h2>' +
+            '<p>お疲れさまでした。また明日，同じ時間帯にお越しください。</p>' +
+            '<a href="index.html" class="btn-home">← トップページへ戻る</a>' +
+            '</div>';
+        return;
+    }
+
+    if (!moodDone) {
+        renderMood(main, pid, day);
+        return;
+    }
+
+    renderTaskList(main, pid, day, taskDone);
+}
+
+// ── 気分尺度（VAS）画面 ──
+function renderMood(main, pid, day) {
+    main.innerHTML =
+        '<div class="card">' +
+        '<span class="task-badge">気分尺度</span>' +
+        '<h2>今日の気分はいかがですか。</h2>' +
+        '<p>下の線上で，最も適当だと思う位置をスライダーで選んでください。</p>' +
+        '<div class="vas-wrap">' +
+        '<input type="range" min="0" max="100" value="50" id="vasSlider" class="vas-slider">' +
+        '<div class="vas-labels"><span>今までで最も悪い</span><span>今までで最も良い</span></div>' +
+        '</div>' +
+        '<button class="btn-start" id="vasSubmitBtn" onclick="submitMood()">回答する</button>' +
+        '</div>';
+}
+
+function submitMood() {
+    var pid   = localStorage.getItem(ID_KEY);
+    var day   = getCurrentDay(pid);
+    var score = document.getElementById('vasSlider').value;
+    var now   = new Date().toLocaleString('ja-JP');
+
+    document.getElementById('vasSubmitBtn').disabled = true;
+    document.getElementById('overlay').classList.add('show');
+
+    var payload = {
+        'タイプ':       '気分尺度',
+        '参加者ID':     pid,
+        '実施日時':     now,
+        'Day':          day,
+        'VASスコア':    score
+    };
+
+    postToGAS(payload).then(function() {
+        localStorage.setItem(dayKey(day, 'mood_done'), 'true');
+        document.getElementById('overlay').classList.remove('show');
+        render();
+    }).catch(function() {
+        localStorage.setItem(dayKey(day, 'mood_done'), 'true');
+        document.getElementById('overlay').classList.remove('show');
+        render();
+    });
+}
+
+// ── 3課題の一覧画面 ──
+function renderTaskList(main, pid, day, taskDone) {
+    var order = getTaskOrder();
+    var html = '<div class="done-panel"><span class="icon">✅</span><p>気分尺度への回答が完了しています。</p></div>';
+
+    var firstNotDoneIndex = -1;
+    for (var i = 0; i < order.length; i++) {
+        if (!taskDone[order[i]]) { firstNotDoneIndex = i; break; }
+    }
+
+    order.forEach(function(task, idx) {
+        var info = TASK_INFO[task];
+        if (taskDone[task]) {
+            html += '<div class="done-panel"><span class="icon">✅</span><p>' + info.label + 'が完了しています。</p></div>';
+        } else if (idx === firstNotDoneIndex) {
+            html +=
+                '<div class="card">' +
+                '<span class="task-badge">' + (idx + 1) + 'つ目 / ' + info.label + '</span>' +
+                '<p>' + info.desc + '</p>' +
+                '<p style="margin-top:0.8rem;">所要時間：' + info.time + '</p>' +
+                '<button class="btn-start" onclick="startTask(\'' + task + '\',' + day + ')">' +
+                info.label + 'を始める →' +
+                '</button>' +
+                '</div>';
+        } else {
+            html += '<div class="todo-panel">⬜ ' + info.label + '（前の課題完了後に解放されます）</div>';
+        }
+    });
+
+    main.innerHTML = html;
+}
+
+window.addEventListener('DOMContentLoaded', render);
+</script>
+</body>
+</html>
