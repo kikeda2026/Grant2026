@@ -184,6 +184,7 @@
             'タイプ':            '2-back集計',
             '参加者ID':          pid,
             '実施日時':          now_str,
+            'Day':              day || '',
             'dprime':           outcomes.dprime      !== undefined ? outcomes.dprime      : '',
             'crit':             outcomes.crit        !== undefined ? outcomes.crit        : '',
             'hitRate':          outcomes.OEprop      !== undefined ? (1 - outcomes.OEprop) : '',
@@ -205,6 +206,7 @@
                 'タイプ':    '2-back詳細',
                 '参加者ID': pid,
                 '実施日時': now_str,
+                'Day':       day || '',
                 'trials':   JSON.stringify(testTrials)
             };
             sendPromises.push(postToGAS(detailPayload));
@@ -321,6 +323,7 @@
     var last_event = now();				// variable used for debouncing
     var practice_feedback;				// feedback div during practice
     var firstrun;						// URL parameter: set to 'true' to run as part of practice.html's practice task (still practice — no GAS submission, continues to next practice step) — 池田研究室 研究1で追加
+    var day;							// URL parameter: 本番実施時の研究日（1〜14） 池田研究室 研究1で追加
     var lastPracticeSequence = null;	// 直前の練習試行の文字列・ヒット位置（やり直し画面の説明表示用）— 池田研究室 研究1で追加
     
     function sample(lo, hi, n, replacement){
@@ -954,9 +957,11 @@
                 // 池田研究室 研究1で改修（元はtmbSubmitToServerでTestMyBrain側へ送信していた）
                 sendResultsToGAS(outcomes, results).then(function()
                 {
+                    if (day) localStorage.setItem('study1_day' + day + '_nback_done', 'true');
                     window.location.href = '../cognitive.html';
                 }).catch(function()
                 {
+                    if (day) localStorage.setItem('study1_day' + day + '_nback_done', 'true');
                     window.location.href = '../cognitive.html';
                 });
             }
@@ -1375,6 +1380,9 @@
         // firstrun=true: 練習課題ページ内のテスト（あくまで練習）。GAS送信なし，完了後は次の練習ステップへ 池田研究室 研究1で追加
         firstrun = getUrlParameters("firstrun","",true);
         if (!firstrun) firstrun = 'false';
+
+        // day: 本番実施時の研究日（1〜14）。cognitive.htmlから渡される 池田研究室 研究1で追加
+        day = getUrlParameters("day","",true);
         
         // get the nback conditions
         nBack = getUrlParameters("nback","",true);
