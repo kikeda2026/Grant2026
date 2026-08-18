@@ -136,6 +136,7 @@
             'タイプ':            'GradCPT集計',
             '参加者ID':          pid,
             '実施日時':          now,
+            'Day':              day || '',
             'dprime':           outcomes.dprime      !== null ? outcomes.dprime      : '',
             'goAccuracy':       outcomes.goAccuracy  !== null ? outcomes.goAccuracy  : '',
             'nogoAccuracy':     outcomes.nogoAccuracy!== null ? outcomes.nogoAccuracy: '',
@@ -154,6 +155,7 @@
                 'タイプ':    'GradCPT詳細',
                 '参加者ID': pid,
                 '実施日時': now,
+                'Day':       day || '',
                 'trials':   JSON.stringify(testTrials)
             };
             sendPromises.push(postToGAS(detailPayload));
@@ -287,6 +289,7 @@
     var nopractice;                 // URL parameter: set to 'true' to skip practice
     var practiceonly;               // URL parameter: set to 'true' to skip main test after practice
     var firstrun;                   // URL parameter: set to 'true' to run this as part of practice.html's practice task (practice trials + first 75-trial test, still practice — no GAS submission, continues to next practice step)
+    var day;                        // URL parameter: 本番実施時の研究日（1〜14）。GASへのデータ送信・完了フラグに使用 池田研究室 研究1で追加
     var usage = "";                 // URL parameter: show usage
     var chosenInput;                // input type (taps or keys)
 	var practiceChoice = null;	// whether the participant chose to complete optional practice trials
@@ -1338,9 +1341,11 @@
                 // 回線が遅い場合に詳細データの送信が間に合わず失われることがあった
                 sendResultsToGAS(outcomes, results).then(function()
                 {
+                    if (day) localStorage.setItem('study1_day' + day + '_gradcpt_done', 'true');
                     window.location.href = '../cognitive.html';
                 }).catch(function()
                 {
+                    if (day) localStorage.setItem('study1_day' + day + '_gradcpt_done', 'true');
                     window.location.href = '../cognitive.html';
                 });
             }
@@ -1667,6 +1672,9 @@
         // firstrun=true: 練習課題ページ内の75試行テスト（初回・あくまで練習）。GAS送信なし，完了後は次の練習ステップへ
         firstrun = getUrlParameters("firstrun","",true);
         if (!firstrun) firstrun = 'false';
+
+        // day: 本番実施時の研究日（1〜14）。cognitive.htmlから渡される 池田研究室 研究1で追加
+        day = getUrlParameters("day","",true);
 
         // specify the input file
         inputFile = getUrlParameters("input", "", true);
