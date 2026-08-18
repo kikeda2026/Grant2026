@@ -222,6 +222,7 @@
             'タイプ':            'DSM集計',
             '参加者ID':          pid,
             '実施日時':          now,
+            'Day':              day || '',
             'num_correct':      outcomes.num_correct  !== null ? outcomes.num_correct  : '',
             'num_responses':    outcomes.num_responses!== null ? outcomes.num_responses: '',
             'accuracy':         outcomes.accuracy     !== null ? outcomes.accuracy     : '',
@@ -243,6 +244,7 @@
                 'タイプ':    'DSM詳細',
                 '参加者ID': pid,
                 '実施日時': now,
+                'Day':       day || '',
                 'trials':   JSON.stringify(testTrials)
             };
             sendPromises.push(postToGAS(detailPayload));
@@ -323,6 +325,7 @@
     var usage = "";                 // URL parameter: show usage
     var practiceChoice = null;		// whether the participant chose to complete optional practice trials
     var firstrun;                   // URL parameter: set to 'true' to run as part of practice.html's practice task (still practice — no GAS submission, continues to next practice step)
+    var day;                        // URL parameter: 本番実施時の研究日（1〜14） 池田研究室 研究1で追加
 
 	// message for optional practice trials
 	function showOptionalPractice()
@@ -614,9 +617,11 @@
                 // ── GASへデータ送信し，完了を確認してから次画面へ ──
                 sendResultsToGAS(outcomes, results).then(function()
                 {
+                    if (day) localStorage.setItem('study1_day' + day + '_dsm_done', 'true');
                     window.location.href = '../cognitive.html';
                 }).catch(function()
                 {
+                    if (day) localStorage.setItem('study1_day' + day + '_dsm_done', 'true');
                     window.location.href = '../cognitive.html';
                 });
             }
@@ -832,6 +837,9 @@
         // firstrun=true: 練習課題ページ内のテスト（あくまで練習）。GAS送信なし，完了後は次の練習ステップへ 池田研究室 研究1で追加
         firstrun = getUrlParameters("firstrun", "", true);
         if (!firstrun) firstrun = 'false';
+
+        // day: 本番実施時の研究日（1〜14）。cognitive.htmlから渡される 池田研究室 研究1で追加
+        day = getUrlParameters("day", "", true);
 
         // see if they don't want practice or optional practice
         nopractice = getUrlParameters("nopractice", "", true);
