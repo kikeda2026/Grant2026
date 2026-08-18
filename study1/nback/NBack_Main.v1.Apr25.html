@@ -288,7 +288,7 @@
     var feedback;         				// URL parameter: whether or not to show feedback
     var practiceItems = 6;				// how many letters in practice sequence
     var totalPracticeAttempts = 0;		// how many practice attempts have been completed
-    var maxPracticeAttempts = 3;		// maximum number of practice attempts before advancing
+    var maxPracticeAttempts = 10;		// maximum number of practice attempts before advancing 池田研究室 研究1で変更（元は3。累積ミス数のカウントのため，少ない値だと学習途中でテストへ進んでしまう問題があった）
     var feedbackDuration = 150;			// duration of feedback in ms (when feedback is present)
     var debug;         					// URL parameter: output to console
     var showresults;   					// URL parameter: if they want to show results in a popup window
@@ -1026,9 +1026,10 @@
                               ("<h2>説明：</h2>" +
                               "別の例を見てみましょう。<br>" +
                               "<br><span style='font-size:20pt; letter-spacing:0.3em;'>" +
-                              "<span>C</span><span>A</span><span>B</span>" +
-                              "<span style='color:#2EAA6E; font-weight:bold;'>A</span>" +
-                              "<span>D</span><span>C</span></span><br>" +
+                              "<span>B</span><span>E</span><span>C</span>" +
+                              "<span style='color:#2EAA6E; font-weight:bold;'>E</span>" +
+                              "<span>D</span>" +
+                              "<span style='color:#2EAA6E; font-weight:bold;'>E</span></span><br>" +
                               "下の緑色の文字のときに，<br>すべて" +
                               (hasTouch ? "タップして" : "スペースキーを押して") + "ください。<br>" +
                               "緑色の文字はどれも，2つ前に<br>同じ文字が表示されています。<br><br>")];
