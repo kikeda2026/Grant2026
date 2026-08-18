@@ -197,7 +197,7 @@
             'responseDevice':   outcomes.responseDevice !== undefined ? outcomes.responseDevice : '',
             'testVersion':      outcomes.testVersion !== undefined ? outcomes.testVersion : ''
         };
-        postToGAS(summaryPayload);
+        var sendPromises = [postToGAS(summaryPayload)];
 
         // ── 詳細データ送信（試行レベル JSON） ──
         if (testTrials.length > 0) {
@@ -207,8 +207,13 @@
                 '実施日時': now_str,
                 'trials':   JSON.stringify(testTrials)
             };
-            postToGAS(detailPayload);
+            sendPromises.push(postToGAS(detailPayload));
         }
+
+        // 集計・詳細の両方の送信が完了してから呼び出し元へ返す
+        // 池田研究室 研究1で改修：以前は送信を待たずに一定時間（3秒）で強制的に次画面へ遷移していたため，
+        // 回線が遅い環境（特にスマートフォン）で詳細データの送信が完了前にページ遷移し，データが失われることがあった
+        return Promise.all(sendPromises);
     }
 
     // showAlertにスペースキー対応を追加するラッパー 池田研究室 研究1で追加
@@ -237,33 +242,45 @@
     // 送信ごとに専用の使い捨てiframeを生成してPOST送信（CORS回避／複数送信の競合防止）
     // 池田研究室 研究1で改修：以前は共通のgasIframeを使い回しており，集計・詳細を連続送信すると
     // 一方の通信がキャンセルされることがあったため，送信のたびに新規iframeを作る方式に変更
+    // 2026-08-18さらに改修：Promiseを返すようにし，iframeのloadイベント（＝実際の通信完了）を
+    // 呼び出し元が待てるようにした（以前は送信中でもページ遷移で通信が打ち切られることがあった）
     function postToGAS(payload) {
-        var iframeName = 'gasIframe_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
-        var iframe = document.createElement('iframe');
-        iframe.name = iframeName;
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
+        return new Promise(function(resolve) {
+            var iframeName = 'gasIframe_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+            var iframe = document.createElement('iframe');
+            iframe.name = iframeName;
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
 
-        var form = document.createElement('form');
-        form.action  = GAS_URL;
-        form.method  = 'POST';
-        form.target  = iframeName;
-        form.style.display = 'none';
-        Object.keys(payload).forEach(function(key) {
-            var inp = document.createElement('input');
-            inp.type  = 'hidden';
-            inp.name  = key;
-            inp.value = payload[key];
-            form.appendChild(inp);
+            var settled = false;
+            function finish() {
+                if (settled) return;
+                settled = true;
+                resolve();
+                setTimeout(function() {
+                    if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+                }, 1000);
+            }
+
+            iframe.addEventListener('load', finish);
+            setTimeout(finish, 8000);
+
+            var form = document.createElement('form');
+            form.action  = GAS_URL;
+            form.method  = 'POST';
+            form.target  = iframeName;
+            form.style.display = 'none';
+            Object.keys(payload).forEach(function(key) {
+                var inp = document.createElement('input');
+                inp.type  = 'hidden';
+                inp.name  = key;
+                inp.value = payload[key];
+                form.appendChild(inp);
+            });
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
         });
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
-
-        // 送信完了を待ってからiframeを片付ける（早すぎる削除は通信を妨げるため）
-        setTimeout(function() {
-            if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-        }, 10000);
     }
 
     var item_options
@@ -926,9 +943,6 @@
             }
             else
             {
-                // ── GASへデータ送信 ── 池田研究室 研究1で改修（元はtmbSubmitToServerでTestMyBrain側へ送信していた）
-                sendResultsToGAS(outcomes, results);
-
                 showAlert("課題が完了しました。<br><br>" +
                           "ありがとうございました。<br>" +
                           "自動的に画面が切り替わります…<br><br>",
@@ -936,10 +950,15 @@
                           null,
                           '20pt');
 
-                setTimeout(function()
+                // ── GASへデータ送信し，完了を確認してから次画面へ ──
+                // 池田研究室 研究1で改修（元はtmbSubmitToServerでTestMyBrain側へ送信していた）
+                sendResultsToGAS(outcomes, results).then(function()
                 {
                     window.location.href = '../cognitive.html';
-                }, 3000);
+                }).catch(function()
+                {
+                    window.location.href = '../cognitive.html';
+                });
             }
         }
     }
