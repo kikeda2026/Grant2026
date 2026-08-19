@@ -179,6 +179,11 @@
             };
         });
 
+        // 【診断用】池田研究室 研究1で一時的に追加：送信前のtestTrials件数をコンソールに出力
+        console.log('[診断] testTrials件数:', testTrials.length);
+        console.log('[診断] testTrials先頭2件:', JSON.stringify(testTrials.slice(0, 2)));
+        console.log('[診断] resultsの生データ件数（全体）:', (results || []).length);
+
         // ── 集計データ送信 ──
         var summaryPayload = {
             'タイプ':            '2-back集計',
@@ -209,7 +214,11 @@
                 'Day':       day || '',
                 'trials':   JSON.stringify(testTrials)
             };
+            // 【診断用】池田研究室 研究1で一時的に追加：送信する文字列の長さを確認
+            console.log('[診断] 送信するtrials文字列の長さ:', detailPayload['trials'].length);
             sendPromises.push(postToGAS(detailPayload));
+        } else {
+            console.log('[診断] testTrialsが0件のため，詳細データは送信されません');
         }
 
         // 集計・詳細の両方の送信が完了してから呼び出し元へ返す
