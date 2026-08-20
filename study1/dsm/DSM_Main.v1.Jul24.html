@@ -280,7 +280,9 @@
             }
 
             iframe.addEventListener('load', finish);
-            setTimeout(finish, 8000);
+            // 池田研究室 研究1で修正：8秒では，LockServiceの待機（最大15秒）や回線の遅い
+            // スマホ環境下で本当の完了より先にタイムアウトしてしまうことがあったため25秒に延長
+            setTimeout(finish, 25000);
 
             var form = document.createElement('form');
             form.action  = GAS_URL;
