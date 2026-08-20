@@ -1341,11 +1341,15 @@
                 // 回線が遅い場合に詳細データの送信が間に合わず失われることがあった
                 sendResultsToGAS(outcomes, results).then(function()
                 {
-                    if (day) localStorage.setItem('study1_day' + day + '_gradcpt_done', 'true');
+                    // 池田研究室 研究1で修正：完了フラグに参加者IDを含めないと，同じ端末で
+                    // 別の参加者が同じDay番号を実施した際にフラグが誤って共有されてしまう
+                    var _pid = localStorage.getItem('study1_participant_id') || '';
+                    if (day) localStorage.setItem('study1_' + _pid + '_day' + day + '_gradcpt_done', 'true');
                     window.location.href = '../cognitive.html';
                 }).catch(function()
                 {
-                    if (day) localStorage.setItem('study1_day' + day + '_gradcpt_done', 'true');
+                    var _pid = localStorage.getItem('study1_participant_id') || '';
+                    if (day) localStorage.setItem('study1_' + _pid + '_day' + day + '_gradcpt_done', 'true');
                     window.location.href = '../cognitive.html';
                 });
             }
