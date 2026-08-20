@@ -451,6 +451,22 @@
 
   <div class="menu-grid">
 
+    <!-- 0. 研究目的 -->
+    <a href="purpose.html" class="menu-card accent-amber" id="link-purpose">
+      <div class="menu-card-bar"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-icon">📖</div>
+        <div class="menu-card-text">
+          <div class="menu-card-title">
+            研究目的
+            <span class="badge badge-init">初日のみ</span>
+          </div>
+          <p class="menu-card-desc">この研究の目的・内容・リスク等をご説明します。同意確認の前に，必ずお読みください（所要時間：約5分）。</p>
+        </div>
+      </div>
+      <span class="menu-card-arrow">›</span>
+    </a>
+
     <!-- 1. 同意確認 -->
     <a href="consent.html" class="menu-card accent-amber" id="link-consent">
       <div class="menu-card-bar"></div>
@@ -468,7 +484,7 @@
     </a>
 
     <!-- 2. 認知課題の練習（初回のみ） -->
-    <a href="practice.html" class="menu-card" id="link-practice">
+    <a href="practice.html" class="menu-card accent-amber" id="link-practice">
       <div class="menu-card-bar"></div>
       <div class="menu-card-body">
         <div class="menu-card-icon">🧪</div>
@@ -525,7 +541,7 @@
             夕食記録・リマインダー
             <span class="badge badge-daily">毎日実施</span>
           </div>
-          <p class="menu-card-desc">夕食を始めたらここをタップして記録してください。60分後に認知課題のリマインダーメールが届きます。</p>
+          <p class="menu-card-desc">夕食を始めたらここをタップして記録してください。80分後に認知課題のリマインダーメールが届きます。</p>
         </div>
       </div>
       <span class="menu-card-arrow">›</span>
@@ -541,7 +557,7 @@
             今日の認知課題
             <span class="badge badge-daily">毎日実施</span>
           </div>
-          <p class="menu-card-desc">注意機能（CPT）とワーキングメモリ（Nバック）の2つの課題です。毎日同じ時間帯に実施してください。所要時間：約20分。</p>
+          <p class="menu-card-desc">気分の評定と，注意機能（GradCPT）・処理速度（DSM）・ワーキングメモリ（2-back）の3課題です。毎日夕食後60〜90分以内に実施してください。所要時間：約5分。</p>
         </div>
       </div>
       <span class="menu-card-arrow">›</span>
@@ -572,6 +588,7 @@
       <thead>
         <tr>
           <th>日</th>
+          <th>夕食記録<br>（毎日）</th>
           <th>認知課題<br>（毎日）</th>
           <th>CES-D<br>（特定日）</th>
           <th>備考</th>
@@ -581,11 +598,13 @@
         <tr>
           <td class="day-col">1日目（初日）</td>
           <td><span class="dot-green">●</span></td>
+          <td><span class="dot-green">●</span></td>
           <td><span class="dot-amber">●</span></td>
           <td>同意確認・機器装着も実施</td>
         </tr>
         <tr>
           <td class="day-col">2〜6日目</td>
+          <td><span class="dot-green">●</span></td>
           <td><span class="dot-green">●</span></td>
           <td><span class="dot-gray">−</span></td>
           <td></td>
@@ -593,17 +612,20 @@
         <tr>
           <td class="day-col">7日目</td>
           <td><span class="dot-green">●</span></td>
+          <td><span class="dot-green">●</span></td>
           <td><span class="dot-amber">●</span></td>
           <td></td>
         </tr>
         <tr>
           <td class="day-col">8〜13日目</td>
           <td><span class="dot-green">●</span></td>
+          <td><span class="dot-green">●</span></td>
           <td><span class="dot-gray">−</span></td>
           <td></td>
         </tr>
         <tr>
           <td class="day-col">14日目（最終日）</td>
+          <td><span class="dot-green">●</span></td>
           <td><span class="dot-green">●</span></td>
           <td><span class="dot-amber">●</span></td>
           <td>機器返却・謝礼受け取り</td>
