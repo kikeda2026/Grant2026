@@ -957,11 +957,13 @@
                 // 池田研究室 研究1で改修（元はtmbSubmitToServerでTestMyBrain側へ送信していた）
                 sendResultsToGAS(outcomes, results).then(function()
                 {
-                    if (day) localStorage.setItem('study1_day' + day + '_nback_done', 'true');
+                    var _pid = localStorage.getItem('study1_participant_id') || '';
+                    if (day) localStorage.setItem('study1_' + _pid + '_day' + day + '_nback_done', 'true');
                     window.location.href = '../cognitive.html';
                 }).catch(function()
                 {
-                    if (day) localStorage.setItem('study1_day' + day + '_nback_done', 'true');
+                    var _pid = localStorage.getItem('study1_participant_id') || '';
+                    if (day) localStorage.setItem('study1_' + _pid + '_day' + day + '_nback_done', 'true');
                     window.location.href = '../cognitive.html';
                 });
             }
