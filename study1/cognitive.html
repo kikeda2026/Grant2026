@@ -180,25 +180,11 @@ function getCurrentDay(pid) {
     return diffDays + 1; // 初回夕食記録日を1日目とする
 }
 
-// ── 日別のlocalStorageキー ──
-function dayKey(day, suffix) {
-    return 'study1_day' + day + '_' + suffix;
-}
-
-// ── その日の3課題の提示順序（ページを開くたびにランダムに決め直す。リロード中は保持） ──
-function getTaskOrder(day) {
-    var key = dayKey(day, 'task_order');
-    var saved = sessionStorage.getItem(key);
-    if (saved) {
-        try { return JSON.parse(saved); } catch (e) {}
-    }
-    var tasks = ['gradcpt', 'dsm', 'nback'];
-    for (var i = tasks.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var tmp = tasks[i]; tasks[i] = tasks[j]; tasks[j] = tmp;
-    }
-    sessionStorage.setItem(key, JSON.stringify(tasks));
-    return tasks;
+// ── 日別のlocalStorageキー ── 池田研究室 研究1で修正：参加者IDを含めないと，
+// 同じ端末で別の参加者（またはテストID）が同じDay番号を実施した際に，完了フラグが
+// 誤って共有されてしまう不具合があったため，参加者IDをキーに含めるよう変更
+function dayKey(pid, day, suffix) {
+    return 'study1_' + pid + '_day' + day + '_' + suffix;
 }
 
 // ── その日の3課題の提示順序：保存せず，画面を表示するたびに毎回シャッフルし直す
@@ -293,11 +279,11 @@ function render() {
 
     document.getElementById('headerDay').textContent = 'Day ' + day + ' / ' + STUDY_DAYS;
 
-    var moodDone   = !!localStorage.getItem(dayKey(day, 'mood_done'));
+    var moodDone   = !!localStorage.getItem(dayKey(pid, day, 'mood_done'));
     var taskDone   = {
-        gradcpt: !!localStorage.getItem(dayKey(day, 'gradcpt_done')),
-        dsm:     !!localStorage.getItem(dayKey(day, 'dsm_done')),
-        nback:   !!localStorage.getItem(dayKey(day, 'nback_done'))
+        gradcpt: !!localStorage.getItem(dayKey(pid, day, 'gradcpt_done')),
+        dsm:     !!localStorage.getItem(dayKey(pid, day, 'dsm_done')),
+        nback:   !!localStorage.getItem(dayKey(pid, day, 'nback_done'))
     };
     var allDone = moodDone && taskDone.gradcpt && taskDone.dsm && taskDone.nback;
 
@@ -353,11 +339,11 @@ function submitMood() {
     };
 
     postToGAS(payload).then(function() {
-        localStorage.setItem(dayKey(day, 'mood_done'), 'true');
+        localStorage.setItem(dayKey(pid, day, 'mood_done'), 'true');
         document.getElementById('overlay').classList.remove('show');
         render();
     }).catch(function() {
-        localStorage.setItem(dayKey(day, 'mood_done'), 'true');
+        localStorage.setItem(dayKey(pid, day, 'mood_done'), 'true');
         document.getElementById('overlay').classList.remove('show');
         render();
     });
