@@ -617,11 +617,13 @@
                 // ── GASへデータ送信し，完了を確認してから次画面へ ──
                 sendResultsToGAS(outcomes, results).then(function()
                 {
-                    if (day) localStorage.setItem('study1_day' + day + '_dsm_done', 'true');
+                    var _pid = localStorage.getItem('study1_participant_id') || '';
+                    if (day) localStorage.setItem('study1_' + _pid + '_day' + day + '_dsm_done', 'true');
                     window.location.href = '../cognitive.html';
                 }).catch(function()
                 {
-                    if (day) localStorage.setItem('study1_day' + day + '_dsm_done', 'true');
+                    var _pid = localStorage.getItem('study1_participant_id') || '';
+                    if (day) localStorage.setItem('study1_' + _pid + '_day' + day + '_dsm_done', 'true');
                     window.location.href = '../cognitive.html';
                 });
             }
