@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>【検証用】Day切り替えツール | 研究1</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Noto Sans JP', sans-serif; max-width: 640px; margin: 0 auto; padding: 24px 20px 80px; color: #1A2340; background: #F4F6FA; line-height: 1.8; }
+  h1 { font-size: 1.2rem; margin-bottom: 0.3rem; }
+  .warn { background: #FFF3CD; border-left: 4px solid #E8973A; padding: 0.9rem 1.1rem; font-size: 0.85rem; color: #7A5000; margin: 1rem 0 1.5rem; border-radius: 2px; line-height: 1.8; }
+  .card { background: #fff; border: 1.5px solid #E2E8F0; border-radius: 4px; padding: 1.3rem 1.4rem; margin-bottom: 1.1rem; }
+  .card h2 { font-size: 0.95rem; margin-bottom: 0.8rem; }
+  label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem; }
+  input, select { width: 100%; padding: 0.6rem 0.8rem; border: 1.5px solid #E2E8F0; border-radius: 3px; font-size: 0.95rem; margin-bottom: 0.9rem; font-family: 'DM Mono', monospace; }
+  button { width: 100%; padding: 0.9rem; font-size: 0.95rem; font-weight: 700; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 0.6rem; }
+  .btn-primary { background: #2EAA6E; color: #fff; }
+  .btn-primary:hover { background: #1E7A4E; }
+  .btn-danger { background: #fff; color: #C0392B; border: 1.5px solid #C0392B; }
+  .btn-danger:hover { background: #FDEDEC; }
+  .status { font-size: 0.83rem; color: #4A5568; margin-top: 0.6rem; padding: 0.7rem 0.9rem; background: #F4F6FA; border-radius: 3px; white-space: pre-wrap; word-break: break-all; }
+  .status.ok { background: #EBF7F2; color: #1E7A4E; }
+</style>
+</head>
+<body>
+
+<h1>【検証用】Day切り替えツール</h1>
+<p style="font-size:0.85rem;color:#8A94A6;">14日分の動作を，実際に14日間待たずに確認するための開発者用ツールです。</p>
+
+<div class="warn">
+  ⚠️ このページは<strong>参加者には案内しないでください</strong>。実際の参加者データと混同しないよう，参加者IDには必ず「TEST」など，実データと明確に区別できる名前を使ってください。
+</div>
+
+<div class="card">
+  <h2>① 任意の日をシミュレートする</h2>
+  <label for="pid">参加者ID（テスト用）</label>
+  <input type="text" id="pid" value="TESTDAY">
+
+  <label for="dayNum">シミュレートしたい日（1〜14）</label>
+  <input type="number" id="dayNum" min="1" max="14" value="1">
+
+  <button class="btn-primary" onclick="simulateDay()">この日として認知課題ページを開く →</button>
+  <div class="status" id="statusBox"></div>
+</div>
+
+<div class="card">
+  <h2>② テストデータの削除</h2>
+  <p style="font-size:0.83rem;color:#4A5568;margin-bottom:0.8rem;">上記の参加者IDに関する記録（夕食記録・各課題の完了フラグ）を，このブラウザから削除します。</p>
+  <button class="btn-danger" onclick="clearTestData()">このIDのテストデータを削除する</button>
+  <div class="status" id="clearStatusBox"></div>
+</div>
+
+<div class="card">
+  <h2>③ 確認のしかた</h2>
+  <p style="font-size:0.83rem;color:#4A5568;">
+    ①のボタンを押すと，指定した日数分だけ過去の日付で「夕食記録」があったことにして，<code>cognitive.html</code>を開きます。画面上部に正しく「Day N/14」と表示されるか，3課題の刺激（GradCPTの画像・DSMの数字-シンボル対応・2-backの文字列）が，Dayごとに違う内容になっているかをご確認ください。<br><br>
+    刺激が本当に変化しているかは，スプレッドシートの各詳細タブ（GradCPT詳細・DSM詳細・2-back詳細）の「Day」列でも比較・確認できます。
+  </p>
+</div>
+
+<script>
+function getTodayKey(pid, dateObj) {
+  return `dinner_recorded_${pid}_${dateObj.toDateString()}`;
+}
+
+function simulateDay() {
+  const pid = document.getElementById('pid').value.trim();
+  const dayNum = parseInt(document.getElementById('dayNum').value, 10);
+  const statusBox = document.getElementById('statusBox');
+
+  if (!pid) {
+    statusBox.className = 'status';
+    statusBox.textContent = '参加者IDを入力してください。';
+    return;
+  }
+  if (!dayNum || dayNum < 1 || dayNum > 14) {
+    statusBox.className = 'status';
+    statusBox.textContent = '1〜14の範囲で日数を指定してください。';
+    return;
+  }
+
+  // 参加者IDを保存（cognitive.html/各課題ページが参照するため）
+  localStorage.setItem('study1_participant_id', pid);
+
+  // dayNum日目に見せかけるため，(dayNum - 1)日前の日付で夕食記録キーを作成
+  const fakeDate = new Date();
+  fakeDate.setDate(fakeDate.getDate() - (dayNum - 1));
+  const key = getTodayKey(pid, fakeDate);
+  localStorage.setItem(key, fakeDate.toLocaleString('ja-JP'));
+
+  statusBox.className = 'status ok';
+  statusBox.textContent =
+    `設定しました。\n参加者ID: ${pid}\n偽装した夕食記録日: ${fakeDate.toDateString()}\n→ 本日は Day ${dayNum} として認識されるはずです。\n\ncognitive.html を開きます…`;
+
+  setTimeout(() => {
+    window.location.href = 'cognitive.html';
+  }, 1200);
+}
+
+function clearTestData() {
+  const pid = document.getElementById('pid').value.trim();
+  const clearStatusBox = document.getElementById('clearStatusBox');
+  if (!pid) {
+    clearStatusBox.className = 'status';
+    clearStatusBox.textContent = '参加者IDを入力してください。';
+    return;
+  }
+
+  const keysToRemove = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.includes(pid)) {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach(k => localStorage.removeItem(k));
+
+  clearStatusBox.className = 'status ok';
+  clearStatusBox.textContent = `削除しました（${keysToRemove.length}件）。\n` + keysToRemove.join('\n');
+}
+</script>
+
+</body>
+</html>
