@@ -193,7 +193,10 @@
             // 通信完了（iframeへの応答読み込み完了）を検知
             iframe.addEventListener('load', finish);
             // 万一loadイベントが発火しない場合に備えたフォールバック（最大8秒待機）
-            setTimeout(finish, 8000);
+            // 万一loadイベントが発火しない場合に備えたフォールバック
+            // 池田研究室 研究1で修正：8秒では，LockServiceの待機（最大15秒）や回線の遅い
+            // スマホ環境下で本当の完了より先にタイムアウトしてしまうことがあったため25秒に延長
+            setTimeout(finish, 25000);
 
             var form = document.createElement('form');
             form.action  = GAS_URL;
