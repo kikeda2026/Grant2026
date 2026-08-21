@@ -103,8 +103,6 @@
   <p>© 2026 池田研究室 ― 尚絅学院大学 心理部門　|　倫理審査承認番号：2026-002</p>
 </footer>
 
-<iframe id="gasIframe" name="gasIframe" style="display:none;"></iframe>
-
 <script>
 const GAS_URL    = 'https://script.google.com/macros/s/AKfycby5FYl7ruaqdoQvbxhCrUxUG8IMpxYHY6cUFwASDWxwplmTA49eOV6-24hgDD0grCSV/exec';
 const ID_KEY     = 'study1_participant_id';
@@ -222,30 +220,21 @@ function recordDinner() {
   const dinnerBtnEl = document.getElementById('dinnerBtn');
   if (dinnerBtnEl) dinnerBtnEl.disabled = true;
 
-  // GASへ送信
+  // GASへ送信 池田研究室 研究1で改修：隠しiframe方式からfetch+keepalive方式に変更
+  // （ページ遷移をまたいでも送信を保証する，他ページと統一した方式）
   const payload = {
     タイプ:        '夕食記録',
     参加者ID:      pid,
     メールアドレス: email,
     夕食開始時刻:   nowStr,
   };
-  const form = document.createElement('form');
-  form.action = GAS_URL;
-  form.method = 'POST';
-  form.target = 'gasIframe';
-  form.style.display = 'none';
-  Object.entries(payload).forEach(([k, v]) => {
-    const input = document.createElement('input');
-    input.type  = 'hidden';
-    input.name  = k;
-    input.value = v;
-    form.appendChild(input);
-  });
-  document.body.appendChild(form);
+  const body = new URLSearchParams();
+  Object.entries(payload).forEach(([k, v]) => body.append(k, v));
+
+  fetch(GAS_URL, { method: 'POST', mode: 'no-cors', keepalive: true, body: body })
+    .catch(err => console.warn('GAS送信でエラーが発生しましたが，処理を継続します：', err));
 
   setTimeout(() => {
-    form.submit();
-    document.body.removeChild(form);
     document.getElementById('overlay').classList.remove('show');
     showDone(document.getElementById('mainContent'), pid, nowStr, email);
   }, 1500);
