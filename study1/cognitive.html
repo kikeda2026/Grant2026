@@ -113,21 +113,45 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycby5FYl7ruaqdoQvbxhCrUxU
 const ID_KEY  = 'study1_participant_id';
 const STUDY_DAYS = 14;
 
-// POST送信（CORS回避／ページ遷移をまたいでも送信を保証） 池田研究室 研究1で改修
-// 2026-08-21：GradCPT/DSM/2-backと同様，隠しiframe方式からfetch+keepalive方式に統一
-// （気分尺度は送信データが小さいため，データ量に応じたiframeフォールバックは不要）
+// POST送信（CORS回避／専用の使い捨てiframeを都度生成） 池田研究室 研究1で改修
+// 2026-08-21：一時fetch+keepalive方式を試したが，GradCPT/DSM/2-backにて
+// データ量の少ないケースでも送信失敗する事例が発生し，iframe方式の方が実績で
+// 勝ると判断し，こちらに一本化（GradCPT/DSM/2-backと統一）
 function postToGAS(payload) {
-    var body = new URLSearchParams();
-    Object.keys(payload).forEach(function(key) {
-        body.append(key, payload[key]);
-    });
-    return fetch(GAS_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        keepalive: true,
-        body: body
-    }).catch(function(err) {
-        console.warn('GAS送信でエラーが発生しましたが，処理を継続します：', err);
+    return new Promise(function(resolve) {
+        var iframeName = 'gasIframe_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+        var iframe = document.createElement('iframe');
+        iframe.name = iframeName;
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+
+        var settled = false;
+        function finish() {
+            if (settled) return;
+            settled = true;
+            resolve();
+            setTimeout(function() {
+                if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+            }, 1000);
+        }
+        iframe.addEventListener('load', finish);
+        setTimeout(finish, 25000);
+
+        var form = document.createElement('form');
+        form.action = GAS_URL;
+        form.method = 'POST';
+        form.target = iframeName;
+        form.style.display = 'none';
+        Object.keys(payload).forEach(function(key) {
+            var inp = document.createElement('input');
+            inp.type  = 'hidden';
+            inp.name  = key;
+            inp.value = payload[key];
+            form.appendChild(inp);
+        });
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
     });
 }
 

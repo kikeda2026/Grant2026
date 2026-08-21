@@ -220,19 +220,34 @@ function recordDinner() {
   const dinnerBtnEl = document.getElementById('dinnerBtn');
   if (dinnerBtnEl) dinnerBtnEl.disabled = true;
 
-  // GASへ送信 池田研究室 研究1で改修：隠しiframe方式からfetch+keepalive方式に変更
-  // （ページ遷移をまたいでも送信を保証する，他ページと統一した方式）
+  // GASへ送信 池田研究室 研究1で改修
+  // 2026-08-21：一時fetch+keepalive方式を試したが，GradCPT/DSM/2-backにて
+  // データ量の少ないケースでも送信失敗する事例が発生したため，実績のあるiframe方式に戻す
   const payload = {
     タイプ:        '夕食記録',
     参加者ID:      pid,
     メールアドレス: email,
     夕食開始時刻:   nowStr,
   };
-  const body = new URLSearchParams();
-  Object.entries(payload).forEach(([k, v]) => body.append(k, v));
-
-  fetch(GAS_URL, { method: 'POST', mode: 'no-cors', keepalive: true, body: body })
-    .catch(err => console.warn('GAS送信でエラーが発生しましたが，処理を継続します：', err));
+  const form = document.createElement('form');
+  form.action = GAS_URL;
+  form.method = 'POST';
+  form.target = 'gasIframeDinner_' + Date.now();
+  form.style.display = 'none';
+  const iframe = document.createElement('iframe');
+  iframe.name = form.target;
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
+  Object.entries(payload).forEach(([k, v]) => {
+    const input = document.createElement('input');
+    input.type  = 'hidden';
+    input.name  = k;
+    input.value = v;
+    form.appendChild(input);
+  });
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
 
   setTimeout(() => {
     document.getElementById('overlay').classList.remove('show');
