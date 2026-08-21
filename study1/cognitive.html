@@ -115,6 +115,7 @@ const STUDY_DAYS = 14;
 
 // POST送信（CORS回避／ページ遷移をまたいでも送信を保証） 池田研究室 研究1で改修
 // 2026-08-21：GradCPT/DSM/2-backと同様，隠しiframe方式からfetch+keepalive方式に統一
+// （気分尺度は送信データが小さいため，データ量に応じたiframeフォールバックは不要）
 function postToGAS(payload) {
     var body = new URLSearchParams();
     Object.keys(payload).forEach(function(key) {
@@ -128,6 +129,15 @@ function postToGAS(payload) {
     }).catch(function(err) {
         console.warn('GAS送信でエラーが発生しましたが，処理を継続します：', err);
     });
+}
+
+// 安全弁：どんな理由であれ処理が固まって参加者が先に進めなくなることを防ぐため，
+// 一定時間（既定30秒）で強制的に次へ進める 池田研究室 研究1で追加
+function withTimeout(promise, ms) {
+    return Promise.race([
+        promise,
+        new Promise(function(resolve) { setTimeout(resolve, ms || 30000); })
+    ]);
 }
 
 // ── 「何日目か」の判定：dinner.htmlが保存する日別キー（dinner_recorded_{ID}_{日付}）を
@@ -316,7 +326,7 @@ function submitMood() {
         'VASスコア':    score
     };
 
-    postToGAS(payload).then(function() {
+    withTimeout(postToGAS(payload), 30000).then(function() {
         localStorage.setItem(dayKey(pid, day, 'mood_done'), 'true');
         document.getElementById('overlay').classList.remove('show');
         render();
