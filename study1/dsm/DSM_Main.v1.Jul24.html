@@ -257,23 +257,79 @@
     }
 
     // POST送信（CORS回避／ページ遷移をまたいでも送信を保証） 池田研究室 研究1で改修
-    // 2026-08-21さらに改修：以前は隠しiframeを使っており，「本当に送信が終わったか」を
-    // 確認する手段がなく，ページ遷移が通信を打ち切ってしまうことがあった。
-    // fetch の keepalive オプションは，まさにこの「ページ遷移をまたいでも送信を保証する」
-    // ために標準搭載されている仕組みのため，こちらに置き換えることで根本的に解決する。
+    // 2026-08-21さらに改修：keepalive付きfetchには合計約64KBの送信量上限があり，
+    // 上限を超えると送信が失敗するだけでなく処理が固まることがあると判明したため，
+    // データ量が多い場合（DSMは高速回答で試行数が増えやすい）は上限のないiframe方式に
+    // 自動でフォールバックするよう変更
     function postToGAS(payload) {
         var body = new URLSearchParams();
         Object.keys(payload).forEach(function(key) {
             body.append(key, payload[key]);
         });
-        return fetch(GAS_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            keepalive: true,
-            body: body
-        }).catch(function(err) {
-            console.warn('GAS送信でエラーが発生しましたが，処理を継続します：', err);
+        var bodyStr = body.toString();
+
+        if (bodyStr.length < 40000) {
+            return fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                keepalive: true,
+                body: body
+            }).catch(function(err) {
+                console.warn('keepalive送信に失敗，iframe方式で再送信します：', err);
+                return postToGASViaIframe(payload);
+            });
+        } else {
+            return postToGASViaIframe(payload);
+        }
+    }
+
+    // iframe方式（送信量に上限はないが，ページ遷移で打ち切られる可能性があるため
+    // 大きいデータの時のみ使用。呼び出し元のwithTimeoutが最終的な安全弁となる）
+    function postToGASViaIframe(payload) {
+        return new Promise(function(resolve) {
+            var iframeName = 'gasIframe_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+            var iframe = document.createElement('iframe');
+            iframe.name = iframeName;
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+
+            var settled = false;
+            function finish() {
+                if (settled) return;
+                settled = true;
+                resolve();
+                setTimeout(function() {
+                    if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+                }, 1000);
+            }
+            iframe.addEventListener('load', finish);
+            setTimeout(finish, 20000);
+
+            var form = document.createElement('form');
+            form.action  = GAS_URL;
+            form.method  = 'POST';
+            form.target  = iframeName;
+            form.style.display = 'none';
+            Object.keys(payload).forEach(function(key) {
+                var inp = document.createElement('input');
+                inp.type  = 'hidden';
+                inp.name  = key;
+                inp.value = payload[key];
+                form.appendChild(inp);
+            });
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
         });
+    }
+
+    // 安全弁：どんな理由であれ処理が固まって参加者が先に進めなくなることを防ぐため，
+    // 一定時間（既定30秒）で強制的に次へ進める 池田研究室 研究1で追加
+    function withTimeout(promise, ms) {
+        return Promise.race([
+            promise,
+            new Promise(function(resolve) { setTimeout(resolve, ms || 30000); })
+        ]);
     }
 
     var testVersion;                // version identifier for this test
@@ -591,7 +647,9 @@
                           '20pt');
 
                 // ── GASへデータ送信し，完了を確認してから次画面へ ──
-                sendResultsToGAS(outcomes, results).then(function()
+                // 2026-08-21改修：withTimeoutにより，万一送信処理が固まっても
+                // 30秒で強制的に次へ進み，参加者が画面に取り残されることを防ぐ
+                withTimeout(sendResultsToGAS(outcomes, results), 30000).then(function()
                 {
                     var _pid = localStorage.getItem('study1_participant_id') || '';
                     if (day) localStorage.setItem('study1_' + _pid + '_day' + day + '_dsm_done', 'true');
