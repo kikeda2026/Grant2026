@@ -256,49 +256,23 @@
         return Promise.all(sendPromises);
     }
 
-    // 送信ごとに専用の使い捨てiframeを生成してPOST送信（CORS回避／複数送信の競合防止）
-    // 池田研究室 研究1で改修：以前は共通のgasIframeを使い回しており，集計・詳細を連続送信すると
-    // 一方の通信がキャンセルされることがあったため，送信のたびに新規iframeを作る方式に変更
-    // 2026-08-18さらに改修：Promiseを返すようにし，iframeのloadイベント（＝実際の通信完了）を
-    // 呼び出し元が待てるようにした（以前は送信中でもページ遷移で通信が打ち切られることがあった）
+    // POST送信（CORS回避／ページ遷移をまたいでも送信を保証） 池田研究室 研究1で改修
+    // 2026-08-21さらに改修：以前は隠しiframeを使っており，「本当に送信が終わったか」を
+    // 確認する手段がなく，ページ遷移が通信を打ち切ってしまうことがあった。
+    // fetch の keepalive オプションは，まさにこの「ページ遷移をまたいでも送信を保証する」
+    // ために標準搭載されている仕組みのため，こちらに置き換えることで根本的に解決する。
     function postToGAS(payload) {
-        return new Promise(function(resolve) {
-            var iframeName = 'gasIframe_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
-            var iframe = document.createElement('iframe');
-            iframe.name = iframeName;
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-
-            var settled = false;
-            function finish() {
-                if (settled) return;
-                settled = true;
-                resolve();
-                setTimeout(function() {
-                    if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-                }, 1000);
-            }
-
-            iframe.addEventListener('load', finish);
-            // 池田研究室 研究1で修正：8秒では，LockServiceの待機（最大15秒）や回線の遅い
-            // スマホ環境下で本当の完了より先にタイムアウトしてしまうことがあったため25秒に延長
-            setTimeout(finish, 25000);
-
-            var form = document.createElement('form');
-            form.action  = GAS_URL;
-            form.method  = 'POST';
-            form.target  = iframeName;
-            form.style.display = 'none';
-            Object.keys(payload).forEach(function(key) {
-                var inp = document.createElement('input');
-                inp.type  = 'hidden';
-                inp.name  = key;
-                inp.value = payload[key];
-                form.appendChild(inp);
-            });
-            document.body.appendChild(form);
-            form.submit();
-            document.body.removeChild(form);
+        var body = new URLSearchParams();
+        Object.keys(payload).forEach(function(key) {
+            body.append(key, payload[key]);
+        });
+        return fetch(GAS_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            keepalive: true,
+            body: body
+        }).catch(function(err) {
+            console.warn('GAS送信でエラーが発生しましたが，処理を継続します：', err);
         });
     }
 
