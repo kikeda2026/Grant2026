@@ -167,35 +167,12 @@
         return Promise.all(sendPromises);
     }
 
-    // POST送信（CORS回避／ページ遷移をまたいでも送信を保証） 池田研究室 研究1で改修
-    // 2026-08-21さらに改修：keepalive付きfetchには合計約64KBの送信量上限があり，
-    // 上限を超えると送信が失敗するだけでなく処理が固まることがあると判明したため，
-    // データ量が多い場合は上限のないiframe方式に自動でフォールバックするよう変更
+    // POST送信（CORS回避／専用の使い捨てiframeを都度生成） 池田研究室 研究1で改修
+    // 2026-08-21：一時fetch+keepalive方式を試したが，データ量の少ないケースでも
+    // 集計・詳細ともに送信失敗する事例が発生し，iframe方式の方が実績（特に集計は
+    // 一度も失敗していない）で勝ると判断し，こちらに一本化。呼び出し元のwithTimeoutを
+    // 安全弁として残すことで，万一の通信不調時も参加者が画面に取り残されないようにする
     function postToGAS(payload) {
-        var body = new URLSearchParams();
-        Object.keys(payload).forEach(function(key) {
-            body.append(key, payload[key]);
-        });
-        var bodyStr = body.toString();
-
-        if (bodyStr.length < 40000) {
-            return fetch(GAS_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                keepalive: true,
-                body: body
-            }).catch(function(err) {
-                console.warn('keepalive送信に失敗，iframe方式で再送信します：', err);
-                return postToGASViaIframe(payload);
-            });
-        } else {
-            return postToGASViaIframe(payload);
-        }
-    }
-
-    // iframe方式（送信量に上限はないが，ページ遷移で打ち切られる可能性があるため
-    // 大きいデータの時のみ使用。呼び出し元のwithTimeoutが最終的な安全弁となる）
-    function postToGASViaIframe(payload) {
         return new Promise(function(resolve) {
             var iframeName = 'gasIframe_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
             var iframe = document.createElement('iframe');
@@ -213,7 +190,7 @@
                 }, 1000);
             }
             iframe.addEventListener('load', finish);
-            setTimeout(finish, 20000);
+            setTimeout(finish, 25000);
 
             var form = document.createElement('form');
             form.action  = GAS_URL;
